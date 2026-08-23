@@ -92,7 +92,7 @@ const HowItWorks = () => {
             <Card key={s.n} hover className="relative flex flex-col p-6">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold tracking-widest text-muted">{s.n}</span>
-                <span className={`flex h-9 w-9 items-center justify-center rounded-xl border border-border text-primary ${s.color}`}>
+                <span className={`flex h-9 w-9 items-center justify-center rounded-lg border border-border text-primary ${s.color}`}>
                   <span className="material-symbols-outlined text-[20px]">{s.icon}</span>
                 </span>
               </div>

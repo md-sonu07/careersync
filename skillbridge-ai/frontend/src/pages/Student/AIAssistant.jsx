@@ -40,7 +40,7 @@ export default function AIAssistant() {
 
       <Card className="mt-4 flex flex-1 flex-col overflow-hidden !p-0">
         <div className="flex items-center gap-3 border-b border-border px-5 py-3 bg-sage/40">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white"><span className="material-symbols-outlined text-[20px]">smart_toy</span></div>
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white"><span className="material-symbols-outlined text-[20px]">smart_toy</span></div>
           <div>
             <p className="text-sm font-bold text-charcoal">SkillBridge AI</p>
             <p className="text-xs text-muted">Context: React • Full Stack Developer track • 82% ready</p>
