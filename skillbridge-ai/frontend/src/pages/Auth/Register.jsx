@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setCredentials } from "../../features/auth/authSlice";
+import { setCredentials, registerUser } from "../../features/auth/authSlice";
+import { profileApi } from "../../api/profile.api";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import Select from "../../components/ui/Select";
@@ -34,7 +35,7 @@ export default function Register() {
   const [skills, setSkills] = useState([]);
 
   const [studentForm, setStudentForm] = useState({ name: "", email: "", password: "", phone: "", college: "", degree: "", gradYear: "", careerGoal: "", interests: "" });
-  const [industryForm, setIndustryForm] = useState({ companyName: "", companyEmail: "", website: "", industryType: "", companySize: "", location: "", contactPerson: "", businessInfo: "" });
+  const [industryForm, setIndustryForm] = useState({ companyName: "", companyEmail: "", password: "", website: "", industryType: "", companySize: "", location: "", contactPerson: "", businessInfo: "" });
   const [academiaForm, setAcademiaForm] = useState({ name: "", email: "", password: "", college: "", department: "", designation: "", contact: "" });
 
   const addSkill = () => {
@@ -44,14 +45,11 @@ export default function Register() {
     setSkillInput("");
   };
 
-  const persistAndRedirect = async (payload, targetRole, targetRoute) => {
-    const token = `mock-token-${Date.now()}`;
-    const user = { ...payload, role: targetRole, name: payload.name || payload.companyName || payload.email.split("@")[0] };
-    try { dispatch(setCredentials({ user, token })); } catch {}
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-    localStorage.setItem("auth", JSON.stringify({ user, role: targetRole, token }));
-    if (targetRoute) setTimeout(() => navigate(targetRoute), 700);
+  const splitName = (fullName) => {
+    const parts = (fullName || "").trim().split(/\s+/);
+    const first_name = parts[0] || "User";
+    const last_name = parts.slice(1).join(" ") || "User";
+    return { first_name, last_name };
   };
 
   const validateStudent = () => {
@@ -73,6 +71,8 @@ export default function Register() {
     if (!industryForm.companyName.trim()) e.companyName = "Company name required";
     if (!industryForm.companyEmail.trim()) e.companyEmail = "Company email required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(industryForm.companyEmail)) e.companyEmail = "Invalid email";
+    if (!industryForm.password) e.password = "Password required";
+    else if (industryForm.password.length < 6) e.password = "At least 6 chars";
     if (!industryForm.industryType) e.industryType = "Industry type required";
     if (!industryForm.companySize) e.companySize = "Company size required";
     if (!industryForm.location.trim()) e.location = "Location required";
@@ -101,22 +101,98 @@ export default function Register() {
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setErrors({});
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 800));
+    setToast(null);
 
+    let registerPayload = {};
     if (activeRole === "student") {
-      await persistAndRedirect({ ...studentForm, skills, interests: studentForm.interests }, "student", "/student/dashboard");
-      setToast({ type: "success", message: "Account created! Redirecting to Student dashboard…" });
-      setLoading(false);
+      const { first_name, last_name } = splitName(studentForm.name);
+      registerPayload = {
+        email: studentForm.email,
+        first_name,
+        last_name,
+        role: "student",
+        password: studentForm.password,
+        confirm_password: studentForm.password,
+      };
     } else if (activeRole === "industry") {
-      setPending({ role: "industry", title: "Verification Pending", desc: "Your company profile is under review. Our admin team will verify your documents within 24–48 hours. You’ll be notified by email once approved." });
-      setLoading(false);
-      await persistAndRedirect({ ...industryForm, email: industryForm.companyEmail, name: industryForm.companyName }, "industry", null);
+      const { first_name, last_name } = splitName(industryForm.contactPerson || industryForm.companyName);
+      registerPayload = {
+        email: industryForm.companyEmail,
+        first_name,
+        last_name,
+        role: "industry",
+        password: industryForm.password,
+        confirm_password: industryForm.password,
+      };
     } else {
-      setPending({ role: "academia", title: "Verification Pending", desc: "Your academician profile is under review. Verification typically takes 24 hours. You’ll receive an email once approved." });
+      const { first_name, last_name } = splitName(academiaForm.name);
+      registerPayload = {
+        email: academiaForm.email,
+        first_name,
+        last_name,
+        role: "academician",
+        password: academiaForm.password,
+        confirm_password: academiaForm.password,
+      };
+    }
+
+    try {
+      const resultAction = await dispatch(registerUser(registerPayload));
+      if (registerUser.fulfilled.match(resultAction)) {
+        if (activeRole === "student") {
+          try {
+            await profileApi.updateStudentProfile({
+              phone: studentForm.phone,
+              college: studentForm.college,
+              degree: studentForm.degree,
+              graduation_year: studentForm.gradYear,
+              career_goal: studentForm.careerGoal,
+              interests: studentForm.interests,
+            });
+          } catch {
+            // Profile update fallback
+          }
+          setToast({ type: "success", message: "Account created! Redirecting to Student dashboard…" });
+          setTimeout(() => navigate("/student/dashboard"), 700);
+        } else if (activeRole === "industry") {
+          try {
+            await profileApi.updateCompanyProfile({
+              company_name: industryForm.companyName,
+              website: industryForm.website,
+              location: industryForm.location,
+              industry_type: industryForm.industryType,
+              company_size: industryForm.companySize,
+              contact_person: industryForm.contactPerson,
+              business_info: industryForm.businessInfo,
+            });
+          } catch {
+            // Profile update fallback
+          }
+          setPending({ role: "industry", title: "Verification Pending", desc: "Your company profile is under review. Our admin team will verify your documents within 24–48 hours. You’ll be notified by email once approved." });
+        } else {
+          try {
+            await profileApi.updateAcademicianProfile({
+              college: academiaForm.college,
+              department: academiaForm.department,
+              designation: academiaForm.designation,
+              contact: academiaForm.contact,
+            });
+          } catch {
+            // Profile update fallback
+          }
+          setPending({ role: "academia", title: "Verification Pending", desc: "Your academician profile is under review. Verification typically takes 24 hours. You’ll receive an email once approved." });
+        }
+      } else {
+        const errorMsg = resultAction.payload || "Registration failed. Please check your details.";
+        setToast({ type: "danger", message: errorMsg });
+      }
+    } catch (err) {
+      setToast({ type: "danger", message: err.message || "An unexpected error occurred during registration." });
+    } finally {
       setLoading(false);
-      await persistAndRedirect({ ...academiaForm, name: academiaForm.name }, "academia", null);
     }
   };
+
 
   if (pending) {
     return (
@@ -252,6 +328,14 @@ export default function Register() {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <Input label="Company name" placeholder="TechNova Pvt Ltd" required value={industryForm.companyName} onChange={(e) => setIndustryForm({ ...industryForm, companyName: e.target.value })} error={errors.companyName} />
                     <Input label="Company email" type="email" placeholder="hr@technova.com" required value={industryForm.companyEmail} onChange={(e) => setIndustryForm({ ...industryForm, companyEmail: e.target.value })} error={errors.companyEmail} />
+                  </div>
+                  <div>
+                    <label htmlFor="industry-password" className="text-sm font-medium text-charcoal">Password <span className="text-danger ml-1">*</span></label>
+                    <div className="relative mt-1.5">
+                      <Input id="industry-password" type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete="new-password" required value={industryForm.password} onChange={(e) => setIndustryForm({ ...industryForm, password: e.target.value })} error={errors.password} wrapperClassName="!gap-0" className="pr-11" />
+                      <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 grid place-items-center rounded-lg text-muted hover:text-charcoal hover:bg-background"><span className="material-symbols-outlined text-[20px]">{showPassword ? "visibility_off" : "visibility"}</span></button>
+                    </div>
+                    {errors.password && <p role="alert" className="mt-1 text-xs font-medium text-danger">{errors.password}</p>}
                   </div>
                   <div className="grid sm:grid-cols-2 gap-4">
                     <Input label="Website" placeholder="https://technova.com" value={industryForm.website} onChange={(e) => setIndustryForm({ ...industryForm, website: e.target.value })} />

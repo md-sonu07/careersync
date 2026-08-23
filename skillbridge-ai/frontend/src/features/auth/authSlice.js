@@ -1,7 +1,23 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { authApi } from '../../api/auth.api'
 
-// Async thunks - example (connect to real backend later)
+// Helper to extract clean error message from DRF error response
+const formatError = (err) => {
+  if (!err.response) return err.message || 'Network error occurred'
+  const data = err.response.data
+  if (typeof data === 'string') return data
+  if (data?.detail) return data.detail
+  if (data?.message) return data.message
+  if (typeof data === 'object') {
+    const firstKey = Object.keys(data)[0]
+    if (firstKey) {
+      const val = data[firstKey]
+      return Array.isArray(val) ? `${firstKey}: ${val.join(' ')}` : `${firstKey}: ${val}`
+    }
+  }
+  return err.message || 'An error occurred'
+}
+
 export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
@@ -9,7 +25,7 @@ export const loginUser = createAsyncThunk(
       const data = await authApi.login(credentials)
       return data
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || err.message)
+      return rejectWithValue(formatError(err))
     }
   }
 )
@@ -21,7 +37,33 @@ export const registerUser = createAsyncThunk(
       const data = await authApi.register(payload)
       return data
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || err.message)
+      return rejectWithValue(formatError(err))
+    }
+  }
+)
+
+export const fetchCurrentUser = createAsyncThunk(
+  'auth/fetchCurrentUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await authApi.getMe()
+      return data
+    } catch (err) {
+      return rejectWithValue(formatError(err))
+    }
+  }
+)
+
+export const logoutUser = createAsyncThunk(
+  'auth/logoutUser',
+  async (_, { getState }) => {
+    try {
+      const refreshToken = localStorage.getItem('refresh_token')
+      if (refreshToken) {
+        await authApi.logout(refreshToken)
+      }
+    } catch {
+      // Ignore backend logout errors if token already invalidated
     }
   }
 )
@@ -58,19 +100,27 @@ const authSlice = createSlice({
       state.user = null
       state.token = null
       state.isAuthenticated = false
+      state.error = null
       localStorage.removeItem('token')
+      localStorage.removeItem('refresh_token')
       localStorage.removeItem('user')
+      localStorage.removeItem('auth')
     },
     clearError: (state) => {
       state.error = null
     },
     setCredentials: (state, action) => {
-      const { user, token } = action.payload
+      const { user, token, refresh } = action.payload
       state.user = user
       state.token = token
       state.isAuthenticated = true
-      localStorage.setItem('token', token)
-      localStorage.setItem('user', JSON.stringify(user))
+      if (token) localStorage.setItem('token', token)
+      if (refresh) localStorage.setItem('refresh_token', refresh)
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user))
+        const normalizedRole = (user.role || 'student').toLowerCase()
+        localStorage.setItem('auth', JSON.stringify({ user, role: normalizedRole, token }))
+      }
     },
   },
   extraReducers: (builder) => {
@@ -82,11 +132,19 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false
-        state.user = action.payload.user
-        state.token = action.payload.token
+        const user = action.payload.user
+        const token = action.payload.access || action.payload.tokens?.access || action.payload.token
+        const refresh = action.payload.refresh || action.payload.tokens?.refresh
+        state.user = user
+        state.token = token
         state.isAuthenticated = true
-        localStorage.setItem('token', action.payload.token)
-        localStorage.setItem('user', JSON.stringify(action.payload.user))
+        if (token) localStorage.setItem('token', token)
+        if (refresh) localStorage.setItem('refresh_token', refresh)
+        if (user) {
+          localStorage.setItem('user', JSON.stringify(user))
+          const normalizedRole = (user.role || 'student').toLowerCase()
+          localStorage.setItem('auth', JSON.stringify({ user, role: normalizedRole, token }))
+        }
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false
@@ -99,15 +157,40 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false
-        state.user = action.payload.user
-        state.token = action.payload.token
+        const user = action.payload.user
+        const token = action.payload.access || action.payload.tokens?.access || action.payload.token
+        const refresh = action.payload.refresh || action.payload.tokens?.refresh
+        state.user = user
+        state.token = token
         state.isAuthenticated = true
-        localStorage.setItem('token', action.payload.token)
-        localStorage.setItem('user', JSON.stringify(action.payload.user))
+        if (token) localStorage.setItem('token', token)
+        if (refresh) localStorage.setItem('refresh_token', refresh)
+        if (user) {
+          localStorage.setItem('user', JSON.stringify(user))
+          const normalizedRole = (user.role || 'student').toLowerCase()
+          localStorage.setItem('auth', JSON.stringify({ user, role: normalizedRole, token }))
+        }
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.payload
+      })
+      // fetchCurrentUser
+      .addCase(fetchCurrentUser.fulfilled, (state, action) => {
+        state.user = action.payload
+        if (action.payload) {
+          localStorage.setItem('user', JSON.stringify(action.payload))
+        }
+      })
+      // logoutUser
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null
+        state.token = null
+        state.isAuthenticated = false
+        localStorage.removeItem('token')
+        localStorage.removeItem('refresh_token')
+        localStorage.removeItem('user')
+        localStorage.removeItem('auth')
       })
   },
 })
@@ -119,3 +202,4 @@ export default authSlice.reducer
 export const selectCurrentUser = (state) => state.auth.user
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated
 export const selectAuthLoading = (state) => state.auth.isLoading
+export const selectAuthError = (state) => state.auth.error

@@ -12,8 +12,9 @@ export const authApi = {
     return data
   },
 
-  logout: async () => {
-    const { data } = await apiClient.post(ENDPOINTS.AUTH.LOGOUT)
+  logout: async (refreshToken) => {
+    const refresh = refreshToken || localStorage.getItem('refresh_token')
+    const { data } = await apiClient.post(ENDPOINTS.AUTH.LOGOUT, { refresh })
     return data
   },
 
@@ -22,8 +23,10 @@ export const authApi = {
     return data
   },
 
-  refreshToken: async () => {
-    const { data } = await apiClient.post(ENDPOINTS.AUTH.REFRESH)
+  refreshToken: async (refreshToken) => {
+    const refresh = refreshToken || localStorage.getItem('refresh_token')
+    const { data } = await apiClient.post(ENDPOINTS.AUTH.REFRESH, { refresh })
     return data
   },
 }
+

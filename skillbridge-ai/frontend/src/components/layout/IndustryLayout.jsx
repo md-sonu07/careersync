@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { NavLink, useLocation, Outlet } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate, Outlet } from 'react-router-dom'
 import Drawer from '../ui/Drawer'
+import { useAuth } from '../../hooks/useAuth'
 
 const navSections = [
   { label: 'Overview', items: [{ label: 'Dashboard', icon: 'dashboard', path: '/industry' }] },
@@ -57,7 +58,19 @@ function NavItem({ item, active, onClick }) {
 
 function SidebarContent({ onNavigate }) {
   const { pathname } = useLocation()
+  const navigate = useNavigate()
+  const { user, logout } = useAuth()
   const isActive = (p) => pathname === p || (p !== '/industry' && pathname.startsWith(p))
+
+  const companyName = user?.company_name || user?.full_name || (user?.first_name ? `${user.first_name} ${user.last_name}` : 'TechNova')
+  const email = user?.email || 'hr@technova.com'
+
+  const handleLogout = async () => {
+    await logout()
+    if (onNavigate) onNavigate()
+    navigate('/login')
+  }
+
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-3 px-5 py-5 border-b border-border">
@@ -82,20 +95,28 @@ function SidebarContent({ onNavigate }) {
           </div>
         ))}
       </div>
-      <div className="border-t border-border p-3">
+      <div className="border-t border-border p-3 space-y-2">
         <div className="flex items-center gap-3 rounded-2xl bg-background border border-border p-3">
           <div className="relative shrink-0">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white font-bold text-sm border border-border">TN</div>
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white font-bold text-sm border border-border">
+              {companyName.slice(0, 2).toUpperCase()}
+            </div>
             <span className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-success text-white text-[10px] border-2 border-white">✓</span>
           </div>
           <div className="min-w-0 flex-1">
             <p className="flex items-center gap-1 text-sm font-semibold text-charcoal truncate">
-              TechNova <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-success text-white text-[8px]">✓</span>
+              {companyName} <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-success text-white text-[8px]">✓</span>
             </p>
-            <p className="text-xs text-muted truncate">Verified • Technology</p>
+            <p className="text-xs text-muted truncate">{email}</p>
           </div>
         </div>
-        <p className="mt-2 text-center text-[11px] text-muted">© 2026 SkillBridge AI</p>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 rounded-xl border border-border bg-white py-2 text-xs font-semibold text-danger hover:bg-danger/5 transition-colors"
+        >
+          <span className="material-symbols-outlined text-[16px]">logout</span> Log out
+        </button>
+        <p className="text-center text-[11px] text-muted">© 2026 SkillBridge AI</p>
       </div>
     </div>
   )
@@ -103,6 +124,15 @@ function SidebarContent({ onNavigate }) {
 
 export default function IndustryLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const navigate = useNavigate()
+  const { user, logout } = useAuth()
+  const companyName = user?.company_name || user?.full_name || 'TechNova'
+
+  const handleLogout = async () => {
+    await logout()
+    navigate('/login')
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-white px-4 lg:hidden">
@@ -111,9 +141,11 @@ export default function IndustryLayout() {
         </button>
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white font-bold text-xs">SB</div>
-          <span className="text-sm font-bold text-primary">SkillBridge AI</span>
+          <span className="text-sm font-bold text-primary truncate max-w-[130px]">{companyName}</span>
         </div>
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white font-bold text-xs border border-border">TN</div>
+        <button onClick={handleLogout} className="p-2 rounded-xl border border-border text-danger hover:bg-danger/5">
+          <span className="material-symbols-outlined text-[20px]">logout</span>
+        </button>
       </header>
       <div className="flex">
         <aside className="hidden lg:flex lg:w-[240px] lg:shrink-0 lg:flex-col lg:border-r lg:border-border lg:bg-white lg:sticky lg:top-0 lg:h-screen lg:overflow-hidden">

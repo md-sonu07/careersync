@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setCredentials } from "../../features/auth/authSlice";
+import { setCredentials, loginUser } from "../../features/auth/authSlice";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import Select from "../../components/ui/Select";
@@ -11,6 +11,7 @@ const ROLE_ROUTES = {
   industry: "/industry/dashboard",
   academia: "/academia/dashboard",
   academician: "/academia/dashboard",
+  admin: "/admin/dashboard",
 };
 
 export default function Login() {
@@ -55,41 +56,40 @@ export default function Login() {
     setLoading(true);
     setToast(null);
 
-    // Mock async — simulate API
-    await new Promise((r) => setTimeout(r, 700));
-
-    const mockRole = "student"; // Hardcoded mock since role check is auto
-    const mockToken = `mock-token-${Date.now()}`;
-    const user = {
-      email: form.email,
-      role: mockRole,
-      name: form.email.split("@")[0],
-    };
-
-    // Persist mock auth — both slice + raw localStorage for compatibility
     try {
-      dispatch(setCredentials({ user, token: mockToken }));
-    } catch {
-      // fallback if store not wired yet
+      const cleanEmail = form.email.trim().toLowerCase();
+      const resultAction = await dispatch(loginUser({ email: cleanEmail, password: form.password }));
+      if (loginUser.fulfilled.match(resultAction)) {
+        const payload = resultAction.payload;
+        const user = payload.user;
+        const userRole = (user?.role || "student").toLowerCase();
+
+        if (form.rememberMe) localStorage.setItem("rememberMe", "true");
+
+        setToast({
+          type: "success",
+          message: `Welcome back${user?.first_name ? `, ${user.first_name}` : ""}! Redirecting...`,
+        });
+
+        const target = ROLE_ROUTES[userRole] || ROLE_ROUTES.student;
+        setTimeout(() => navigate(target), 600);
+      } else {
+        const errorMsg = resultAction.payload || "Login failed. Please check your credentials.";
+        setToast({
+          type: "danger",
+          message: errorMsg,
+        });
+      }
+    } catch (err) {
+      setToast({
+        type: "danger",
+        message: err.message || "An unexpected error occurred during sign in.",
+      });
+    } finally {
+      setLoading(false);
     }
-    localStorage.setItem("token", mockToken);
-    localStorage.setItem("user", JSON.stringify(user));
-    // Unified shape as requested: {user, role, token}
-    localStorage.setItem(
-      "auth",
-      JSON.stringify({ user, role: mockRole, token: mockToken })
-    );
-    if (form.rememberMe) localStorage.setItem("rememberMe", "true");
-
-    setToast({
-      type: "success",
-      message: `Welcome back! Redirecting...`,
-    });
-
-    const target = ROLE_ROUTES[mockRole] || "/dashboard";
-    setTimeout(() => navigate(target), 600);
-    setLoading(false);
   };
+
 
   const handleGooglePlaceholder = () => {
     setToast({

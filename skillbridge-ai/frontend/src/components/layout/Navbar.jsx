@@ -16,9 +16,10 @@ const Navbar = () => {
   }, [])
 
   const [mobileOpen, setMobileOpen] = useState(false)
-  const handleLogout = () => {
-    logout()
-    navigate('/')
+  const handleLogout = async () => {
+    await logout()
+    setMobileOpen(false)
+    navigate('/login')
   }
 
   return (
@@ -69,12 +70,12 @@ const Navbar = () => {
         <div className="hidden sm:flex items-center gap-3">
           {isAuthenticated ? (
             <>
-              <Link to="/dashboard" className="hidden md:inline text-sm font-medium text-charcoal hover:text-primary">
+              <Link to="/student/dashboard" className="hidden md:inline text-sm font-medium text-charcoal hover:text-primary">
                 Dashboard
               </Link>
-              <span className="hidden md:inline text-sm text-charcoal/60">{user?.name || user?.email}</span>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                Log out
+              <span className="hidden md:inline text-sm text-charcoal/60 truncate max-w-[150px]">{user?.full_name || user?.name || user?.email}</span>
+              <Button variant="outline" size="sm" onClick={handleLogout} className="gap-1">
+                <span className="material-symbols-outlined text-[18px]">logout</span> Log out
               </Button>
             </>
           ) : (
@@ -111,12 +112,20 @@ const Navbar = () => {
             </Link>
           ))}
           <hr className="my-2 border-border" />
-          <Link to="/login" onClick={() => setMobileOpen(false)} className="px-3 py-2.5 rounded-xl text-sm font-medium bg-primary text-white text-center">
-            Log In
-          </Link>
-          <Link to="/register" onClick={() => setMobileOpen(false)} className="px-3 py-2.5 rounded-xl text-sm font-medium border border-border text-center">
-            Get Started
-          </Link>
+          {isAuthenticated ? (
+            <button onClick={handleLogout} className="px-3 py-2.5 rounded-xl text-sm font-medium bg-danger/10 text-danger text-center flex items-center justify-center gap-2">
+              <span className="material-symbols-outlined text-[18px]">logout</span> Log out
+            </button>
+          ) : (
+            <>
+              <Link to="/login" onClick={() => setMobileOpen(false)} className="px-3 py-2.5 rounded-xl text-sm font-medium bg-primary text-white text-center">
+                Log In
+              </Link>
+              <Link to="/register" onClick={() => setMobileOpen(false)} className="px-3 py-2.5 rounded-xl text-sm font-medium border border-border text-center">
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
       </Drawer>
     </>

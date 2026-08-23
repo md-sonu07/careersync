@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { NavLink, useLocation, Outlet } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate, Outlet } from 'react-router-dom'
 import Drawer from '../ui/Drawer'
+import { useAuth } from '../../hooks/useAuth'
 
 const navSections = [
   { label: 'Overview', items: [{ label: 'Dashboard', icon: 'dashboard', path: '/admin' }] },
@@ -89,7 +90,19 @@ function NavItem({ item, active, onClick }) {
 
 function SidebarContent({ onNavigate }) {
   const { pathname } = useLocation()
+  const navigate = useNavigate()
+  const { user, logout } = useAuth()
   const isActive = (p) => pathname === p || (p !== '/admin' && pathname.startsWith(p))
+
+  const displayName = user?.full_name || (user?.first_name ? `${user.first_name} ${user.last_name}` : 'Super Admin')
+  const email = user?.email || 'admin@skillbridge.ai'
+
+  const handleLogout = async () => {
+    await logout()
+    if (onNavigate) onNavigate()
+    navigate('/login')
+  }
+
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-3 px-5 py-5 border-b border-white/10">
@@ -114,16 +127,23 @@ function SidebarContent({ onNavigate }) {
           </div>
         ))}
       </div>
-      <div className="border-t border-white/10 p-3">
+      <div className="border-t border-white/10 p-3 space-y-2">
         <div className="flex items-center gap-3 rounded-2xl bg-white/10 border border-white/10 p-3">
-          <img src="https://i.pravatar.cc/150?img=15" alt="Admin" className="h-9 w-9 rounded-full object-cover border border-white/20 shrink-0" />
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-white truncate">Super Admin</p>
-            <p className="text-xs text-slate-400 truncate">admin@skillbridge.ai</p>
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500 text-white font-bold text-sm shrink-0">
+            {displayName.slice(0, 2).toUpperCase()}
           </div>
-          <span className="h-2 w-2 rounded-full bg-emerald-400 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-white truncate">{displayName}</p>
+            <p className="text-xs text-slate-400 truncate">{email}</p>
+          </div>
         </div>
-        <p className="mt-2 text-center text-[11px] text-slate-500">© 2026 SkillBridge AI</p>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 py-2 text-xs font-semibold text-rose-400 hover:bg-rose-500/10 transition-colors"
+        >
+          <span className="material-symbols-outlined text-[16px]">logout</span> Log out
+        </button>
+        <p className="text-center text-[11px] text-slate-500">© 2026 SkillBridge AI</p>
       </div>
     </div>
   )
@@ -131,6 +151,15 @@ function SidebarContent({ onNavigate }) {
 
 export default function AdminLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const navigate = useNavigate()
+  const { user, logout } = useAuth()
+  const displayName = user?.full_name || 'Super Admin'
+
+  const handleLogout = async () => {
+    await logout()
+    navigate('/login')
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-slate-800 bg-slate-900 px-4 lg:hidden">
@@ -139,9 +168,11 @@ export default function AdminLayout() {
         </button>
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-slate-900 font-bold text-xs">SB</div>
-          <span className="text-sm font-bold text-white">SkillBridge AI</span>
+          <span className="text-sm font-bold text-white truncate max-w-[130px]">{displayName}</span>
         </div>
-        <img src="https://i.pravatar.cc/150?img=15" alt="" className="h-8 w-8 rounded-full border border-white/20" />
+        <button onClick={handleLogout} className="p-2 rounded-xl border border-white/20 text-rose-400 hover:bg-rose-500/10">
+          <span className="material-symbols-outlined text-[20px]">logout</span>
+        </button>
       </header>
       <div className="flex">
         <aside className="hidden lg:flex lg:w-[240px] lg:shrink-0 lg:flex-col lg:bg-slate-900 lg:sticky lg:top-0 lg:h-screen lg:overflow-hidden">

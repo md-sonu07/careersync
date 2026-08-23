@@ -1,20 +1,53 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import Card from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
 import Button from '../../components/ui/Button'
 import FileUpload from '../../components/ui/FileUpload'
 import { ProgressBar } from '../../components/ui/Progress'
 import PageHeader from '../../components/common/PageHeader'
+import { selectCurrentUser } from '../../features/auth/authSlice'
+import { profileApi } from '../../api/profile.api'
 import { mockUser, mockSkills, mockProjects, mockCertificates } from '../../utils/mockData'
 
 export default function Profile() {
+  const currentUser = useSelector(selectCurrentUser)
   const [resumeUploaded, setResumeUploaded] = useState(false)
+  const [studentProfile, setStudentProfile] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    let isMounted = true
+    const loadProfile = async () => {
+      try {
+        setLoading(true)
+        const data = await profileApi.getStudentProfile()
+        if (isMounted && data) {
+          setStudentProfile(data)
+        }
+      } catch {
+        // Fallback to initial mock defaults if API error or profile not created yet
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+    loadProfile()
+    return () => { isMounted = false }
+  }, [])
+
+  const name = currentUser?.full_name || (currentUser?.first_name ? `${currentUser.first_name} ${currentUser.last_name}` : mockUser.name)
+  const email = currentUser?.email || mockUser.email
+  const phone = studentProfile?.phone || mockUser.phone
+  const college = studentProfile?.college || mockUser.college
+  const degree = studentProfile?.degree || 'B.Tech Computer Science'
+  const careerGoal = studentProfile?.career_goal || mockUser.careerGoal
+  const gradYear = studentProfile?.graduation_year || '2027'
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="My Profile"
-        subtitle="Manage your personal, education and career info — 87% complete. Add more to boost visibility to recruiters."
+        subtitle="Manage your personal, education and career info — connected to SkillBridge AI backend."
         actions={<Button variant="outline">Edit Profile</Button>}
       />
 
@@ -25,7 +58,7 @@ export default function Profile() {
             <p className="text-sm font-bold text-charcoal">Profile Completion — 87%</p>
             <p className="text-xs text-muted">Add resume + 1 more project to reach 100%</p>
           </div>
-          <span className="rounded-full bg-success/10 px-3 py-1 text-xs font-bold text-success">ALMOST THERE</span>
+          <span className="rounded-full bg-success/10 px-3 py-1 text-xs font-bold text-success">CONNECTED</span>
         </div>
         <ProgressBar value={87} size="sm" className="mt-3" barClassName="bg-success" showLabel />
       </Card>
@@ -34,18 +67,18 @@ export default function Profile() {
         {/* Left column */}
         <div className="space-y-6">
           <Card className="text-center">
-            <img src={mockUser.avatar} alt={mockUser.name} className="mx-auto h-24 w-24 rounded-full border-4 border-sage object-cover" />
-            <h3 className="mt-4 text-lg font-bold text-charcoal">{mockUser.name}</h3>
-            <p className="text-sm text-muted">{mockUser.branch}</p>
-            <p className="text-xs text-muted">{mockUser.college}</p>
+            <img src={mockUser.avatar} alt={name} className="mx-auto h-24 w-24 rounded-full border-4 border-sage object-cover" />
+            <h3 className="mt-4 text-lg font-bold text-charcoal">{name}</h3>
+            <p className="text-sm text-muted">{degree}</p>
+            <p className="text-xs text-muted">{college}</p>
             <div className="mt-3 flex justify-center gap-2">
-              <Badge variant="default">{mockUser.careerGoal}</Badge>
+              <Badge variant="default">{careerGoal}</Badge>
               <Badge variant="muted">{mockUser.location}</Badge>
             </div>
             <p className="mt-4 text-sm leading-relaxed text-muted">{mockUser.bio}</p>
             <div className="mt-4 space-y-2 text-sm text-left">
-              <div className="flex justify-between rounded-xl bg-background border border-border px-3 py-2"><span className="text-muted">Email</span><span className="font-medium text-charcoal text-xs sm:text-sm truncate ml-2">{mockUser.email}</span></div>
-              <div className="flex justify-between rounded-xl bg-background border border-border px-3 py-2"><span className="text-muted">Phone</span><span className="font-medium text-charcoal">{mockUser.phone}</span></div>
+              <div className="flex justify-between rounded-xl bg-background border border-border px-3 py-2"><span className="text-muted">Email</span><span className="font-medium text-charcoal text-xs sm:text-sm truncate ml-2">{email}</span></div>
+              <div className="flex justify-between rounded-xl bg-background border border-border px-3 py-2"><span className="text-muted">Phone</span><span className="font-medium text-charcoal">{phone}</span></div>
               <div className="flex justify-between rounded-xl bg-background border border-border px-3 py-2"><span className="text-muted">Streak</span><span className="font-bold text-primary">{mockUser.streak} days 🔥</span></div>
             </div>
             <div className="mt-4 flex gap-2">
@@ -77,9 +110,9 @@ export default function Profile() {
           <Card>
             <h3 className="font-bold text-charcoal">Personal Information</h3>
             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="rounded-xl bg-background border border-border px-4 py-3"><p className="text-xs uppercase tracking-wider font-semibold text-muted">Full Name</p><p className="text-sm font-semibold text-charcoal mt-1">{mockUser.name}</p></div>
-              <div className="rounded-xl bg-background border border-border px-4 py-3"><p className="text-xs uppercase tracking-wider font-semibold text-muted">Email</p><p className="text-sm font-semibold text-charcoal mt-1">{mockUser.email}</p></div>
-              <div className="rounded-xl bg-background border border-border px-4 py-3"><p className="text-xs uppercase tracking-wider font-semibold text-muted">Phone</p><p className="text-sm font-semibold text-charcoal mt-1">{mockUser.phone}</p></div>
+              <div className="rounded-xl bg-background border border-border px-4 py-3"><p className="text-xs uppercase tracking-wider font-semibold text-muted">Full Name</p><p className="text-sm font-semibold text-charcoal mt-1">{name}</p></div>
+              <div className="rounded-xl bg-background border border-border px-4 py-3"><p className="text-xs uppercase tracking-wider font-semibold text-muted">Email</p><p className="text-sm font-semibold text-charcoal mt-1">{email}</p></div>
+              <div className="rounded-xl bg-background border border-border px-4 py-3"><p className="text-xs uppercase tracking-wider font-semibold text-muted">Phone</p><p className="text-sm font-semibold text-charcoal mt-1">{phone}</p></div>
               <div className="rounded-xl bg-background border border-border px-4 py-3"><p className="text-xs uppercase tracking-wider font-semibold text-muted">Location</p><p className="text-sm font-semibold text-charcoal mt-1">{mockUser.location}</p></div>
               <div className="rounded-xl bg-background border border-border px-4 py-3 sm:col-span-2"><p className="text-xs uppercase tracking-wider font-semibold text-muted">Bio</p><p className="text-sm text-charcoal mt-1 leading-relaxed">{mockUser.bio}</p></div>
             </div>
@@ -88,13 +121,13 @@ export default function Profile() {
           <Card>
             <h3 className="font-bold text-charcoal">Education</h3>
             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <div className="rounded-xl bg-background border border-border px-4 py-3"><p className="text-xs font-semibold uppercase tracking-wider text-muted">College</p><p className="text-sm font-semibold text-charcoal mt-1">{mockUser.college}</p></div>
-              <div className="rounded-xl bg-background border border-border px-4 py-3"><p className="text-xs font-semibold uppercase tracking-wider text-muted">Degree</p><p className="text-sm font-semibold text-charcoal mt-1">B.Tech Computer Science</p></div>
-              <div className="rounded-xl bg-background border border-border px-4 py-3"><p className="text-xs font-semibold uppercase tracking-wider text-muted">Semester</p><p className="text-sm font-semibold text-charcoal mt-1">6th Semester — 3rd Year</p></div>
+              <div className="rounded-xl bg-background border border-border px-4 py-3"><p className="text-xs font-semibold uppercase tracking-wider text-muted">College</p><p className="text-sm font-semibold text-charcoal mt-1">{college}</p></div>
+              <div className="rounded-xl bg-background border border-border px-4 py-3"><p className="text-xs font-semibold uppercase tracking-wider text-muted">Degree</p><p className="text-sm font-semibold text-charcoal mt-1">{degree}</p></div>
+              <div className="rounded-xl bg-background border border-border px-4 py-3"><p className="text-xs font-semibold uppercase tracking-wider text-muted">Graduation Year</p><p className="text-sm font-semibold text-charcoal mt-1">{gradYear}</p></div>
             </div>
             <div className="mt-3 rounded-xl bg-sage border border-sage p-3 flex items-center gap-3">
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white border border-border text-primary"><span className="material-symbols-outlined text-[18px]">school</span></span>
-              <div><p className="text-sm font-semibold text-charcoal">CGPA 8.4 / 10</p><p className="text-xs text-muted">Expected graduation 2027</p></div>
+              <div><p className="text-sm font-semibold text-charcoal">CGPA 8.4 / 10</p><p className="text-xs text-muted">Expected graduation {gradYear}</p></div>
             </div>
           </Card>
 
@@ -103,7 +136,7 @@ export default function Profile() {
             <div className="mt-4 rounded-2xl bg-sage border border-sage p-4 flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-white shrink-0"><span className="material-symbols-outlined">flag</span></div>
               <div>
-                <p className="font-bold text-charcoal">Full Stack Developer</p>
+                <p className="font-bold text-charcoal">{careerGoal}</p>
                 <p className="text-sm text-charcoal/70">82% readiness — target 85% for top internship matches</p>
               </div>
               <Badge variant="success" className="ml-auto hidden sm:inline-flex">ON TRACK</Badge>
