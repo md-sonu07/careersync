@@ -85,7 +85,7 @@ npm run build        # 174 modules, 737kb (gzip 191kb)
 npm run test:run     # 2 tests passed
 ```
 
-Env: copy `.env.example` → `.env` → `VITE_API_BASE_URL=http://localhost:5000/api`
+Env: copy `.env.example` → `.env` → `VITE_API_BASE_URL=http://127.0.0.1:8000/api`
 
 ---
 
