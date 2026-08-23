@@ -55,10 +55,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         ]
 
     def validate_role(self, value):
+        val = str(value).lower()
         allowed_roles = [UserRole.STUDENT, UserRole.INDUSTRY, UserRole.ACADEMICIAN]
-        if value not in allowed_roles:
+        if val not in allowed_roles:
             raise serializers.ValidationError("Invalid role for self-registration.")
-        return value
+        return val
+
 
     def validate_email(self, value):
         normalized_email = value.lower()
@@ -83,6 +85,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     Custom JWT Token Serializer that returns user profile info along with access & refresh tokens.
     """
     def validate(self, attrs):
+        username_field = self.username_field
+        if username_field in attrs and isinstance(attrs[username_field], str):
+            attrs[username_field] = attrs[username_field].strip().lower()
         data = super().validate(attrs)
         data['user'] = UserResponseSerializer(self.user).data
         return data
+

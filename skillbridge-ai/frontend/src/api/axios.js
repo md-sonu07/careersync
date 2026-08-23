@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api',
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
@@ -29,9 +29,10 @@ apiClient.interceptors.response.use(
     if (status === 401) {
       // Auto logout on 401 - token expired/invalid
       localStorage.removeItem('token')
+      localStorage.removeItem('refresh_token')
       localStorage.removeItem('user')
-      // Optional: redirect to login
-      if (window.location.pathname !== '/login') {
+      localStorage.removeItem('auth')
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
         window.location.href = '/login'
       }
     }

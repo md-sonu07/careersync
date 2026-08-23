@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { selectCurrentUser, selectIsAuthenticated, selectAuthLoading, logout } from '../features/auth/authSlice'
+import { selectCurrentUser, selectIsAuthenticated, selectAuthLoading, logoutUser, logout as logoutSync } from '../features/auth/authSlice'
 
 export const useAuth = () => {
   const dispatch = useDispatch()
@@ -7,7 +7,13 @@ export const useAuth = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated)
   const isLoading = useSelector(selectAuthLoading)
 
-  const handleLogout = () => dispatch(logout())
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutUser()).unwrap()
+    } catch {
+      dispatch(logoutSync())
+    }
+  }
 
   return { user, isAuthenticated, isLoading, logout: handleLogout }
 }

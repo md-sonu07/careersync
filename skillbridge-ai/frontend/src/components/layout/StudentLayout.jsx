@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { NavLink, useLocation, Outlet } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate, Outlet } from 'react-router-dom'
 import Drawer from '../ui/Drawer'
+import { useAuth } from '../../hooks/useAuth'
 import { mockUser } from '../../utils/mockData'
 
 const navSections = [
@@ -82,7 +83,19 @@ function NavItem({ item, active, onClick }) {
 
 function SidebarContent({ onNavigate }) {
   const { pathname } = useLocation()
+  const navigate = useNavigate()
+  const { user, logout } = useAuth()
   const isActive = (p) => pathname === p || (p !== '/student' && pathname.startsWith(p))
+
+  const displayName = user?.full_name || (user?.first_name ? `${user.first_name} ${user.last_name}` : mockUser.name)
+  const displayEmail = user?.email || mockUser.branch
+
+  const handleLogout = async () => {
+    await logout()
+    if (onNavigate) onNavigate()
+    navigate('/login')
+  }
+
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-3 px-5 py-5 border-b border-border">
@@ -107,19 +120,21 @@ function SidebarContent({ onNavigate }) {
           </div>
         ))}
       </div>
-      <div className="border-t border-border p-3">
+      <div className="border-t border-border p-3 space-y-2">
         <div className="flex items-center gap-3 rounded-2xl bg-background border border-border p-3">
-          <img src={mockUser.avatar} alt={mockUser.name} className="h-9 w-9 rounded-full object-cover border border-border" />
+          <img src={mockUser.avatar} alt={displayName} className="h-9 w-9 rounded-full object-cover border border-border shrink-0" />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-charcoal truncate">{mockUser.name}</p>
-            <p className="text-xs text-muted truncate">{mockUser.branch}</p>
+            <p className="text-sm font-semibold text-charcoal truncate">{displayName}</p>
+            <p className="text-xs text-muted truncate">{displayEmail}</p>
           </div>
-          <span className="inline-flex items-center gap-1 rounded-full bg-white border border-border px-2 py-1 text-xs font-bold text-primary shadow-soft">
-            <span className="material-symbols-outlined text-[16px] text-orange-500">local_fire_department</span>
-            {mockUser.streak}
-          </span>
         </div>
-        <p className="mt-2 text-center text-[11px] text-muted">© 2026 SkillBridge AI</p>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 rounded-xl border border-border bg-white py-2 text-xs font-semibold text-danger hover:bg-danger/5 transition-colors"
+        >
+          <span className="material-symbols-outlined text-[16px]">logout</span> Log out
+        </button>
+        <p className="text-center text-[11px] text-muted">© 2026 SkillBridge AI</p>
       </div>
     </div>
   )
@@ -127,6 +142,15 @@ function SidebarContent({ onNavigate }) {
 
 export default function StudentLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const navigate = useNavigate()
+  const { user, logout } = useAuth()
+  const displayName = user?.full_name || (user?.first_name ? `${user.first_name} ${user.last_name}` : mockUser.name)
+
+  const handleLogout = async () => {
+    await logout()
+    navigate('/login')
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-white px-4 lg:hidden">
@@ -135,15 +159,11 @@ export default function StudentLayout() {
         </button>
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white font-bold text-xs">SB</div>
-          <span className="text-sm font-bold text-primary">SkillBridge AI</span>
+          <span className="text-sm font-bold text-primary truncate max-w-[120px]">{displayName}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1 rounded-full bg-sage px-2 py-1 text-xs font-bold text-primary">
-            <span className="material-symbols-outlined text-[14px] text-orange-500">local_fire_department</span>
-            {mockUser.streak}
-          </span>
-          <img src={mockUser.avatar} alt="" className="h-8 w-8 rounded-full border border-border" />
-        </div>
+        <button onClick={handleLogout} className="p-2 rounded-xl border border-border text-danger hover:bg-danger/5">
+          <span className="material-symbols-outlined text-[20px]">logout</span>
+        </button>
       </header>
       <div className="flex">
         <aside className="hidden lg:flex lg:w-[240px] lg:shrink-0 lg:flex-col lg:border-r lg:border-border lg:bg-white lg:sticky lg:top-0 lg:h-screen lg:overflow-hidden">
