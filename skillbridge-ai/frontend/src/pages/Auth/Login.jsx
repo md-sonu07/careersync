@@ -1,55 +1,408 @@
-import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { loginUser, selectAuthLoading } from '../../features/auth/authSlice'
-import { useNavigate, Link } from 'react-router-dom'
-import Button from '../../components/ui/Button'
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "../../features/auth/authSlice";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Select from "../../components/ui/Select";
 
-const Login = () => {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const isLoading = useSelector(selectAuthLoading)
-  const [form, setForm] = useState({ email: '', password: '' })
+const ROLE_ROUTES = {
+  student: "/student/dashboard",
+  industry: "/industry/dashboard",
+  academia: "/academia/dashboard",
+  academician: "/academia/dashboard",
+};
+
+export default function Login() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    rememberMe: false,
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [toast, setToast] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const validate = () => {
+    const e = {};
+    if (!form.email.trim()) e.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+      e.email = "Enter a valid email address";
+    if (!form.password) e.password = "Password is required";
+    else if (form.password.length < 6)
+      e.password = "Password must be at least 6 characters";
+    return e;
+  };
+
+  const handleChange = (field) => (e) => {
+    const value =
+      e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    setForm((p) => ({ ...p, [field]: value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    const result = await dispatch(loginUser(form))
-    if (loginUser.fulfilled.match(result)) {
-      navigate('/dashboard')
+    e.preventDefault();
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length) {
+      setErrors(validationErrors);
+      return;
     }
-  }
+    setLoading(true);
+    setToast(null);
+
+    // Mock async — simulate API
+    await new Promise((r) => setTimeout(r, 700));
+
+    const mockRole = "student"; // Hardcoded mock since role check is auto
+    const mockToken = `mock-token-${Date.now()}`;
+    const user = {
+      email: form.email,
+      role: mockRole,
+      name: form.email.split("@")[0],
+    };
+
+    // Persist mock auth — both slice + raw localStorage for compatibility
+    try {
+      dispatch(setCredentials({ user, token: mockToken }));
+    } catch {
+      // fallback if store not wired yet
+    }
+    localStorage.setItem("token", mockToken);
+    localStorage.setItem("user", JSON.stringify(user));
+    // Unified shape as requested: {user, role, token}
+    localStorage.setItem(
+      "auth",
+      JSON.stringify({ user, role: mockRole, token: mockToken })
+    );
+    if (form.rememberMe) localStorage.setItem("rememberMe", "true");
+
+    setToast({
+      type: "success",
+      message: `Welcome back! Redirecting...`,
+    });
+
+    const target = ROLE_ROUTES[mockRole] || "/dashboard";
+    setTimeout(() => navigate(target), 600);
+    setLoading(false);
+  };
+
+  const handleGooglePlaceholder = () => {
+    setToast({
+      type: "info",
+      message: "Google sign-in is coming soon. Please use email login.",
+    });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   return (
-    <div className="max-w-md mx-auto mt-10 border rounded-xl p-8 space-y-6">
-      <h2 className="text-2xl font-bold">Welcome back</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full border rounded-md px-3 py-2"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-          required
+    <div className="min-h-screen bg-background flex flex-col lg:flex-row">
+      {/* Left — Branding / Testimonial */}
+      <div className="relative hidden lg:flex lg:w-[52%] bg-primary text-white flex-col justify-between overflow-hidden">
+        {/* subtle pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.07]"
+          aria-hidden
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+            backgroundSize: "28px 28px",
+          }}
         />
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full border rounded-md px-3 py-2"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-          required
-        />
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? 'Signing in...' : 'Sign In'}
-        </Button>
-      </form>
-      <p className="text-sm text-center text-zinc-600">
-        No account?{' '}
-        <Link to="/register" className="underline">
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-32 -left-20 w-[28rem] h-[28rem] bg-accent/20 rounded-full blur-3xl" />
+
+        <div className="relative z-10 p-10 xl:p-12">
+          <Link to="/" className="inline-flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-white text-primary grid place-items-center font-bold text-lg">
+              S
+            </span>
+            <span className="text-xl font-bold tracking-tight">
+              SkillBridge AI
+            </span>
+          </Link>
+          <p className="mt-2 text-white/70 text-sm font-medium tracking-wide uppercase">
+            Bridging Talent &amp; Opportunity
+          </p>
+        </div>
+
+        <div className="relative z-10 px-10 xl:px-12 pb-10">
+          <div className="max-w-md">
+            <h1 className="text-[2.1rem] font-bold leading-tight">
+              Where ambition
+              <br />
+              meets opportunity.
+            </h1>
+            <p className="mt-4 text-white/75 leading-relaxed">
+              Join thousands of students, mentors and industry partners building
+              the future workforce — unified on one intelligent platform.
+            </p>
+
+            <div className="mt-10 rounded-2xl bg-white/10 backdrop-blur border border-white/15 p-5">
+              <div className="flex gap-1 text-accent-soft" aria-hidden>
+                {"★★★★★".split("").map((s, i) => (
+                  <span key={i} className="text-sm">
+                    ★
+                  </span>
+                ))}
+              </div>
+              <blockquote className="mt-3 text-white leading-relaxed text-sm">
+                “SkillBridge helped me land my first internship within 3 weeks.
+                The mentorship and project matching is unmatched.”
+              </blockquote>
+              <div className="mt-4 flex items-center gap-3">
+                <img
+                  src="https://i.pravatar.cc/100?img=32"
+                  alt=""
+                  className="w-9 h-9 rounded-full object-cover border border-white/20"
+                />
+                <div>
+                  <p className="text-sm font-semibold">Ananya Sharma</p>
+                  <p className="text-xs text-white/60">
+                    B.Tech CSE — Placed at TCS
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 flex items-center gap-6 text-xs text-white/60">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />
+                10k+ Active learners
+              </span>
+              <span>•</span>
+              <span>500+ Industry partners</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile top brand bar */}
+      <div className="lg:hidden bg-primary text-white px-6 py-5 flex items-center justify-between">
+        <Link to="/" className="flex items-center gap-2.5">
+          <span className="w-9 h-9 rounded-xl bg-white text-primary grid place-items-center font-bold">
+            S
+          </span>
+          <span className="font-bold">SkillBridge AI</span>
+        </Link>
+        <Link
+          to="/register"
+          className="text-sm font-medium underline underline-offset-4 decoration-white/30"
+        >
           Sign up
         </Link>
-      </p>
-    </div>
-  )
-}
+      </div>
 
-export default Login
+      {/* Right — Form card */}
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 lg:p-10 bg-background">
+        <div className="w-full max-w-[440px]">
+          {/* Toast / Alert placeholder */}
+          {toast && (
+            <div
+              role="alert"
+              aria-live="polite"
+              className={`mb-6 rounded-xl border px-4 py-3 text-sm flex gap-3 items-start ${toast.type === "success"
+                  ? "bg-success/10 border-success/20 text-success"
+                  : toast.type === "danger"
+                    ? "bg-danger/10 border-danger/20 text-danger"
+                    : "bg-primary/5 border-primary/20 text-primary"
+                }`}
+            >
+              <span className="material-symbols-outlined text-[20px] shrink-0">
+                {toast.type === "success"
+                  ? "check_circle"
+                  : toast.type === "danger"
+                    ? "error"
+                    : "info"}
+              </span>
+              <span className="leading-relaxed">{toast.message}</span>
+              <button
+                onClick={() => setToast(null)}
+                className="ml-auto opacity-60 hover:opacity-100"
+                aria-label="Dismiss notification"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          <div className="bg-surface rounded-2xl border border-border shadow-card p-6 sm:p-8">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-charcoal tracking-tight">
+                Welcome back
+              </h2>
+              <p className="mt-1.5 text-sm text-muted">
+                Sign in to continue your journey.{" "}
+                <Link to="/register" className="text-primary font-medium hover:underline underline-offset-4">
+                  Create account
+                </Link>
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} noValidate className="space-y-5">
+
+
+              <Input
+                label="Email address"
+                type="email"
+                placeholder="you@college.edu"
+                autoComplete="email"
+                required
+                value={form.email}
+                onChange={handleChange("email")}
+                error={errors.email}
+              />
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label
+                    htmlFor="input-password"
+                    className="text-sm font-medium text-charcoal"
+                  >
+                    Password <span className="text-danger ml-1" aria-hidden>*</span>
+                  </label>
+                  <Link
+                    to="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setToast({
+                        type: "info",
+                        message: "Password reset link sent if email exists (mock).",
+                      });
+                    }}
+                    className="text-xs font-medium text-primary hover:underline underline-offset-4"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+                <div className="relative">
+                  <Input
+                    id="input-password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                    required
+                    value={form.password}
+                    onChange={handleChange("password")}
+                    error={errors.password}
+                    wrapperClassName="!gap-0"
+                    className="pr-11"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-pressed={showPassword}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 grid place-items-center rounded-lg text-muted hover:text-charcoal hover:bg-background transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">
+                      {showPassword ? "visibility_off" : "visibility"}
+                    </span>
+                  </button>
+                </div>
+                {errors.password && (
+                  <p role="alert" className="mt-1.5 text-xs font-medium text-danger">
+                    {errors.password}
+                  </p>
+                )}
+              </div>
+
+              <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={form.rememberMe}
+                  onChange={handleChange("rememberMe")}
+                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20 accent-primary"
+                />
+                <span className="text-sm text-charcoal">Remember me</span>
+              </label>
+
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                className="w-full rounded-xl"
+                disabled={loading}
+                aria-busy={loading}
+              >
+                {loading ? "Signing in…" : "Sign in"}
+              </Button>
+
+              <div className="relative flex items-center gap-3 py-1">
+                <div className="h-px flex-1 bg-border" />
+                <span className="text-xs text-muted uppercase tracking-widest font-medium">
+                  or
+                </span>
+                <div className="h-px flex-1 bg-border" />
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                className="w-full rounded-xl bg-white border-border hover:bg-background gap-3"
+                onClick={handleGooglePlaceholder}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
+                  <path
+                    fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.02 5.02 0 0 1-2.18 3.3v2.75h3.53c2.07-1.9 3.27-4.7 3.27-8.06Z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 23c2.95 0 5.43-1 7.24-2.69l-3.53-2.75c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23Z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.84 14.09A6.97 6.97 0 0 1 5.47 12c0-.73.13-1.43.36-2.09V7.07H2.18A10.99 11.99 0 0 0 1 12c0 1.78.42 3.45 1.18 4.93l3.66-2.84Z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 5.38c1.6 0 3.05.55 4.19 1.64l3.14-3.14C17.5 2.09 15.02 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84C6.69 7.3 9.11 5.38 12 5.38Z"
+                  />
+                </svg>
+                Continue with Google
+              </Button>
+            </form>
+
+            <p className="mt-6 text-center text-sm text-muted">
+              Don&apos;t have an account?{" "}
+              <Link
+                to="/register"
+                className="font-semibold text-primary hover:underline underline-offset-4"
+              >
+                Register now
+              </Link>
+            </p>
+
+            <p className="mt-4 text-center text-xs text-muted/70">
+              Admin?{" "}
+              <Link
+                to="/admin/login"
+                className="font-medium text-charcoal hover:text-primary underline underline-offset-4 decoration-border"
+              >
+                Secure admin login
+              </Link>
+            </p>
+          </div>
+
+          <p className="mt-6 text-center text-xs text-muted leading-relaxed px-4">
+            By signing in you agree to our{" "}
+            <a href="#" className="underline decoration-border underline-offset-4 hover:text-charcoal">
+              Terms
+            </a>{" "}
+            and{" "}
+            <a href="#" className="underline decoration-border underline-offset-4 hover:text-charcoal">
+              Privacy Policy
+            </a>
+            .
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

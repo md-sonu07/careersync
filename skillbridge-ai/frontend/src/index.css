@@ -1,21 +1,28 @@
 @import "tailwindcss";
 
 /* =====================================================
-   Centralized Design System - SkillBridge AI
-   Single source of truth for colors / spacing / radii
+   SkillBridge AI - Centralized Design System
+   Spec palette: Background #F7F4EE, Primary #315C4D etc
    ===================================================== */
 
 @theme {
-  --color-background: #fcf9f8;
-  --color-surface: #fcf9f8;
+  --color-background: #f7f4ee;
+  --color-surface: #ffffff;
   --color-card-bg: #ffffff;
   --color-primary: #315c4d;
+  --color-primary-2: #3e6b5b;
   --color-primary-dark: #184436;
   --color-accent: #b78343;
+  --color-accent-soft: #e8d6b8;
+  --color-sage: #dde8e1;
   --color-charcoal: #252525;
+  --color-muted: #737373;
+  --color-border: #e5e0d7;
   --color-border-light: #e5e0d7;
+  --color-success: #3e7c59;
+  --color-warning: #b78343;
+  --color-danger: #b85450;
   --color-on-surface: #252525;
-  --color-on-background: #252525;
 
   --font-sans: "Inter", sans-serif;
 
@@ -24,22 +31,28 @@
   --radius-2xl: 1rem;
 
   --shadow-subtle: 0 4px 20px rgba(49, 92, 77, 0.06);
-  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.03);
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.04);
+  --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.04);
 }
 
-/* CSS variables for plain CSS usage */
 :root {
-  --background: #fcf9f8;
-  --surface: #fcf9f8;
+  --background: #f7f4ee;
+  --surface: #ffffff;
   --card-bg: #ffffff;
   --primary: #315c4d;
+  --primary-2: #3e6b5b;
   --primary-dark: #184436;
   --accent: #b78343;
+  --accent-soft: #e8d6b8;
+  --sage: #dde8e1;
   --charcoal: #252525;
+  --muted: #737373;
+  --border: #e5e0d7;
   --border-light: #e5e0d7;
-  --on-surface: #252525;
+  --success: #3e7c59;
+  --warning: #b78343;
+  --danger: #b85450;
 
-  /* spacing scale */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 16px;
@@ -60,24 +73,22 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Reusable utilities - keep logic centralized */
+/* Utilities */
 .glass-card {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--border);
 }
-
 .btn-primary {
   background-color: var(--primary);
-  color: #ffffff;
+  color: #fff;
   transition: all 0.2s ease;
 }
 .btn-primary:hover {
   background-color: var(--primary-dark);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: 0 4px 20px rgba(49, 92, 77, 0.15);
 }
-
 .btn-secondary {
   background-color: transparent;
   color: var(--primary);
@@ -86,17 +97,24 @@ body {
 }
 .btn-secondary:hover {
   background-color: rgba(49, 92, 77, 0.05);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
-/* Scrollbar polish */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-light);
+  background: var(--border);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #d6d0c3;
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
