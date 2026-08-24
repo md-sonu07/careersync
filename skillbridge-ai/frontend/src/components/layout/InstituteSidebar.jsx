@@ -55,7 +55,7 @@ const navSections = [
 
 function NavItem({ item, active, onClick }) {
   return (
-    <NavLink to={item.path} onClick={onClick} className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${active ? 'bg-white text-slate-900 shadow-soft' : 'text-slate-400 hover:bg-white/10 hover:text-white'}`}>
+    <NavLink to={item.path} onClick={onClick} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${active ? 'bg-white text-slate-900 shadow-soft' : 'text-slate-400 hover:bg-white/10 hover:text-white'}`}>
       <span className="material-symbols-outlined text-[20px] shrink-0">{item.icon}</span>
       <span className="truncate">{item.label}</span>
     </NavLink>
