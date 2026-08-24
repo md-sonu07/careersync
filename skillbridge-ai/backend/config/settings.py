@@ -235,3 +235,14 @@ SWAGGER_SETTINGS = {
     'JSON_EDITOR': True,
 }
 
+# Razorpay Configuration
+RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID', default='rzp_test_SgNPgO51icjN28')
+RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET', default='23lZ3ffgn3n2ggOeN1BMhRJE')
+RAZORPAY_WEBHOOK_SECRET = config('RAZORPAY_WEBHOOK_SECRET', default='5094022fbfb69d093bfc995822b2238079c5413acfa1f314e3e41928dfd5c582')
+
+# ImageKit Configuration
+IMAGEKIT_PUBLIC_KEY = config('IMAGEKIT_PUBLIC_KEY', default='public_vNSu+tU1Im8jNsOi7Ipd1Ptt92c=')
+IMAGEKIT_PRIVATE_KEY = config('IMAGEKIT_PRIVATE_KEY', default='private_Epzp01NXplITplT8YKI4Rk7ZLO0=')
+IMAGEKIT_URL_ENDPOINT = config('IMAGEKIT_URL_ENDPOINT', default='https://ik.imagekit.io/crms')
+
+
