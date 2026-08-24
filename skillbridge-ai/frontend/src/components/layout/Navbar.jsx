@@ -34,19 +34,19 @@ const Navbar = () => {
     {
       to: '/courses',
       label: 'Courses',
-      desc: 'Industry-aligned learning modules and skill assessments',
+      desc: 'Industry-aligned learning modules',
       icon: 'auto_stories',
     },
     {
       to: '/internships',
       label: 'Internships',
-      desc: 'Hands-on practical experience at top companies',
+      desc: 'Hands-on practical and experience ',
       icon: 'work_history',
     },
     {
       to: '/jobs',
       label: 'Jobs',
-      desc: 'Full-time career opportunities matched to your skill profile',
+      desc: 'Full-time and contract roles',
       icon: 'work',
     },
   ]
@@ -127,7 +127,7 @@ const Navbar = () => {
                         to={item.to}
                         className="flex items-start gap-3.5 p-2.5 rounded-xl hover:bg-primary/5 transition-colors group"
                       >
-                        <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors shrink-0">
+                        <div className="p-2 h-10 w-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors shrink-0">
                           <span className="material-symbols-outlined text-[20px] block">{item.icon}</span>
                         </div>
                         <div>

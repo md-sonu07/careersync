@@ -87,7 +87,7 @@ const HowItWorks = () => {
 
       {/* Steps */}
       <section className="mx-auto max-w-7xl px-6 py-12">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {steps.map((s) => (
             <Card key={s.n} hover className="relative flex flex-col p-6">
               <div className="flex items-center justify-between">
