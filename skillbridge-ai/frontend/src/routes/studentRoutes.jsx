@@ -37,14 +37,18 @@ import ApplicationDetail from '../pages/Student/ApplicationDetail'
 import AssessmentResult from '../pages/Student/AssessmentResult'
 import Portfolio from '../pages/Student/Portfolio'
 import Help from '../pages/Student/Help'
+import ProtectedRoute from './ProtectedRoute'
 
 export const studentRoutes = {
   path: '/student',
-  element: <StudentLayout />,
+  element: <ProtectedRoute allowedRoles={['student']} />,
   errorElement: <ErrorBoundary />,
   children: [
-    { index: true, element: <StudentDashboard /> },
-    { path: 'dashboard', element: <StudentDashboard /> },
+    {
+      element: <StudentLayout />,
+      children: [
+        { index: true, element: <StudentDashboard /> },
+        { path: 'dashboard', element: <StudentDashboard /> },
     { path: 'profile', element: <Profile /> },
     { path: 'career-goal', element: <CareerGoal /> },
     { path: 'skills', element: <Skills /> },
@@ -83,7 +87,9 @@ export const studentRoutes = {
     { path: 'projects', element: <Projects /> },
     { path: 'certificates', element: <Certificates /> },
     { path: 'help', element: <Help /> },
-    { path: 'notifications', element: <StudentNotifications /> },
-    { path: 'settings', element: <StudentSettings /> },
+        { path: 'notifications', element: <StudentNotifications /> },
+        { path: 'settings', element: <StudentSettings /> },
+      ],
+    },
   ],
 }

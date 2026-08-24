@@ -1,10 +1,35 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { selectIsAuthenticated } from '../features/auth/authSlice'
+import { selectIsAuthenticated, selectCurrentUser } from '../features/auth/authSlice'
 
-const ProtectedRoute = () => {
+const getRoleDashboard = (role) => {
+  const normalizedRole = (role || '').toLowerCase()
+  if (normalizedRole === 'student') return '/student/dashboard'
+  if (normalizedRole === 'industry') return '/industry/dashboard'
+  if (['academician', 'academia'].includes(normalizedRole)) return '/academia/dashboard'
+  if (normalizedRole === 'admin') return '/admin/dashboard'
+  return '/login'
+}
+
+const ProtectedRoute = ({ allowedRoles = [] }) => {
   const isAuthenticated = useSelector(selectIsAuthenticated)
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />
+  const user = useSelector(selectCurrentUser)
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (allowedRoles.length > 0) {
+    const userRole = (user?.role || '').toLowerCase()
+    const isAllowed = allowedRoles.map((r) => r.toLowerCase()).includes(userRole)
+
+    if (!isAllowed) {
+      const redirectPath = getRoleDashboard(userRole)
+      return <Navigate to={redirectPath} replace />
+    }
+  }
+
+  return <Outlet />
 }
 
 export default ProtectedRoute

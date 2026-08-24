@@ -47,14 +47,14 @@ export default function Skills() {
         }))
         setSkillsList(mapped)
       } else {
-        setSkillsList(mockSkills)
+        setSkillsList([])
       }
 
       if (allSkillsData) {
         setAvailableSkills(allSkillsData)
       }
     } catch {
-      setSkillsList(mockSkills)
+      setSkillsList([])
     } finally {
       setLoading(false)
     }

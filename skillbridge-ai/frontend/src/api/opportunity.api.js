@@ -4,20 +4,32 @@ import ENDPOINTS from './endpoints'
 export const opportunityApi = {
   // List published opportunities (supports params: { type, work_mode, search })
   getOpportunities: async (params = {}) => {
-    const { data } = await apiClient.get(ENDPOINTS.OPPORTUNITIES.LIST, { params })
-    return data
+    try {
+      const { data } = await apiClient.get(ENDPOINTS.OPPORTUNITIES.LIST, { params })
+      return data || []
+    } catch {
+      return []
+    }
   },
 
   // Get student's personalized opportunity matches (sorted by -match_score)
   getOpportunityMatches: async () => {
-    const { data } = await apiClient.get(`${ENDPOINTS.OPPORTUNITIES.LIST}matches/`)
-    return data
+    try {
+      const { data } = await apiClient.get(`${ENDPOINTS.OPPORTUNITIES.LIST}matches/`)
+      return data || []
+    } catch {
+      return []
+    }
   },
 
   // Force recalculate opportunity matches for student
   recalculateOpportunityMatches: async () => {
-    const { data } = await apiClient.post(`${ENDPOINTS.OPPORTUNITIES.LIST}matches/recalculate/`)
-    return data
+    try {
+      const { data } = await apiClient.post(`${ENDPOINTS.OPPORTUNITIES.LIST}matches/recalculate/`)
+      return data || []
+    } catch {
+      return []
+    }
   },
 
   // Get opportunity detail with skill requirements
@@ -38,7 +50,7 @@ export const opportunityApi = {
     return data
   },
 
-  // Delete opportunity posting (Owning company only)
+  // Delete opportunity posting
   deleteOpportunity: async (id) => {
     const { data } = await apiClient.delete(ENDPOINTS.OPPORTUNITIES.BY_ID(id))
     return data

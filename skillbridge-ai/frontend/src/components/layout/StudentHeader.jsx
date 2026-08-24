@@ -8,8 +8,8 @@ export default function StudentHeader({ onMenuClick }) {
   const { user, logout } = useAuth()
   const [query, setQuery] = useState('')
   const [notifOpen, setNotifOpen] = useState(false)
-  const displayName = user?.full_name || (user?.first_name ? `${user.first_name} ${user.last_name}` : mockUser.name)
-  const email = user?.email || mockUser.branch
+  const displayName = user?.full_name || (user?.first_name ? `${user.first_name} ${user.last_name}` : 'Student')
+  const email = user?.email || 'student@careersync.com'
   const handleLogout = async () => { await logout(); navigate('/login') }
 
   return (
@@ -26,7 +26,7 @@ export default function StudentHeader({ onMenuClick }) {
           <p className="text-xs text-muted">Learn • Practice • Get Hired</p>
         </div>
         <span className="ml-2 hidden items-center gap-1.5 rounded-full bg-sage border border-border px-2.5 py-1 text-xs font-bold text-primary xl:inline-flex">
-          <span className="h-2 w-2 rounded-full bg-primary animate-pulse" /> {mockUser.streak} day streak
+          <span className="h-2 w-2 rounded-full bg-primary animate-pulse" /> Active Session
         </span>
       </div>
       <div className="flex flex-1 items-center justify-center px-2 sm:px-4 lg:px-8">
@@ -43,17 +43,16 @@ export default function StudentHeader({ onMenuClick }) {
         <div className="relative">
           <button onClick={() => setNotifOpen((v) => !v)} className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-charcoal hover:bg-background shadow-soft">
             <span className="material-symbols-outlined text-[20px]">notifications</span>
-            <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-danger px-1 text-[11px] font-bold text-white shadow-sm">2</span>
+            <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1 text-[11px] font-bold text-white shadow-sm">1</span>
           </button>
           {notifOpen && (
             <div className="absolute right-0 mt-2 w-80 overflow-hidden rounded-2xl border border-border bg-white shadow-card">
               <div className="flex items-center justify-between border-b border-border px-4 py-3">
                 <p className="text-sm font-bold text-charcoal">Notifications</p>
-                <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-bold text-white">2 new</span>
+                <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-bold text-white">1 new</span>
               </div>
               <div className="divide-y divide-border">
-                <div className="flex gap-3 p-3 hover:bg-background"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary shrink-0"><span className="material-symbols-outlined text-[18px]">quiz</span></span><div><p className="text-sm font-medium text-charcoal">New assessment graded 8/10</p><p className="text-xs text-muted">React • 2h ago</p></div></div>
-                <div className="flex gap-3 p-3 hover:bg-background"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-success/10 text-success shrink-0"><span className="material-symbols-outlined text-[18px]">work</span></span><div><p className="text-sm font-medium text-charcoal">Internship match 92% Flipkart</p><p className="text-xs text-muted">Full Stack • 5h ago</p></div></div>
+                <div className="flex gap-3 p-3 hover:bg-background"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary shrink-0"><span className="material-symbols-outlined text-[18px]">verified</span></span><div><p className="text-sm font-medium text-charcoal">Welcome to CareerSync</p><p className="text-xs text-muted">Complete your profile to get started</p></div></div>
               </div>
               <Link to="/student/notifications" onClick={() => setNotifOpen(false)} className="block border-t border-border bg-background px-4 py-2.5 text-center text-sm font-semibold text-primary hover:bg-sage">View all →</Link>
             </div>
@@ -61,7 +60,9 @@ export default function StudentHeader({ onMenuClick }) {
         </div>
         <div className="hidden h-8 w-px bg-border sm:block" />
         <div className="flex items-center gap-2.5 rounded-full border border-border bg-white pl-1.5 pr-1.5 py-1 shadow-soft sm:pr-2">
-          <img src={mockUser.avatar} alt={displayName} className="h-8 w-8 rounded-full object-cover border border-border shrink-0" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white font-bold text-xs shrink-0">
+            {displayName.slice(0, 2).toUpperCase()}
+          </div>
           <div className="hidden text-left sm:block">
             <p className="text-sm font-semibold leading-none text-charcoal">{displayName}</p>
             <p className="text-xs leading-none text-muted">{email}</p>

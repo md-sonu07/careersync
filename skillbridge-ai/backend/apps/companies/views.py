@@ -120,11 +120,14 @@ class OpportunityMatchListView(generics.ListAPIView):
     GET /api/opportunities/matches/ -> Personalized opportunity matches for student (sorted by -match_score)
     """
     serializer_class = OpportunityMatchSerializer
-    permission_classes = [permissions.IsAuthenticated, IsStudent]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        student, _ = StudentProfile.objects.get_or_create(user=self.request.user)
-        return calculate_opportunity_matches_for_student(student)
+        try:
+            student, _ = StudentProfile.objects.get_or_create(user=self.request.user)
+            return calculate_opportunity_matches_for_student(student)
+        except Exception:
+            return OpportunityMatch.objects.none()
 
 
 class OpportunityMatchRecalculateView(APIView):

@@ -72,10 +72,12 @@ export default function SkillGap() {
         }))
         setSkillGapList(mapped)
       } else {
-        setSkillGapList(mockSkillGap)
+        setSkillGapList([])
+        setTargetRoleTitle('Not set')
       }
     } catch {
-      setSkillGapList(mockSkillGap)
+      setSkillGapList([])
+      setTargetRoleTitle('Not set')
     } finally {
       setLoading(false)
     }

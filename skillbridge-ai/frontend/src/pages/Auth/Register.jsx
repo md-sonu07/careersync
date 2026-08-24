@@ -1,22 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setCredentials, registerUser } from "../../features/auth/authSlice";
+import { registerUser } from "../../features/auth/authSlice";
 import { profileApi } from "../../api/profile.api";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
-import Select from "../../components/ui/Select";
-
-const COLLEGE_OPTIONS = ["IIT Bombay", "IIT Delhi", "IIT Madras", "NIT Trichy", "BITS Pilani", "Delhi University", "Anna University", "VIT Vellore", "DTU", "NSUT", "Other"];
-const DEGREE_OPTIONS = ["B.Tech", "B.E.", "B.Sc", "BCA", "M.Tech", "MBA", "MCA", "Diploma", "Other"];
-const CAREER_GOALS = ["Full Stack Developer", "Frontend Developer", "Backend Developer", "Data Analyst", "Data Scientist", "DevOps Engineer", "Cloud Engineer", "AI/ML Engineer", "Cybersecurity", "Product Manager"];
-const INDUSTRY_TYPES = ["Technology", "Finance", "Healthcare", "Education", "Manufacturing", "Retail", "Consulting", "Other"];
-const COMPANY_SIZES = ["1-10", "11-50", "51-200", "201-1000", "1000+"];
 
 const ROLE_TABS = [
-  { id: "student", label: "Student", icon: "school", desc: "Learn & get hired" },
-  { id: "industry", label: "Industry", icon: "business", desc: "Post & hire" },
-  { id: "academia", label: "Academia", icon: "apartment", desc: "Manage college" },
+  { id: "student", label: "Student", icon: "school" },
+  { id: "industry", label: "Industry", icon: "business" },
+  { id: "academia", label: "Academia", icon: "apartment" },
 ];
 
 export default function Register() {
@@ -31,19 +24,14 @@ export default function Register() {
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(false);
   const [pending, setPending] = useState(null);
-  const [skillInput, setSkillInput] = useState("");
-  const [skills, setSkills] = useState([]);
 
-  const [studentForm, setStudentForm] = useState({ name: "", email: "", password: "", phone: "", college: "", degree: "", gradYear: "", careerGoal: "", interests: "" });
-  const [industryForm, setIndustryForm] = useState({ companyName: "", companyEmail: "", password: "", website: "", industryType: "", companySize: "", location: "", contactPerson: "", businessInfo: "" });
-  const [academiaForm, setAcademiaForm] = useState({ name: "", email: "", password: "", college: "", department: "", designation: "", contact: "" });
-
-  const addSkill = () => {
-    const v = skillInput.trim();
-    if (!v) return;
-    if (!skills.includes(v)) setSkills((p) => [...p, v]);
-    setSkillInput("");
-  };
+  // Short forms as requested:
+  // Student: name, email, phone, password
+  // Industry: companyName, companyEmail, password
+  // Academia: name, email, password
+  const [studentForm, setStudentForm] = useState({ name: "", email: "", phone: "", password: "" });
+  const [industryForm, setIndustryForm] = useState({ companyName: "", companyEmail: "", password: "" });
+  const [academiaForm, setAcademiaForm] = useState({ name: "", email: "", password: "" });
 
   const splitName = (fullName) => {
     const parts = (fullName || "").trim().split(/\s+/);
@@ -57,15 +45,12 @@ export default function Register() {
     if (!studentForm.name.trim()) e.name = "Full name required";
     if (!studentForm.email.trim()) e.email = "Email required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(studentForm.email)) e.email = "Invalid email";
+    if (!studentForm.phone.trim()) e.phone = "Phone number required";
     if (!studentForm.password) e.password = "Password required";
     else if (studentForm.password.length < 6) e.password = "At least 6 chars";
-    if (!studentForm.phone.trim()) e.phone = "Phone required";
-    if (!studentForm.college) e.college = "College required";
-    if (!studentForm.degree) e.degree = "Degree required";
-    if (!studentForm.gradYear) e.gradYear = "Graduation year required";
-    if (!studentForm.careerGoal) e.careerGoal = "Career goal required";
     return e;
   };
+
   const validateIndustry = () => {
     const e = {};
     if (!industryForm.companyName.trim()) e.companyName = "Company name required";
@@ -73,22 +58,16 @@ export default function Register() {
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(industryForm.companyEmail)) e.companyEmail = "Invalid email";
     if (!industryForm.password) e.password = "Password required";
     else if (industryForm.password.length < 6) e.password = "At least 6 chars";
-    if (!industryForm.industryType) e.industryType = "Industry type required";
-    if (!industryForm.companySize) e.companySize = "Company size required";
-    if (!industryForm.location.trim()) e.location = "Location required";
-    if (!industryForm.contactPerson.trim()) e.contactPerson = "Contact person required";
     return e;
   };
+
   const validateAcademia = () => {
     const e = {};
-    if (!academiaForm.name.trim()) e.name = "Name required";
+    if (!academiaForm.name.trim()) e.name = "Full name required";
     if (!academiaForm.email.trim()) e.email = "Email required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(academiaForm.email)) e.email = "Invalid email";
     if (!academiaForm.password) e.password = "Password required";
     else if (academiaForm.password.length < 6) e.password = "At least 6 chars";
-    if (!academiaForm.college.trim()) e.college = "College required";
-    if (!academiaForm.department.trim()) e.department = "Department required";
-    if (!academiaForm.designation.trim()) e.designation = "Designation required";
     return e;
   };
 
@@ -98,7 +77,11 @@ export default function Register() {
     if (activeRole === "student") errs = validateStudent();
     else if (activeRole === "industry") errs = validateIndustry();
     else errs = validateAcademia();
-    if (Object.keys(errs).length) { setErrors(errs); return; }
+
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      return;
+    }
     setErrors({});
     setLoading(true);
     setToast(null);
@@ -115,7 +98,7 @@ export default function Register() {
         confirm_password: studentForm.password,
       };
     } else if (activeRole === "industry") {
-      const { first_name, last_name } = splitName(industryForm.contactPerson || industryForm.companyName);
+      const { first_name, last_name } = splitName(industryForm.companyName);
       registerPayload = {
         email: industryForm.companyEmail,
         first_name,
@@ -141,46 +124,29 @@ export default function Register() {
       if (registerUser.fulfilled.match(resultAction)) {
         if (activeRole === "student") {
           try {
-            await profileApi.updateStudentProfile({
-              phone: studentForm.phone,
-              college: studentForm.college,
-              degree: studentForm.degree,
-              graduation_year: studentForm.gradYear,
-              career_goal: studentForm.careerGoal,
-              interests: studentForm.interests,
-            });
+            await profileApi.updateStudentProfile({ phone: studentForm.phone });
           } catch {
-            // Profile update fallback
+            // Profile fallback
           }
           setToast({ type: "success", message: "Account created! Redirecting to Student dashboard…" });
           setTimeout(() => navigate("/student/dashboard"), 700);
         } else if (activeRole === "industry") {
           try {
-            await profileApi.updateCompanyProfile({
-              company_name: industryForm.companyName,
-              website: industryForm.website,
-              location: industryForm.location,
-              industry_type: industryForm.industryType,
-              company_size: industryForm.companySize,
-              contact_person: industryForm.contactPerson,
-              business_info: industryForm.businessInfo,
-            });
+            await profileApi.updateCompanyProfile({ company_name: industryForm.companyName });
           } catch {
-            // Profile update fallback
+            // Profile fallback
           }
-          setPending({ role: "industry", title: "Verification Pending", desc: "Your company profile is under review. Our admin team will verify your documents within 24–48 hours. You’ll be notified by email once approved." });
+          setPending({
+            role: "industry",
+            title: "Verification Pending",
+            desc: "Your company account has been created. You can complete remaining company profile details in your dashboard.",
+          });
         } else {
-          try {
-            await profileApi.updateAcademicianProfile({
-              college: academiaForm.college,
-              department: academiaForm.department,
-              designation: academiaForm.designation,
-              contact: academiaForm.contact,
-            });
-          } catch {
-            // Profile update fallback
-          }
-          setPending({ role: "academia", title: "Verification Pending", desc: "Your academician profile is under review. Verification typically takes 24 hours. You’ll receive an email once approved." });
+          setPending({
+            role: "academia",
+            title: "Account Created",
+            desc: "Your academia account has been created. You can complete your institution profile details in your dashboard.",
+          });
         }
       } else {
         const errorMsg = resultAction.payload || "Registration failed. Please check your details.";
@@ -206,7 +172,12 @@ export default function Register() {
             <Button onClick={() => navigate("/login")} className="w-full">Go to Login</Button>
             <Button variant="outline" onClick={() => navigate("/")} className="w-full">Back to Home</Button>
           </div>
-          <p className="mt-4 text-xs text-muted">Demo: also saved locally as {pending.role} — you can still <Link to={pending.role === "industry" ? "/industry/dashboard" : "/academia/dashboard"} className="text-primary underline">view dashboard</Link>.</p>
+          <p className="mt-4 text-xs text-muted">
+            Demo: also saved locally as {pending.role} — you can still{" "}
+            <Link to={pending.role === "industry" ? "/industry/dashboard" : "/academia/dashboard"} className="text-primary underline">
+              view dashboard
+            </Link>.
+          </p>
         </div>
       </div>
     );
@@ -215,7 +186,7 @@ export default function Register() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto w-full my-auto grid lg:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl border border-border bg-surface items-stretch">
-        {/* Left — Branding Panel (50% Width, Equal Height, No Form Scroll) */}
+        {/* Left — Branding Panel (50% Width, Equal Height, Fixed Top Gap) */}
         <div className="relative hidden lg:flex bg-primary text-white flex-col justify-between p-10 xl:p-12 overflow-hidden h-full">
           <div className="absolute inset-0 opacity-[0.07]" aria-hidden style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "28px 28px" }} />
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
@@ -289,7 +260,10 @@ export default function Register() {
 
         {/* Mobile Header */}
         <div className="lg:hidden bg-primary text-white px-6 py-5 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5"><span className="w-9 h-9 rounded-xl bg-white text-primary grid place-items-center font-bold">C</span><span className="font-bold">CareerSync</span></Link>
+          <Link to="/" className="flex items-center gap-2.5">
+            <span className="w-9 h-9 rounded-xl bg-white text-primary grid place-items-center font-bold">C</span>
+            <span className="font-bold">CareerSync</span>
+          </Link>
           <Link to="/login" className="text-sm font-medium underline underline-offset-4 decoration-white/30">Sign in</Link>
         </div>
 
@@ -336,123 +310,75 @@ export default function Register() {
                 {activeRole === "student" ? "Create Student Account" : activeRole === "industry" ? "Create Industry Account" : "Create Academia Account"}
               </h2>
               <p className="mt-1.5 text-sm text-charcoal/70">
-                {activeRole === "student" ? "Join as a learner — get skills, assessments & internships." : activeRole === "industry" ? "Hire verified talent — post internships & jobs." : "Manage your college — track skills & placements."}{" "}
+                {activeRole === "student" ? "Get started in 30 seconds — set up full profile later." : activeRole === "industry" ? "Hire verified talent — complete company profile in dashboard." : "Manage college placements — complete profile in dashboard."}{" "}
                 <Link to="/login" className="text-primary font-semibold hover:underline underline-offset-4">Sign in</Link>
               </p>
             </div>
 
-            {activeRole === "industry" || activeRole === "academia" ? (
-              <p className="mb-4 rounded-xl bg-amber-50 border border-amber-200 px-3.5 py-2.5 text-xs leading-relaxed text-amber-800"><span className="font-bold">Note:</span> {activeRole === "industry" ? "Industry accounts require admin verification (24–48h) before posting." : "Academia accounts are verified against college domain."}</p>
-            ) : null}
-
             <form onSubmit={handleSubmit} noValidate className="space-y-4">
               {activeRole === "student" && (
                 <>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <Input label="Full name" placeholder="Ananya Sharma" autoComplete="name" required value={studentForm.name} onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })} error={errors.name} />
-                    <Input label="Phone" placeholder="+91 98765 43210" autoComplete="tel" required value={studentForm.phone} onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })} error={errors.phone} />
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <Input label="Email" type="email" placeholder="you@college.edu" autoComplete="email" required value={studentForm.email} onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })} error={errors.email} />
-                    <div>
-                      <label htmlFor="student-password" className="text-sm font-medium text-charcoal">Password <span className="text-danger ml-1">*</span></label>
-                      <div className="relative mt-1.5">
-                        <Input id="student-password" type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete="new-password" required value={studentForm.password} onChange={(e) => setStudentForm({ ...studentForm, password: e.target.value })} error={errors.password} wrapperClassName="!gap-0" className="pr-11" />
-                        <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 grid place-items-center rounded-lg text-muted hover:text-charcoal hover:bg-background"><span className="material-symbols-outlined text-[20px]">{showPassword ? "visibility_off" : "visibility"}</span></button>
-                      </div>
-                      {errors.password && <p role="alert" className="mt-1 text-xs font-medium text-danger">{errors.password}</p>}
-                    </div>
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <Select label="College / University" required value={studentForm.college} onChange={(e) => setStudentForm({ ...studentForm, college: e.target.value })} options={COLLEGE_OPTIONS} placeholder="Select college" error={errors.college} />
-                    <Select label="Degree" required value={studentForm.degree} onChange={(e) => setStudentForm({ ...studentForm, degree: e.target.value })} options={DEGREE_OPTIONS} placeholder="Select degree" error={errors.degree} />
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <Select label="Graduation year" required value={studentForm.gradYear} onChange={(e) => setStudentForm({ ...studentForm, gradYear: e.target.value })} options={["2025", "2026", "2027", "2028", "2029"]} placeholder="Year" error={errors.gradYear} />
-                    <Select label="Career goal" required value={studentForm.careerGoal} onChange={(e) => setStudentForm({ ...studentForm, careerGoal: e.target.value })} options={CAREER_GOALS} placeholder="Select goal" error={errors.careerGoal} />
-                  </div>
+                  <Input label="Full name" placeholder="Ananya Sharma" autoComplete="name" required value={studentForm.name} onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })} error={errors.name} />
+                  <Input label="Email address" type="email" placeholder="you@college.edu" autoComplete="email" required value={studentForm.email} onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })} error={errors.email} />
+                  <Input label="Phone number" placeholder="+91 98765 43210" autoComplete="tel" required value={studentForm.phone} onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })} error={errors.phone} />
                   <div>
-                    <label className="text-sm font-medium text-charcoal">Skills (add to personalize)</label>
-                    <div className="mt-1.5 flex gap-2">
-                      <input value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addSkill(); } }} placeholder="e.g. React, Python" className="flex-1 rounded-xl border border-border bg-white px-3.5 py-2.5 text-sm placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
-                      <Button type="button" variant="outline" onClick={addSkill}>Add</Button>
+                    <label htmlFor="student-password" className="text-sm font-medium text-charcoal">Password <span className="text-danger ml-1">*</span></label>
+                    <div className="relative mt-1.5">
+                      <Input id="student-password" type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete="new-password" required value={studentForm.password} onChange={(e) => setStudentForm({ ...studentForm, password: e.target.value })} error={errors.password} wrapperClassName="!gap-0" className="pr-11" />
+                      <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 grid place-items-center rounded-lg text-muted hover:text-charcoal hover:bg-background">
+                        <span className="material-symbols-outlined text-[20px]">{showPassword ? "visibility_off" : "visibility"}</span>
+                      </button>
                     </div>
-                    {skills.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {skills.map((s) => (
-                          <span key={s} className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/15 px-3 py-1 text-xs font-medium text-primary">
-                            {s}
-                            <button type="button" onClick={() => setSkills((p) => p.filter((x) => x !== s))} aria-label={`Remove ${s}`} className="ml-1 hover:text-danger">×</button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    {errors.password && <p role="alert" className="mt-1 text-xs font-medium text-danger">{errors.password}</p>}
                   </div>
-                  <Input label="Interests" placeholder="e.g. AI, Web Dev, Data Science (comma separated)" value={studentForm.interests} onChange={(e) => setStudentForm({ ...studentForm, interests: e.target.value })} />
                 </>
               )}
 
               {activeRole === "industry" && (
                 <>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <Input label="Company name" placeholder="TechNova Pvt Ltd" required value={industryForm.companyName} onChange={(e) => setIndustryForm({ ...industryForm, companyName: e.target.value })} error={errors.companyName} />
-                    <Input label="Company email" type="email" placeholder="hr@technova.com" required value={industryForm.companyEmail} onChange={(e) => setIndustryForm({ ...industryForm, companyEmail: e.target.value })} error={errors.companyEmail} />
-                  </div>
+                  <Input label="Company name" placeholder="TechNova Pvt Ltd" required value={industryForm.companyName} onChange={(e) => setIndustryForm({ ...industryForm, companyName: e.target.value })} error={errors.companyName} />
+                  <Input label="Company email" type="email" placeholder="hr@technova.com" autoComplete="email" required value={industryForm.companyEmail} onChange={(e) => setIndustryForm({ ...industryForm, companyEmail: e.target.value })} error={errors.companyEmail} />
                   <div>
                     <label htmlFor="industry-password" className="text-sm font-medium text-charcoal">Password <span className="text-danger ml-1">*</span></label>
                     <div className="relative mt-1.5">
                       <Input id="industry-password" type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete="new-password" required value={industryForm.password} onChange={(e) => setIndustryForm({ ...industryForm, password: e.target.value })} error={errors.password} wrapperClassName="!gap-0" className="pr-11" />
-                      <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 grid place-items-center rounded-lg text-muted hover:text-charcoal hover:bg-background"><span className="material-symbols-outlined text-[20px]">{showPassword ? "visibility_off" : "visibility"}</span></button>
+                      <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 grid place-items-center rounded-lg text-muted hover:text-charcoal hover:bg-background">
+                        <span className="material-symbols-outlined text-[20px]">{showPassword ? "visibility_off" : "visibility"}</span>
+                      </button>
                     </div>
                     {errors.password && <p role="alert" className="mt-1 text-xs font-medium text-danger">{errors.password}</p>}
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <Input label="Website" placeholder="https://technova.com" value={industryForm.website} onChange={(e) => setIndustryForm({ ...industryForm, website: e.target.value })} />
-                    <Input label="Location" placeholder="Bengaluru, India" required value={industryForm.location} onChange={(e) => setIndustryForm({ ...industryForm, location: e.target.value })} error={errors.location} />
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <Select label="Industry type" required value={industryForm.industryType} onChange={(e) => setIndustryForm({ ...industryForm, industryType: e.target.value })} options={INDUSTRY_TYPES} placeholder="Select type" error={errors.industryType} />
-                    <Select label="Company size" required value={industryForm.companySize} onChange={(e) => setIndustryForm({ ...industryForm, companySize: e.target.value })} options={COMPANY_SIZES} placeholder="Select size" error={errors.companySize} />
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <Input label="Contact person" placeholder="Rahul Mehta — HR Lead" required value={industryForm.contactPerson} onChange={(e) => setIndustryForm({ ...industryForm, contactPerson: e.target.value })} error={errors.contactPerson} />
-                    <Input label="Phone / Business info" placeholder="+91 98xxx xxxxx • GSTIN optional" value={industryForm.businessInfo} onChange={(e) => setIndustryForm({ ...industryForm, businessInfo: e.target.value })} />
                   </div>
                 </>
               )}
 
               {activeRole === "academia" && (
                 <>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <Input label="Full name" placeholder="Dr. Priya Singh" required value={academiaForm.name} onChange={(e) => setAcademiaForm({ ...academiaForm, name: e.target.value })} error={errors.name} />
-                    <Input label="Email" type="email" placeholder="priya@college.edu" required value={academiaForm.email} onChange={(e) => setAcademiaForm({ ...academiaForm, email: e.target.value })} error={errors.email} />
-                  </div>
+                  <Input label="Full name" placeholder="Dr. Priya Singh" autoComplete="name" required value={academiaForm.name} onChange={(e) => setAcademiaForm({ ...academiaForm, name: e.target.value })} error={errors.name} />
+                  <Input label="Email address" type="email" placeholder="priya@college.edu" autoComplete="email" required value={academiaForm.email} onChange={(e) => setAcademiaForm({ ...academiaForm, email: e.target.value })} error={errors.email} />
                   <div>
                     <label htmlFor="academia-password" className="text-sm font-medium text-charcoal">Password <span className="text-danger ml-1">*</span></label>
                     <div className="relative mt-1.5">
                       <Input id="academia-password" type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete="new-password" required value={academiaForm.password} onChange={(e) => setAcademiaForm({ ...academiaForm, password: e.target.value })} error={errors.password} wrapperClassName="!gap-0" className="pr-11" />
-                      <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 grid place-items-center rounded-lg text-muted hover:text-charcoal hover:bg-background"><span className="material-symbols-outlined text-[20px]">{showPassword ? "visibility_off" : "visibility"}</span></button>
+                      <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 grid place-items-center rounded-lg text-muted hover:text-charcoal hover:bg-background">
+                        <span className="material-symbols-outlined text-[20px]">{showPassword ? "visibility_off" : "visibility"}</span>
+                      </button>
                     </div>
                     {errors.password && <p role="alert" className="mt-1 text-xs font-medium text-danger">{errors.password}</p>}
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <Input label="College" placeholder="Delhi Technological University" required value={academiaForm.college} onChange={(e) => setAcademiaForm({ ...academiaForm, college: e.target.value })} error={errors.college} />
-                    <Input label="Department" placeholder="Computer Science" required value={academiaForm.department} onChange={(e) => setAcademiaForm({ ...academiaForm, department: e.target.value })} error={errors.department} />
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <Input label="Designation" placeholder="Assistant Professor" required value={academiaForm.designation} onChange={(e) => setAcademiaForm({ ...academiaForm, designation: e.target.value })} error={errors.designation} />
-                    <Input label="Contact details" placeholder="+91 98765 43210" value={academiaForm.contact} onChange={(e) => setAcademiaForm({ ...academiaForm, contact: e.target.value })} />
                   </div>
                 </>
               )}
 
-              <label className="flex items-start gap-2.5 text-sm leading-relaxed mt-1">
+              <label className="flex items-start gap-2.5 text-sm leading-relaxed mt-2">
                 <input type="checkbox" required className="mt-1 w-4 h-4 rounded border-border text-primary accent-primary" />
-                <span className="text-muted">I agree to the <a href="#" className="font-medium text-primary hover:underline">Terms</a> and <a href="#" className="font-medium text-primary hover:underline">Privacy Policy</a> {activeRole !== "student" && <span>• I confirm I am authorized to create this {activeRole} account</span>}</span>
+                <span className="text-muted">I agree to the <a href="#" className="font-medium text-primary hover:underline">Terms</a> and <a href="#" className="font-medium text-primary hover:underline">Privacy Policy</a></span>
               </label>
 
-              <Button type="submit" variant="primary" size="lg" className="w-full rounded-xl mt-1" disabled={loading}>{loading ? "Creating account…" : `Create ${activeRole === "student" ? "Student" : activeRole === "industry" ? "Industry" : "Academia"} account`}</Button>
-              <p className="text-center text-xs text-charcoal/60 mt-4">Already have an account? <Link to="/login" className="font-semibold text-primary hover:underline">Sign in</Link> • Admin? <Link to="/admin/login" className="font-medium text-charcoal hover:text-primary underline decoration-border">Admin login</Link></p>
+              <Button type="submit" variant="primary" size="lg" className="w-full rounded-xl mt-2" disabled={loading}>
+                {loading ? "Creating account…" : `Create ${activeRole === "student" ? "Student" : activeRole === "industry" ? "Industry" : "Academia"} account`}
+              </Button>
+              <p className="text-center text-xs text-charcoal/60 mt-4">
+                Already have an account? <Link to="/login" className="font-semibold text-primary hover:underline">Sign in</Link> • Admin? <Link to="/admin/login" className="font-medium text-charcoal hover:text-primary underline decoration-border">Admin login</Link>
+              </p>
             </form>
           </div>
         </div>

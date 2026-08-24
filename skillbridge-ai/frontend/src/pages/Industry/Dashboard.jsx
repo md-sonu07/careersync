@@ -24,9 +24,9 @@ export default function IndustryDashboard() {
     return () => { isMounted = false }
   }, [])
 
-  const activeOpp = analytics?.active_opportunities || 2
-  const totalApps = analytics?.total_applications || 1
-  const shortlisted = analytics?.shortlisted_candidates || 1
+  const activeOpp = analytics?.active_opportunities ?? 0
+  const totalApps = analytics?.total_applications ?? 0
+  const shortlisted = analytics?.shortlisted_candidates ?? 0
   const topCandidates = analytics?.top_matching_candidates || []
 
   return (

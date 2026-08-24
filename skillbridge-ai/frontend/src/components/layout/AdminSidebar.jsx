@@ -88,7 +88,7 @@ export default function AdminSidebar({ onNavigate }) {
   const handleLogout = async () => { await logout(); if (onNavigate) onNavigate(); navigate('/login') }
   return (
     <div className="flex h-full flex-col">
-      <div className="hidden lg:flex items-center gap-3 px-5 py-4 border-b border-white/10">
+      <div className="hidden lg:flex h-[68px] shrink-0 items-center gap-3 px-5 border-b border-white/10">
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-slate-900 font-bold text-sm">CS</div>
         <div className="min-w-0">
           <p className="text-sm font-bold text-white leading-none">CareerSync</p>

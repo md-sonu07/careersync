@@ -23,11 +23,11 @@ export default function AcademiaDashboard() {
     return () => { isMounted = false }
   }, [])
 
-  const totalStudents = analytics?.total_students || 1248
-  const avgScore = analytics?.average_student_skill_score || 67.5
+  const totalStudents = analytics?.total_students ?? 0
+  const avgScore = analytics?.average_student_skill_score ?? 0
   const topGaps = analytics?.top_skill_gaps || []
-  const readiness = analytics?.student_readiness || { job_ready_count: 320, improving_count: 650, needs_focus_count: 278 }
-  const placement = analytics?.placement_statistics || { total_applications: 450, shortlisted_applications: 180, selected_applications: 95 }
+  const readiness = analytics?.student_readiness || { job_ready_count: 0, improving_count: 0, needs_focus_count: 0 }
+  const placement = analytics?.placement_statistics || { total_applications: 0, shortlisted_applications: 0, selected_applications: 0 }
 
   return (
     <div className="space-y-6">

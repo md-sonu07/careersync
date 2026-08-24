@@ -19,6 +19,16 @@ export const analyticsApi = {
     const { data } = await apiClient.get(ENDPOINTS.ANALYTICS.ACADEMICIAN)
     return data
   },
+
+  // System admin analytics
+  getSystemAnalytics: async () => {
+    try {
+      const { data } = await apiClient.get('/api/analytics/system/')
+      return data
+    } catch {
+      return null
+    }
+  },
 }
 
 export default analyticsApi

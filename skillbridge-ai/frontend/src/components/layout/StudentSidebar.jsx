@@ -1,6 +1,5 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import { mockUser } from '../../utils/mockData'
 
 const navSections = [
   { label: 'Overview', items: [{ label: 'Dashboard', icon: 'dashboard', path: '/student' }] },
@@ -72,8 +71,8 @@ export default function StudentSidebar({ onNavigate }) {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
   const isActive = (p) => pathname === p || (p !== '/student' && pathname.startsWith(p))
-  const displayName = user?.full_name || (user?.first_name ? `${user.first_name} ${user.last_name}` : mockUser.name)
-  const displayEmail = user?.email || mockUser.branch
+  const displayName = user?.full_name || (user?.first_name ? `${user.first_name} ${user.last_name}` : 'Student')
+  const displayEmail = user?.email || 'student@careersync.com'
   const handleLogout = async () => { await logout(); if (onNavigate) onNavigate(); navigate('/login') }
   return (
     <div className="flex h-full flex-col">
@@ -89,7 +88,7 @@ export default function StudentSidebar({ onNavigate }) {
           <span className="material-symbols-outlined text-[20px]">logout</span>
         </button>
       </header>
-      <div className="hidden lg:flex items-center gap-3 px-5 py-4 border-b border-white/10">
+      <div className="hidden lg:flex h-[68px] shrink-0 items-center gap-3 px-5 border-b border-white/10">
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-slate-900 font-bold text-sm">CS</div>
         <div className="min-w-0">
           <p className="text-sm font-bold text-white leading-none">CareerSync</p>
@@ -116,7 +115,9 @@ export default function StudentSidebar({ onNavigate }) {
       </div>
       <div className="border-t border-white/10 p-3 space-y-2">
         <div className="flex items-center gap-3 rounded-2xl bg-white/10 border border-white/10 p-3">
-          <img src={mockUser.avatar} alt={displayName} className="h-9 w-9 rounded-full object-cover border border-white/20 shrink-0" />
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500 text-white font-bold text-sm shrink-0">
+            {displayName.slice(0, 2).toUpperCase()}
+          </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-white truncate">{displayName}</p>
             <p className="text-xs text-slate-400 truncate">{displayEmail}</p>

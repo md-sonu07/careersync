@@ -19,6 +19,8 @@ import AcademiaProgress from '../pages/Academia/Progress'
 import AcademiaAssessments from '../pages/Academia/Assessments'
 import IndustryPartners from '../pages/Academia/IndustryPartners'
 
+import ProtectedRoute from './ProtectedRoute'
+
 const Placeholder = ({ title, subtitle }) => (
   <div className="py-16 text-center">
     <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-sage text-primary mb-4">
@@ -31,32 +33,37 @@ const Placeholder = ({ title, subtitle }) => (
 
 export const academiaRoutes = {
   path: '/academia',
-  element: <AcademiaLayout />,
+  element: <ProtectedRoute allowedRoles={['academician', 'academia']} />,
   errorElement: <ErrorBoundary />,
   children: [
-    { index: true, element: <AcademiaDashboard /> },
-    { path: 'dashboard', element: <AcademiaDashboard /> },
-    { path: 'students', element: <AcademiaStudents /> },
-    { path: 'student/:id', element: <Performance /> },
-    { path: 'performance', element: <Performance /> },
-    { path: 'skill-distribution', element: <SkillDistribution /> },
-    { path: 'skills', element: <SkillDistribution /> },
-    { path: 'courses', element: <AcademiaCourses /> },
-    { path: 'progress', element: <AcademiaProgress /> },
-    { path: 'assessments', element: <AcademiaAssessments /> },
-    { path: 'industry-demand', element: <IndustryDemand /> },
-    { path: 'skill-gaps', element: <AcademiaSkillGaps /> },
-    { path: 'trending-skills', element: <TrendingSkills /> },
-    { path: 'industry-partners', element: <IndustryPartners /> },
-    { path: 'internships', element: <Placeholder title="Academia Internships" /> },
-    { path: 'jobs', element: <Placeholder title="Academia Jobs" /> },
-    { path: 'placements', element: <AcademiaPlacements /> },
-    { path: 'training-recommendations', element: <TrainingRecommendations /> },
-    { path: 'workshops', element: <Workshops /> },
-    { path: 'training-programs', element: <TrainingPrograms /> },
-    { path: 'reports', element: <AcademiaReports /> },
-    { path: 'analytics', element: <AcademiaAnalytics /> },
-    { path: 'notifications', element: <Placeholder title="Notifications" /> },
-    { path: 'settings', element: <Placeholder title="Academia Settings" /> },
+    {
+      element: <AcademiaLayout />,
+      children: [
+        { index: true, element: <AcademiaDashboard /> },
+        { path: 'dashboard', element: <AcademiaDashboard /> },
+        { path: 'students', element: <AcademiaStudents /> },
+        { path: 'student/:id', element: <Performance /> },
+        { path: 'performance', element: <Performance /> },
+        { path: 'skill-distribution', element: <SkillDistribution /> },
+        { path: 'skills', element: <SkillDistribution /> },
+        { path: 'courses', element: <AcademiaCourses /> },
+        { path: 'progress', element: <AcademiaProgress /> },
+        { path: 'assessments', element: <AcademiaAssessments /> },
+        { path: 'industry-demand', element: <IndustryDemand /> },
+        { path: 'skill-gaps', element: <AcademiaSkillGaps /> },
+        { path: 'trending-skills', element: <TrendingSkills /> },
+        { path: 'industry-partners', element: <IndustryPartners /> },
+        { path: 'internships', element: <Placeholder title="Academia Internships" /> },
+        { path: 'jobs', element: <Placeholder title="Academia Jobs" /> },
+        { path: 'placements', element: <AcademiaPlacements /> },
+        { path: 'training-recommendations', element: <TrainingRecommendations /> },
+        { path: 'workshops', element: <Workshops /> },
+        { path: 'training-programs', element: <TrainingPrograms /> },
+        { path: 'reports', element: <AcademiaReports /> },
+        { path: 'analytics', element: <AcademiaAnalytics /> },
+        { path: 'notifications', element: <Placeholder title="Notifications" /> },
+        { path: 'settings', element: <Placeholder title="Academia Settings" /> },
+      ],
+    },
   ],
 }
