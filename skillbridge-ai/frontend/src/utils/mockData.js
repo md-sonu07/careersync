@@ -214,15 +214,15 @@ export const mockApplications = [
 ]
 
 export const mockProjects = [
-  { id: 'p1', title: 'SkillBridge — Career Portal', desc: 'MERN stack portal with AI skill-gap analysis.', skills: ['React', 'Node.js', 'MongoDB'], status: 'In Progress', progress: 70, link: '#' },
+  { id: 'p1', title: 'CareerSync — Career Portal', desc: 'MERN stack portal with AI skill-gap analysis.', skills: ['React', 'Node.js', 'MongoDB'], status: 'In Progress', progress: 70, link: '#' },
   { id: 'p2', title: 'E-Commerce API', desc: 'REST API with auth, payments, admin panel.', skills: ['Express', 'JWT', 'MongoDB'], status: 'Completed', progress: 100, link: '#' },
   { id: 'p3', title: 'Realtime Chat App', desc: 'Socket.io chat with rooms and typing indicators.', skills: ['React', 'Socket.io'], status: 'Planned', progress: 10, link: '#' },
 ]
 
 export const mockCertificates = [
-  { id: 'cert1', title: 'React Mastery — Completion', issuer: 'SkillBridge AI', date: '2026-02-01', credential: 'SB-2026-REACT-1842', skills: ['React'] },
-  { id: 'cert2', title: 'Node.js Backend Bootcamp', issuer: 'SkillBridge AI', date: '2026-01-15', credential: 'SB-2026-NODE-7721', skills: ['Node.js', 'Express'] },
-  { id: 'cert3', title: 'Git & GitHub Fundamentals', issuer: 'SkillBridge AI', date: '2025-12-20', credential: 'SB-2025-GIT-4419', skills: ['Git'] },
+  { id: 'cert1', title: 'React Mastery — Completion', issuer: 'CareerSync', date: '2026-02-01', credential: 'CS-2026-REACT-1842', skills: ['React'] },
+  { id: 'cert2', title: 'Node.js Backend Bootcamp', issuer: 'CareerSync', date: '2026-01-15', credential: 'CS-2026-NODE-7721', skills: ['Node.js', 'Express'] },
+  { id: 'cert3', title: 'Git & GitHub Fundamentals', issuer: 'CareerSync', date: '2025-12-20', credential: 'CS-2025-GIT-4419', skills: ['Git'] },
 ]
 
 export const mockRoadmap = [
@@ -276,7 +276,7 @@ export const mockAIQuestions = [
 ]
 
 export const mockChatMessages = [
-  { id: 1, role: 'ai', text: 'Hey Rahul! I’m your SkillBridge AI Assistant. Ask me anything about your skills, roadmap, or courses 👋', time: '10:30 AM' },
+  { id: 1, role: 'ai', text: 'Hey Rahul! I’m your CareerSync AI Assistant. Ask me anything about your skills, roadmap, or courses 👋', time: '10:30 AM' },
   { id: 2, role: 'user', text: 'What should I focus on to become internship-ready as a Full Stack Developer?', time: '10:31 AM' },
   { id: 3, role: 'ai', text: 'Great question! Based on your profile, you’re strong in JS/React/Node (78–86%) but Docker (43%) and Testing (38%) are your critical gaps. I recommend: 1) Docker & DevOps Essentials (10h), 2) Jest & RTL (8h). Completing these will push your Career Readiness from 82% → 91%. Want a 2-week study plan?', time: '10:31 AM' },
 ]

@@ -30,7 +30,7 @@ const Navbar = () => {
         }`}
       >
       <Link to="/" className="flex items-center gap-2">
-        <span className="text-xl md:text-2xl font-bold text-primary tracking-tight">SkillBridge AI</span>
+        <span className="text-xl md:text-2xl font-bold text-primary tracking-tight">CareerSync</span>
       </Link>
 
       <div className="hidden lg:flex items-center gap-6">

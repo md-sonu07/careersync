@@ -13,7 +13,7 @@ const HowItWorks = () => {
   return (
     <section id="how-it-works" className="py-24 bg-surface">
       <div className="max-w-7xl mx-auto px-6 md:px-8">
-        <SectionHeading title="How SkillBridge Works" subtitle="A seamless journey from academic learning to professional success." />
+        <SectionHeading title="How CareerSync Works" subtitle="A seamless journey from academic learning to professional success." />
 
         <div className="grid md:grid-cols-5 gap-6">
           {steps.map((s) => (

@@ -1,4 +1,4 @@
-# SkillBridge AI — AI-Powered LMS + Skill Intelligence + Internship & Placement Platform
+# CareerSync — AI-Powered LMS + Skill Intelligence + Internship & Placement Platform
 
 **Tagline:** Learn Better. Build Skills. Get Industry-Ready.  
 **Core loop:** Discover → Assess → Analyze → Learn → Practice → Improve → Match → Apply → Interview → Selected

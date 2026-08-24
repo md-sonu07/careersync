@@ -45,7 +45,7 @@ const ForStudents = () => {
                 Your personal <span className="text-primary">career co-pilot</span>
               </h1>
               <p className="mt-4 text-lg leading-relaxed text-muted">
-                Stop guessing what to learn. SkillBridge shows you exactly where you stand, what to learn next, and which opportunities match — all in one place.
+                Stop guessing what to learn. CareerSync shows you exactly where you stand, what to learn next, and which opportunities match — all in one place.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link to="/register"><Button size="lg">Start free assessment</Button></Link>

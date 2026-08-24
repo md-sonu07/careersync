@@ -1,4 +1,4 @@
-export const APP_NAME = 'SkillBridge AI'
+export const APP_NAME = 'CareerSync'
 export const ROLES = {
   STUDENT: 'student',
   MENTOR: 'mentor',

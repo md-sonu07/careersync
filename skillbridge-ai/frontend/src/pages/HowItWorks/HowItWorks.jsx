@@ -79,7 +79,7 @@ const HowItWorks = () => {
               From profile to placement — <span className="text-primary">in 5 steps</span>
             </h1>
             <p className="mt-4 text-lg leading-relaxed text-muted">
-              SkillBridge AI turns ambiguity into a clear loop: understand where you are, close what matters, and connect to roles that fit.
+              CareerSync turns ambiguity into a clear loop: understand where you are, close what matters, and connect to roles that fit.
             </p>
           </div>
         </div>
@@ -117,7 +117,7 @@ const HowItWorks = () => {
         <Card className="mt-10 p-6 md:p-8 overflow-hidden">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h3 className="font-bold text-charcoal">The SkillBridge Loop</h3>
+              <h3 className="font-bold text-charcoal">The CareerSync Loop</h3>
               <p className="text-sm text-muted">Continuous improvement flywheel — every cycle raises your match %</p>
             </div>
             <Badge variant="success">Live feedback loop</Badge>

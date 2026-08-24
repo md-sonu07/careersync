@@ -20,7 +20,7 @@ const Hero = () => {
           </h1>
 
           <p className="text-lg text-charcoal/70 max-w-xl leading-relaxed">
-            SkillBridge AI combines personalized learning, AI-powered assessment, skill-gap analysis, and intelligent
+            CareerSync combines personalized learning, AI-powered assessment, skill-gap analysis, and intelligent
             internship matching in one platform.
           </p>
 

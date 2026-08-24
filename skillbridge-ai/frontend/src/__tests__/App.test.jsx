@@ -6,12 +6,12 @@ import { store } from '../app/store'
 import router from '../routes'
 
 describe('App', () => {
-  it('renders SkillBridge AI heading', () => {
+  it('renders CareerSync heading', () => {
     render(
       <Provider store={store}>
         <RouterProvider router={router} />
       </Provider>
     )
-    expect(screen.getAllByText(/SkillBridge AI/i).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/CareerSync/i).length).toBeGreaterThan(0)
   })
 })

@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           {/* Brand */}
           <div className="flex flex-col gap-6">
-            <div className="text-2xl font-bold tracking-tight">SkillBridge AI</div>
+            <div className="text-2xl font-bold tracking-tight">CareerSync</div>
             <p className="text-white/80 text-sm leading-relaxed">
               The intelligent bridge between academic learning and industry excellence. Empowering the next generation of
               professionals through AI-driven skill matching.
@@ -92,7 +92,7 @@ const Footer = () => {
             <h4 className="font-bold mb-6 text-lg">Contact</h4>
             <ul className="flex flex-col gap-3 text-sm text-white/80">
               <li className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[18px]">mail</span> info@skillbridge.ai
+                <span className="material-symbols-outlined text-[18px]">mail</span> info@careersync.ai
               </li>
               <li className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-[18px]">location_on</span> Silicon Valley, CA
@@ -105,7 +105,7 @@ const Footer = () => {
         </div>
 
         <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/60">
-          <p>© {new Date().getFullYear()} SkillBridge AI. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} CareerSync. All rights reserved.</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-accent transition-colors">
               Privacy Policy

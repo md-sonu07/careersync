@@ -7,7 +7,7 @@ const CTA = () => {
         <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
           Build skills that industry values.
           <br />
-          Join SkillBridge AI.
+          Join CareerSync.
         </h2>
         <p className="text-xl text-white/80 mb-8">Take the first step towards a guaranteed internship and a successful career.</p>
         <Link to="/register">

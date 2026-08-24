@@ -35,6 +35,10 @@ export const ENDPOINTS = {
   },
   SKILLS: {
     LIST: '/skills/',
+    CAREER_ROLES: '/skills/career-roles/',
+    MY_SKILLS: '/students/my-skills/',
+    MY_SKILLS_HISTORY: '/students/my-skills/history/',
+    MY_SKILL_DETAIL: (id) => `/students/my-skills/${id}/`,
     RECOMMEND: '/skills/recommend/',
   },
 }

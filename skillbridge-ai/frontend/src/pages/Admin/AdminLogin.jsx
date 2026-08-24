@@ -81,7 +81,7 @@ export default function AdminLogin() {
               <span className="material-symbols-outlined text-[22px]">shield</span>
             </span>
             <span className="text-white">
-              <span className="font-bold tracking-tight">SkillBridge</span>{" "}
+              <span className="font-bold tracking-tight">CareerSync</span>{" "}
               <span className="font-light">Admin</span>
             </span>
           </Link>
@@ -128,7 +128,7 @@ export default function AdminLogin() {
           <span className="w-9 h-9 rounded-xl bg-white text-slate-900 grid place-items-center">
             <span className="material-symbols-outlined text-[20px]">shield</span>
           </span>
-          <span className="font-bold">SkillBridge Admin</span>
+          <span className="font-bold">CareerSync Admin</span>
         </Link>
         <Link to="/login" className="text-xs font-medium text-slate-300 border border-slate-700 rounded-full px-3 py-1.5">
           User login
@@ -286,7 +286,7 @@ export default function AdminLogin() {
           </div>
 
           <p className="mt-4 text-center text-[11px] tracking-wide text-slate-600">
-            © 2026 SkillBridge AI • Admin Portal v1.0 • All rights reserved
+            © 2026 CareerSync • Admin Portal v1.0 • All rights reserved
           </p>
         </div>
       </div>

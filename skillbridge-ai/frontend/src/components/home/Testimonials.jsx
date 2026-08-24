@@ -1,12 +1,12 @@
 const testimonials = [
   {
-    text: 'SkillBridge AI transformed my job search. The personalized learning path filled exactly the gaps I needed to land a role at a top tech firm.',
+    text: 'CareerSync transformed my job search. The personalized learning path filled exactly the gaps I needed to land a role at a top tech firm.',
     name: 'Alex S.',
     role: 'Software Engineer Intern',
     initials: 'AS',
   },
   {
-    text: 'We partner with SkillBridge because they provide candidates who are truly industry-ready. The quality of interns is consistently excellent.',
+    text: 'We partner with CareerSync because they provide candidates who are truly industry-ready. The quality of interns is consistently excellent.',
     name: 'Maria J.',
     role: 'Director of Engineering, TechCorp',
     initials: 'MJ',

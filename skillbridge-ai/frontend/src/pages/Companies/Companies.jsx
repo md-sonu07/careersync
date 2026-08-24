@@ -7,7 +7,7 @@ import EmptyState from '../../components/ui/EmptyState'
 const View = () => {
   return (
     <div className="space-y-6">
-      <PageHeader title="Companies" subtitle="Browse verified companies hiring on SkillBridge." actions={<Button>Primary Action</Button>} />
+      <PageHeader title="Companies" subtitle="Browse verified companies hiring on CareerSync." actions={<Button>Primary Action</Button>} />
       <div className="grid gap-6">
         <Card>
           <div className="flex items-center gap-3 mb-4">
@@ -16,7 +16,7 @@ const View = () => {
             </div>
             <div>
               <h3 className="font-bold text-charcoal">Companies</h3>
-              <p className="text-sm text-muted">Browse verified companies hiring on SkillBridge.</p>
+              <p className="text-sm text-muted">Browse verified companies hiring on CareerSync.</p>
             </div>
             <Badge className="ml-auto" variant="success">Live</Badge>
           </div>

@@ -19,7 +19,7 @@ export default function IndustryDemand() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-charcoal">Industry Demand</h1>
-        <p className="text-sm text-muted mt-1">Most in-demand skills across industry postings on SkillBridge.</p>
+        <p className="text-sm text-muted mt-1">Most in-demand skills across industry postings on CareerSync.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

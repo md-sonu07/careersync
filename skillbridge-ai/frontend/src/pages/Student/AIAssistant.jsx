@@ -21,14 +21,14 @@ export default function AIAssistant() {
     setMessages((m) => [...m, userMsg])
     setInput('')
     setTimeout(() => {
-      setMessages((m) => [...m, { id: Date.now() + 1, role: 'ai', text: `Got it! As your SkillBridge AI, here’s a quick take on “${userMsg.text.slice(0, 60)}”: I’ll map this to your Full Stack roadmap and suggest the next best step. Try asking “Generate 5 MCQs on this” for practice.`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }])
+      setMessages((m) => [...m, { id: Date.now() + 1, role: 'ai', text: `Got it! As your CareerSync AI, here’s a quick take on “${userMsg.text.slice(0, 60)}”: I’ll map this to your Full Stack roadmap and suggest the next best step. Try asking “Generate 5 MCQs on this” for practice.`, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }])
     }, 600)
   }
 
   return (
     <div className="flex flex-col h-[calc(100vh-140px)] lg:h-[calc(100vh-120px)]">
       <div className="shrink-0">
-        <PageHeader title="SkillBridge AI Assistant" subtitle="Your 24/7 mentor — ask about skills, courses, roadmap, or generate practice on demand." />
+        <PageHeader title="CareerSync AI Assistant" subtitle="Your 24/7 mentor — ask about skills, courses, roadmap, or generate practice on demand." />
         <div className="mt-4 flex flex-wrap gap-2">
           {chips.map((c) => (
             <button key={c} onClick={() => setInput(c)} className="rounded-full border border-border bg-white px-3 py-1.5 text-xs font-semibold text-charcoal hover:bg-background hover:border-primary/20 transition-colors">
@@ -42,7 +42,7 @@ export default function AIAssistant() {
         <div className="flex items-center gap-3 border-b border-border px-5 py-3 bg-sage/40">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white"><span className="material-symbols-outlined text-[20px]">smart_toy</span></div>
           <div>
-            <p className="text-sm font-bold text-charcoal">SkillBridge AI</p>
+            <p className="text-sm font-bold text-charcoal">CareerSync AI</p>
             <p className="text-xs text-muted">Context: React • Full Stack Developer track • 82% ready</p>
           </div>
           <Badge variant="success" className="ml-auto">ONLINE</Badge>

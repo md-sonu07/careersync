@@ -1,13 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
 import Select from '../../components/ui/Select'
 import { ProgressRing, ProgressBar } from '../../components/ui/Progress'
 import PageHeader from '../../components/common/PageHeader'
+import { skillApi } from '../../api/skill.api'
 import { mockCourses, mockInternships, mockSkillGap } from '../../utils/mockData'
-
-const requiredSkills = ['React', 'Node.js', 'MongoDB', 'Express.js', 'REST APIs', 'Testing (Jest)', 'Docker', 'AWS']
 
 export default function CareerGoal() {
   const [career, setCareer] = useState('Full Stack Developer')
@@ -15,6 +14,36 @@ export default function CareerGoal() {
   const [location, setLocation] = useState('Remote / Bengaluru')
   const [workPref, setWorkPref] = useState('Internship → Full-time')
   const [saved, setSaved] = useState(false)
+  const [careerRoles, setCareerRoles] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let isMounted = true
+    const loadCareerRoles = async () => {
+      try {
+        const data = await skillApi.getCareerRoles()
+        if (isMounted && data && data.length > 0) {
+          setCareerRoles(data)
+          if (!data.some(r => r.title === career)) {
+            setCareer(data[0].title)
+          }
+        }
+      } catch {
+        // Fallback to default mock role list
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+    loadCareerRoles()
+    return () => { isMounted = false }
+  }, [])
+
+  const selectedRoleObj = careerRoles.find(r => r.title === career)
+  const roleSkillRequirements = selectedRoleObj?.skill_requirements || []
+
+  const roleOptions = careerRoles.length > 0 
+    ? careerRoles.map(r => r.title)
+    : ['Full Stack Developer', 'Frontend Developer', 'Backend Developer', 'AI / ML Engineer', 'DevOps Engineer']
 
   const gaps = mockSkillGap.filter(s => s.status !== 'strong').slice(0, 3)
   const recCourses = mockCourses.slice(0, 3)
@@ -23,7 +52,7 @@ export default function CareerGoal() {
     <div className="space-y-6">
       <PageHeader
         title="Career Goal"
-        subtitle="Define your target role so SkillBridge can personalize your roadmap, courses and matches."
+        subtitle="Define your target role — connected to CareerSync Career Intelligence database."
         actions={saved ? <Badge variant="success" icon="check">Saved ✓</Badge> : null}
       />
 
@@ -34,10 +63,30 @@ export default function CareerGoal() {
             <h3 className="font-bold text-charcoal">Choose your target</h3>
             <p className="mt-1 text-sm text-muted">You can change this anytime — your roadmap will adapt automatically.</p>
             <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Select label="Target Career / Role" value={career} onChange={e => setCareer(e.target.value)} options={['Full Stack Developer','Frontend Developer','Backend Developer','Data Analyst','DevOps Engineer','Product Manager']} />
-              <Select label="Industry" value={industry} onChange={e => setIndustry(e.target.value)} options={['Technology / SaaS','Fintech','E-commerce','Healthcare','EdTech','AI / ML']} />
-              <Select label="Preferred Location" value={location} onChange={e => setLocation(e.target.value)} options={['Remote / Bengaluru','Bengaluru','Delhi NCR','Mumbai','Hyderabad','Remote Only']} />
-              <Select label="Work Preference" value={workPref} onChange={e => setWorkPref(e.target.value)} options={['Internship → Full-time','Internship Only','Full-time Only','Part-time / Freelance']} />
+              <Select
+                label="Target Career / Role"
+                value={career}
+                onChange={e => setCareer(e.target.value)}
+                options={roleOptions}
+              />
+              <Select
+                label="Industry"
+                value={industry}
+                onChange={e => setIndustry(e.target.value)}
+                options={['Technology / SaaS','Fintech','E-commerce','Healthcare','EdTech','AI / ML']}
+              />
+              <Select
+                label="Preferred Location"
+                value={location}
+                onChange={e => setLocation(e.target.value)}
+                options={['Remote / Bengaluru','Bengaluru','Delhi NCR','Mumbai','Hyderabad','Remote Only']}
+              />
+              <Select
+                label="Work Preference"
+                value={workPref}
+                onChange={e => setWorkPref(e.target.value)}
+                options={['Internship → Full-time','Internship Only','Full-time Only','Part-time / Freelance']}
+              />
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button onClick={() => { setSaved(true); setTimeout(()=>setSaved(false),2200)}}>Save Career Goal</Button>
@@ -47,14 +96,27 @@ export default function CareerGoal() {
           </Card>
 
           <Card>
-            <h3 className="font-bold text-charcoal">Required Skills for {career}</h3>
-            <p className="mt-1 text-xs text-muted">Based on top industry postings for this role • Last updated Feb 2026</p>
+            <h3 className="font-bold text-charcoal">Required Skill Benchmarks for {career}</h3>
+            <p className="mt-1 text-xs text-muted">Fetched live from CareerSync Career Intelligence Database</p>
             <div className="mt-4 flex flex-wrap gap-2">
-              {requiredSkills.map(s => {
-                const gap = mockSkillGap.find(x=>x.skill.includes(s.split(' ')[0]))
-                const isGap = gap && gap.status !== 'strong'
-                return <span key={s} className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${isGap ? 'bg-white border-amber-200 text-amber-700' : 'bg-sage border-sage text-primary'}`}>{s} {isGap ? '• gap' : '• ready'}</span>
-              })}
+              {roleSkillRequirements.length > 0 ? (
+                roleSkillRequirements.map(req => (
+                  <span
+                    key={req.id || req.skill?.name}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
+                      req.is_required ? 'bg-sage border-sage text-primary' : 'bg-background border-border text-charcoal'
+                    }`}
+                  >
+                    {req.skill?.name} (Min: {req.required_score}%) {req.is_required ? '• required' : '• optional'}
+                  </span>
+                ))
+              ) : (
+                ['React.js', 'Node.js', 'PostgreSQL', 'Django', 'REST APIs', 'Docker', 'AWS'].map(s => (
+                  <span key={s} className="rounded-full border px-3 py-1.5 text-xs font-semibold bg-sage border-sage text-primary">
+                    {s} • Benchmark 75%
+                  </span>
+                ))
+              )}
             </div>
           </Card>
 

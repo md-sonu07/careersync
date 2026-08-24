@@ -14,7 +14,7 @@ const stats = [
 
 const timeline = [
   { year: '2022', title: 'The Idea', desc: 'Identified the growing skill-gap between academia and industry. Started researching AI-driven assessment models.' },
-  { year: '2023', title: 'SkillBridge MVP', desc: 'Launched early access with 3 universities and 20 hiring partners. First 1,000 skill profiles created.' },
+  { year: '2023', title: 'CareerSync MVP', desc: 'Launched early access with 3 universities and 20 hiring partners. First 1,000 skill profiles created.' },
   { year: '2024', title: 'AI Matching Engine', desc: 'Introduced adaptive assessments and gap-based roadmaps. 15k learners placed in internships.' },
   { year: '2026', title: 'Ecosystem Scale', desc: 'Tri-sided platform for students, industry and academia — analytics, pipelines and verified certificates.' },
 ]
@@ -39,16 +39,16 @@ const About = () => {
       <section className="border-b border-border bg-surface">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:py-24">
           <div className="mx-auto max-w-3xl text-center">
-            <Badge variant="default" className="mb-4">About SkillBridge AI</Badge>
+            <Badge variant="default" className="mb-4">About CareerSync</Badge>
             <h1 className="text-4xl font-bold tracking-tight text-charcoal md:text-5xl">
               Bridging <span className="text-primary">education</span> to opportunity with AI
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-muted">
-              SkillBridge AI is an education SaaS that aligns what students learn, what institutions teach, and what industry actually needs — through adaptive assessments, skill roadmaps and intelligent matching.
+              CareerSync is an education SaaS that aligns what students learn, what institutions teach, and what industry actually needs — through adaptive assessments, skill roadmaps and intelligent matching.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link to="/register">
-                <Button size="lg">Join SkillBridge</Button>
+                <Button size="lg">Join CareerSync</Button>
               </Link>
               <Link to="/how-it-works">
                 <Button variant="outline" size="lg">How it works</Button>

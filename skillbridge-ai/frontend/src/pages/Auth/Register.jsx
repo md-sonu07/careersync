@@ -221,22 +221,22 @@ export default function Register() {
         <div className="absolute -bottom-32 -left-20 w-[28rem] h-[28rem] bg-accent/20 rounded-full blur-3xl" />
         <div className="relative z-10 p-10 xl:p-12">
           <Link to="/" className="inline-flex items-center gap-3">
-            <span className="w-10 h-10 rounded-xl bg-white text-primary grid place-items-center font-bold text-lg">S</span>
-            <span className="text-xl font-bold tracking-tight">SkillBridge AI</span>
+            <span className="w-10 h-10 rounded-xl bg-white text-primary grid place-items-center font-bold text-lg">C</span>
+            <span className="text-xl font-bold tracking-tight">CareerSync</span>
           </Link>
           <p className="mt-2 text-white/70 text-sm font-medium tracking-wide uppercase">Bridging Talent &amp; Opportunity</p>
         </div>
         <div className="relative z-10 px-10 xl:px-12 pb-10">
           <div className="max-w-md">
             <h1 className="text-[2.1rem] font-bold leading-tight">Create your<br />future with us.</h1>
-            <p className="mt-4 text-white/75 leading-relaxed">Whether you&apos;re a student, industry partner or educator — SkillBridge connects you to real projects, mentors and talent.</p>
+            <p className="mt-4 text-white/75 leading-relaxed">Whether you&apos;re a student, industry partner or educator — CareerSync connects you to real projects, mentors and talent.</p>
             <div className="mt-8 grid grid-cols-3 gap-4 text-center">
               <div className="rounded-2xl bg-white/10 border border-white/15 p-4"><p className="text-2xl font-bold">10k+</p><p className="text-xs text-white/70 mt-1">Students</p></div>
               <div className="rounded-2xl bg-white/10 border border-white/15 p-4"><p className="text-2xl font-bold">500+</p><p className="text-xs text-white/70 mt-1">Companies</p></div>
               <div className="rounded-2xl bg-white/10 border border-white/15 p-4"><p className="text-2xl font-bold">1.2k</p><p className="text-xs text-white/70 mt-1">Mentors</p></div>
             </div>
             <div className="mt-8 rounded-2xl bg-white/10 backdrop-blur border border-white/15 p-5">
-              <blockquote className="text-white text-sm leading-relaxed">“We hired 12 interns through SkillBridge — all pre-vetted and project-ready.”</blockquote>
+              <blockquote className="text-white text-sm leading-relaxed">“We hired 12 interns through CareerSync — all pre-vetted and project-ready.”</blockquote>
               <div className="mt-3 flex items-center gap-3">
                 <img src="https://i.pravatar.cc/100?img=15" alt="" className="w-9 h-9 rounded-full border border-white/20" />
                 <div><p className="text-sm font-semibold">Rajesh Verma</p><p className="text-xs text-white/60">HR Lead — Infosys</p></div>
@@ -247,7 +247,7 @@ export default function Register() {
       </div>
 
       <div className="lg:hidden bg-primary text-white px-6 py-5 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2.5"><span className="w-9 h-9 rounded-xl bg-white text-primary grid place-items-center font-bold">S</span><span className="font-bold">SkillBridge AI</span></Link>
+        <Link to="/" className="flex items-center gap-2.5"><span className="w-9 h-9 rounded-xl bg-white text-primary grid place-items-center font-bold">C</span><span className="font-bold">CareerSync</span></Link>
         <Link to="/login" className="text-sm font-medium underline underline-offset-4 decoration-white/30">Sign in</Link>
       </div>
 

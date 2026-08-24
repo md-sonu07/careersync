@@ -47,7 +47,7 @@ export default function Profile() {
     <div className="space-y-6">
       <PageHeader
         title="My Profile"
-        subtitle="Manage your personal, education and career info — connected to SkillBridge AI backend."
+        subtitle="Manage your personal, education and career info — connected to CareerSync backend."
         actions={<Button variant="outline">Edit Profile</Button>}
       />
 

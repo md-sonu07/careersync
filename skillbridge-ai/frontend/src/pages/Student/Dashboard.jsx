@@ -141,7 +141,7 @@ export default function Dashboard() {
             </div>
             <div className="flex-1">
               <h3 className="text-sm font-bold text-charcoal">AI Career Insight</h3>
-              <p className="text-xs text-muted">Powered by SkillBridge AI</p>
+              <p className="text-xs text-muted">Powered by CareerSync</p>
             </div>
             <Badge variant="success" className="!bg-white !text-primary border border-border">82% READY</Badge>
           </div>

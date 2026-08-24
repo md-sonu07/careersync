@@ -119,10 +119,10 @@ export default function Login() {
         <div className="relative z-10 p-10 xl:p-12">
           <Link to="/" className="inline-flex items-center gap-3">
             <span className="w-10 h-10 rounded-xl bg-white text-primary grid place-items-center font-bold text-lg">
-              S
+              C
             </span>
             <span className="text-xl font-bold tracking-tight">
-              SkillBridge AI
+              CareerSync
             </span>
           </Link>
           <p className="mt-2 text-white/70 text-sm font-medium tracking-wide uppercase">
@@ -151,7 +151,7 @@ export default function Login() {
                 ))}
               </div>
               <blockquote className="mt-3 text-white leading-relaxed text-sm">
-                “SkillBridge helped me land my first internship within 3 weeks.
+                “CareerSync helped me land my first internship within 3 weeks.
                 The mentorship and project matching is unmatched.”
               </blockquote>
               <div className="mt-4 flex items-center gap-3">
@@ -185,9 +185,9 @@ export default function Login() {
       <div className="lg:hidden bg-primary text-white px-6 py-5 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5">
           <span className="w-9 h-9 rounded-xl bg-white text-primary grid place-items-center font-bold">
-            S
+            C
           </span>
-          <span className="font-bold">SkillBridge AI</span>
+          <span className="font-bold">CareerSync</span>
         </Link>
         <Link
           to="/register"

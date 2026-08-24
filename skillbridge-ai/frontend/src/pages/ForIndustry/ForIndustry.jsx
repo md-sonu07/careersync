@@ -9,7 +9,7 @@ const steps = [
   { title: 'Define Skill Requirements', icon: 'tune', desc: 'Set must-have vs nice-to-have skills with proficiency levels. AI suggests weightings based on successful hires.' },
   { title: 'Discover Candidates', icon: 'search', desc: 'Browse skill-verified candidates ranked by match %. Filter by assessment score, projects and availability.' },
   { title: 'Smart Matching', icon: 'hub', desc: 'Our matching engine explains every score — why a candidate fits and what gap remains, if any.' },
-  { title: 'Application Management', icon: 'fact_check', desc: 'Kanban pipeline, collaborative notes, and one-click outreach. From applied to offer without leaving SkillBridge.' },
+  { title: 'Application Management', icon: 'fact_check', desc: 'Kanban pipeline, collaborative notes, and one-click outreach. From applied to offer without leaving CareerSync.' },
 ]
 
 const pipelineCols = [

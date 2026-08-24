@@ -7,16 +7,15 @@ import EmptyState from '../../components/ui/EmptyState'
 const View = () => {
   return (
     <div className="space-y-6">
-      <PageHeader title="Contact" subtitle="Get in touch with SkillBridge AI." actions={<Button>Primary Action</Button>} />
-      <div className="grid gap-6">
+      <PageHeader title="Contact" subtitle="Get in touch with CareerSync." actions={<Button>Primary Action</Button>} />
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-10 w-10 rounded-xl bg-sage flex items-center justify-center text-primary">
-              <span className="material-symbols-outlined">verified</span>
-            </div>
+          <h3 className="font-bold text-charcoal">Get in Touch</h3>
+          <p className="mt-1 text-sm text-muted">We&apos;re here to help.</p>
+          <div className="mt-6 flex flex-col gap-4">
             <div>
-              <h3 className="font-bold text-charcoal">Contact</h3>
-              <p className="text-sm text-muted">Get in touch with SkillBridge AI.</p>
+              <h4 className="text-sm font-semibold text-charcoal">Support</h4>
+              <p className="text-sm text-muted">Get in touch with CareerSync.</p>
             </div>
             <Badge className="ml-auto" variant="success">Live</Badge>
           </div>
