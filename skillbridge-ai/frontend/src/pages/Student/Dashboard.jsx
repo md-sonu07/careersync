@@ -9,6 +9,14 @@ import ChartCard from '../../components/common/ChartCard'
 import { mockUser, mockSkills, mockCourses, mockInternships, streakData } from '../../utils/mockData'
 import { skillApi } from '../../api/skill.api'
 import { opportunityApi } from '../../api/opportunity.api'
+import { courseApi } from '../../api/course.api'
+
+const recentActivity = [
+  { id: 'a1', text: 'Completed Python Foundations Assessment (Score: 85%)', time: '2 hours ago', icon: 'quiz', color: 'bg-primary' },
+  { id: 'a2', text: 'Applied for Frontend Engineering Intern @ Flipkart', time: 'Yesterday', icon: 'work', color: 'bg-accent' },
+  { id: 'a3', text: 'Updated Skill Gap Analysis for Full Stack Developer role', time: '2 days ago', icon: 'trending_up', color: 'bg-success' },
+  { id: 'a4', text: 'Earned Verified Badge in React.js', time: '3 days ago', icon: 'verified', color: 'bg-primary' },
+]
 
 const gapSkills = [
   { name: 'Docker', yours: 42, required: 65, gap: 23, priority: 'Critical' },
@@ -20,6 +28,7 @@ const gapSkills = [
 export default function Dashboard() {
   const [gapsList, setGapsList] = useState([])
   const [opportunityMatches, setOpportunityMatches] = useState([])
+  const [recommendations, setRecommendations] = useState([])
 
   useEffect(() => {
     let isMounted = true
@@ -35,8 +44,34 @@ export default function Dashboard() {
       })
       .catch(() => {})
 
+    courseApi.getRecommendations()
+      .then((data) => {
+        if (isMounted && data && data.length > 0) setRecommendations(data)
+      })
+      .catch(() => {})
+
     return () => { isMounted = false }
   }, [])
+
+  const recommendedCourses = recommendations.length > 0
+    ? recommendations.map((r) => ({
+        id: r.id,
+        title: r.resource?.title || 'Advanced Skill Course',
+        skill: typeof r.skill === 'string' ? r.skill : (r.skill?.name || 'Programming'),
+        difficulty: r.resource?.level || 'Intermediate',
+        duration: r.resource?.duration_minutes ? `${r.resource.duration_minutes} mins` : '2 hours',
+        rating: '4.8',
+        reason: r.recommended_reason || 'Recommended based on skill gap analysis',
+      }))
+    : mockCourses.slice(0, 3).map((c) => ({
+        id: c.id,
+        title: c.title,
+        skill: c.skills?.[0] || 'Web Development',
+        difficulty: c.difficulty,
+        duration: c.duration,
+        rating: c.rating,
+        reason: c.description || 'Recommended based on your target career role',
+      }))
 
   const topSkills = mockSkills.filter((s) => ['Git & GitHub', 'JavaScript', 'React', 'MongoDB', 'Node.js'].includes(s.name))
 
@@ -225,7 +260,9 @@ export default function Dashboard() {
             {recommendedCourses.map((rc) => (
               <div key={rc.id} className="rounded-2xl border border-border p-4 hover:bg-background">
                 <div className="flex items-start gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white font-bold text-sm shrink-0">{rc.skill[0]}</div>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white font-bold text-sm shrink-0">
+                    {rc.skill?.[0] || 'C'}
+                  </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-bold text-charcoal leading-tight">{rc.title}</p>
                     <p className="mt-0.5 flex flex-wrap gap-2 text-xs text-muted">
