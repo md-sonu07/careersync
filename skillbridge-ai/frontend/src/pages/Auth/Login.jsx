@@ -100,49 +100,49 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col lg:flex-row">
-      {/* Left — Branding / Testimonial */}
-      <div className="relative hidden lg:flex lg:w-[52%] bg-primary text-white flex-col justify-between overflow-hidden">
-        {/* subtle pattern */}
-        <div
-          className="absolute inset-0 opacity-[0.07]"
-          aria-hidden
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
-            backgroundSize: "28px 28px",
-          }}
-        />
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-32 -left-20 w-[28rem] h-[28rem] bg-accent/20 rounded-full blur-3xl" />
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto w-full my-auto grid lg:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl border border-border bg-surface items-stretch">
+        {/* Left — Branding / Testimonial (50% Width, Equal Height) */}
+        <div className="relative hidden lg:flex bg-primary text-white flex-col justify-between p-10 xl:p-12 overflow-hidden h-full">
+          {/* subtle pattern */}
+          <div
+            className="absolute inset-0 opacity-[0.07]"
+            aria-hidden
+            style={{
+              backgroundImage:
+                "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+              backgroundSize: "28px 28px",
+            }}
+          />
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-32 -left-20 w-[28rem] h-[28rem] bg-accent/20 rounded-full blur-3xl" />
 
-        <div className="relative z-10 p-10 xl:p-12">
-          <Link to="/" className="inline-flex items-center gap-3">
-            <span className="w-10 h-10 rounded-xl bg-white text-primary grid place-items-center font-bold text-lg">
-              C
-            </span>
-            <span className="text-xl font-bold tracking-tight">
-              CareerSync
-            </span>
-          </Link>
-          <p className="mt-2 text-white/70 text-sm font-medium tracking-wide uppercase">
-            Bridging Talent &amp; Opportunity
-          </p>
-        </div>
+          <div className="relative z-10">
+            <Link to="/" className="inline-flex items-center gap-3">
+              <span className="w-10 h-10 rounded-xl bg-white text-primary grid place-items-center font-bold text-lg">
+                C
+              </span>
+              <span className="text-xl font-bold tracking-tight">
+                CareerSync
+              </span>
+            </Link>
+            <p className="mt-2 text-white/70 text-sm font-medium tracking-wide uppercase">
+              Bridging Talent &amp; Opportunity
+            </p>
+          </div>
 
-        <div className="relative z-10 px-10 xl:px-12 pb-10">
-          <div className="max-w-md">
-            <h1 className="text-[2.1rem] font-bold leading-tight">
+          <div className="relative z-10 my-auto py-8">
+            <h1 className="text-[2.25rem] font-bold leading-tight">
               Where ambition
               <br />
               meets opportunity.
             </h1>
-            <p className="mt-4 text-white/75 leading-relaxed">
+            <p className="mt-4 text-white/75 leading-relaxed text-sm">
               Join thousands of students, mentors and industry partners building
               the future workforce — unified on one intelligent platform.
             </p>
 
-            <div className="mt-10 rounded-2xl bg-white/10 backdrop-blur border border-white/15 p-5">
+            <div className="mt-8 rounded-2xl bg-white/10 backdrop-blur border border-white/15 p-5">
               <div className="flex gap-1 text-accent-soft" aria-hidden>
                 {"★★★★★".split("").map((s, i) => (
                   <span key={i} className="text-sm">
@@ -156,7 +156,7 @@ export default function Login() {
               </blockquote>
               <div className="mt-4 flex items-center gap-3">
                 <img
-                  src="https://i.pravatar.cc/100?img=32"
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
                   alt=""
                   className="w-9 h-9 rounded-full object-cover border border-white/20"
                 />
@@ -168,84 +168,81 @@ export default function Login() {
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="mt-8 flex items-center gap-6 text-xs text-white/60">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />
-                10k+ Active learners
-              </span>
-              <span>•</span>
-              <span>500+ Industry partners</span>
-            </div>
+          <div className="relative z-10 flex items-center gap-6 text-xs text-white/70">
+            <span className="flex items-center gap-1.5 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />
+              10k+ Active learners
+            </span>
+            <span>•</span>
+            <span className="font-medium">500+ Industry partners</span>
           </div>
         </div>
-      </div>
 
-      {/* Mobile top brand bar */}
-      <div className="lg:hidden bg-primary text-white px-6 py-5 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2.5">
-          <span className="w-9 h-9 rounded-xl bg-white text-primary grid place-items-center font-bold">
-            C
-          </span>
-          <span className="font-bold">CareerSync</span>
-        </Link>
-        <Link
-          to="/register"
-          className="text-sm font-medium underline underline-offset-4 decoration-white/30"
-        >
-          Sign up
-        </Link>
-      </div>
+        {/* Mobile top brand bar */}
+        <div className="lg:hidden bg-primary text-white px-6 py-5 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2.5">
+            <span className="w-9 h-9 rounded-xl bg-white text-primary grid place-items-center font-bold">
+              C
+            </span>
+            <span className="font-bold">CareerSync</span>
+          </Link>
+          <Link
+            to="/register"
+            className="text-sm font-medium underline underline-offset-4 decoration-white/30"
+          >
+            Sign up
+          </Link>
+        </div>
 
-      {/* Right — Form card */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 lg:p-10 bg-background">
-        <div className="w-full max-w-[440px]">
-          {/* Toast / Alert placeholder */}
-          {toast && (
-            <div
-              role="alert"
-              aria-live="polite"
-              className={`mb-6 rounded-xl border px-4 py-3 text-sm flex gap-3 items-start ${toast.type === "success"
-                  ? "bg-success/10 border-success/20 text-success"
-                  : toast.type === "danger"
+        {/* Right — Form card (50% Width, Equal Height) */}
+        <div className="flex flex-col justify-center p-6 sm:p-10 lg:p-12 bg-surface h-full">
+          <div className="w-full max-w-md mx-auto">
+            {/* Toast / Alert placeholder */}
+            {toast && (
+              <div
+                role="alert"
+                aria-live="polite"
+                className={`mb-6 rounded-xl border px-4 py-3 text-sm flex gap-3 items-start ${
+                  toast.type === "success"
+                    ? "bg-success/10 border-success/20 text-success"
+                    : toast.type === "danger"
                     ? "bg-danger/10 border-danger/20 text-danger"
                     : "bg-primary/5 border-primary/20 text-primary"
                 }`}
-            >
-              <span className="material-symbols-outlined text-[20px] shrink-0">
-                {toast.type === "success"
-                  ? "check_circle"
-                  : toast.type === "danger"
+              >
+                <span className="material-symbols-outlined text-[20px] shrink-0">
+                  {toast.type === "success"
+                    ? "check_circle"
+                    : toast.type === "danger"
                     ? "error"
                     : "info"}
-              </span>
-              <span className="leading-relaxed">{toast.message}</span>
-              <button
-                onClick={() => setToast(null)}
-                className="ml-auto opacity-60 hover:opacity-100"
-                aria-label="Dismiss notification"
-              >
-                ✕
-              </button>
-            </div>
-          )}
+                </span>
+                <span className="leading-relaxed">{toast.message}</span>
+                <button
+                  onClick={() => setToast(null)}
+                  className="ml-auto opacity-60 hover:opacity-100"
+                  aria-label="Dismiss notification"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
 
-          <div className="bg-surface rounded-2xl border border-border shadow-card p-6 sm:p-8">
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-charcoal tracking-tight">
                 Welcome back
               </h2>
-              <p className="mt-1.5 text-sm text-muted">
+              <p className="mt-1.5 text-sm text-charcoal/70">
                 Sign in to continue your journey.{" "}
-                <Link to="/register" className="text-primary font-medium hover:underline underline-offset-4">
+                <Link to="/register" className="text-primary font-semibold hover:underline underline-offset-4">
                   Create account
                 </Link>
               </p>
             </div>
 
             <form onSubmit={handleSubmit} noValidate className="space-y-5">
-
-
               <Input
                 label="Email address"
                 type="email"
@@ -369,7 +366,7 @@ export default function Login() {
               </Button>
             </form>
 
-            <p className="mt-6 text-center text-sm text-muted">
+            <p className="mt-6 text-center text-sm text-charcoal/70">
               Don&apos;t have an account?{" "}
               <Link
                 to="/register"
@@ -379,7 +376,7 @@ export default function Login() {
               </Link>
             </p>
 
-            <p className="mt-4 text-center text-xs text-muted/70">
+            <p className="mt-4 text-center text-xs text-charcoal/60">
               Admin?{" "}
               <Link
                 to="/admin/login"
@@ -389,18 +386,6 @@ export default function Login() {
               </Link>
             </p>
           </div>
-
-          <p className="mt-6 text-center text-xs text-muted leading-relaxed px-4">
-            By signing in you agree to our{" "}
-            <a href="#" className="underline decoration-border underline-offset-4 hover:text-charcoal">
-              Terms
-            </a>{" "}
-            and{" "}
-            <a href="#" className="underline decoration-border underline-offset-4 hover:text-charcoal">
-              Privacy Policy
-            </a>
-            .
-          </p>
         </div>
       </div>
     </div>

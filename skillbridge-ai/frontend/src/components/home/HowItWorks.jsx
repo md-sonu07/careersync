@@ -2,27 +2,63 @@ import SectionHeading from '../common/SectionHeading'
 import Card from '../ui/Card'
 
 const steps = [
-  { icon: 'person_add', title: '1. Build Your Profile', desc: 'Create a comprehensive profile detailing your academic background and interests.', bg: 'bg-primary/10', color: 'text-primary' },
-  { icon: 'psychology', title: '2. Assess Your Skills', desc: 'Take our AI-driven assessments to evaluate your current technical capabilities.', bg: 'bg-accent/10', color: 'text-accent' },
-  { icon: 'troubleshoot', title: '3. Discover Gaps', desc: 'Identify exactly what skills you need to land your dream industry role.', bg: 'bg-primary/10', color: 'text-primary' },
-  { icon: 'menu_book', title: '4. Learn & Practice', desc: 'Follow personalized AI-curated courses to build the required expertise.', bg: 'bg-accent/10', color: 'text-accent' },
-  { icon: 'work', title: '5. Find Opportunities', desc: 'Get intelligently matched with internships and entry-level positions.', bg: 'bg-primary/10', color: 'text-primary' },
+  {
+    icon: 'person_add',
+    title: '1. Build Your Profile',
+    desc: 'Create a comprehensive profile detailing your academic background, skills, and career interests.',
+    bg: 'bg-primary/10',
+    color: 'text-primary',
+  },
+  {
+    icon: 'psychology',
+    title: '2. Assess Your Skills',
+    desc: 'Take our AI-driven assessments to evaluate your current technical strengths and capabilities.',
+    bg: 'bg-accent/10',
+    color: 'text-accent',
+  },
+  {
+    icon: 'troubleshoot',
+    title: '3. Discover Gaps',
+    desc: 'Identify exactly what skills and competencies you need to land your target industry role.',
+    bg: 'bg-primary/10',
+    color: 'text-primary',
+  },
+  {
+    icon: 'menu_book',
+    title: '4. Learn & Practice',
+    desc: 'Follow personalized, AI-curated courses and practical projects to build required expertise.',
+    bg: 'bg-accent/10',
+    color: 'text-accent',
+  },
+  {
+    icon: 'work',
+    title: '5. Find Opportunities',
+    desc: 'Get intelligently matched with top verified internships and high-growth job opportunities.',
+    bg: 'bg-primary/10',
+    color: 'text-primary',
+  },
 ]
 
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="py-24 bg-surface">
-      <div className="max-w-7xl mx-auto px-6 md:px-8">
+    <section id="how-it-works" className="py-16 sm:py-20 bg-surface">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading title="How CareerSync Works" subtitle="A seamless journey from academic learning to professional success." />
 
-        <div className="grid md:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3.5 lg:gap-4">
           {steps.map((s) => (
-            <Card key={s.title} hover className="text-center">
-              <div className={`w-12 h-12 ${s.bg} rounded-xl flex items-center justify-center ${s.color} mx-auto mb-4`}>
-                <span className="material-symbols-outlined text-[24px]">{s.icon}</span>
+            <Card key={s.title} hover className="text-center p-3.5 sm:p-4 lg:p-4 flex flex-col justify-between h-full">
+              <div>
+                <div className={`w-11 h-11 ${s.bg} rounded-xl flex items-center justify-center ${s.color} mx-auto mb-3.5`}>
+                  <span className="material-symbols-outlined text-[22px]">{s.icon}</span>
+                </div>
+                <h3 className="text-xs sm:text-sm lg:text-[14px] font-bold text-charcoal mb-2 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">
+                  {s.title}
+                </h3>
+                <p className="text-xs text-charcoal/70 leading-relaxed min-h-[3.75rem] flex items-center justify-center">
+                  {s.desc}
+                </p>
               </div>
-              <h3 className="text-lg font-bold text-charcoal mb-2">{s.title}</h3>
-              <p className="text-sm text-charcoal/70 leading-relaxed">{s.desc}</p>
             </Card>
           ))}
         </div>

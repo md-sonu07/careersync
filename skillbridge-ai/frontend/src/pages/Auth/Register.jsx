@@ -193,7 +193,6 @@ export default function Register() {
     }
   };
 
-
   if (pending) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
@@ -214,61 +213,131 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col lg:flex-row">
-      <div className="relative hidden lg:flex lg:w-[52%] bg-primary text-white flex-col justify-between overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.07]" aria-hidden style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "28px 28px" }} />
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-32 -left-20 w-[28rem] h-[28rem] bg-accent/20 rounded-full blur-3xl" />
-        <div className="relative z-10 p-10 xl:p-12">
-          <Link to="/" className="inline-flex items-center gap-3">
-            <span className="w-10 h-10 rounded-xl bg-white text-primary grid place-items-center font-bold text-lg">C</span>
-            <span className="text-xl font-bold tracking-tight">CareerSync</span>
-          </Link>
-          <p className="mt-2 text-white/70 text-sm font-medium tracking-wide uppercase">Bridging Talent &amp; Opportunity</p>
-        </div>
-        <div className="relative z-10 px-10 xl:px-12 pb-10">
-          <div className="max-w-md">
-            <h1 className="text-[2.1rem] font-bold leading-tight">Create your<br />future with us.</h1>
-            <p className="mt-4 text-white/75 leading-relaxed">Whether you&apos;re a student, industry partner or educator — CareerSync connects you to real projects, mentors and talent.</p>
-            <div className="mt-8 grid grid-cols-3 gap-4 text-center">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto w-full my-auto grid lg:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl border border-border bg-surface items-stretch">
+        {/* Left — Branding Panel (50% Width, Equal Height, No Form Scroll) */}
+        <div className="relative hidden lg:flex bg-primary text-white flex-col justify-between p-10 xl:p-12 overflow-hidden h-full">
+          <div className="absolute inset-0 opacity-[0.07]" aria-hidden style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "28px 28px" }} />
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-32 -left-20 w-[28rem] h-[28rem] bg-accent/20 rounded-full blur-3xl" />
+
+          {/* Top Logo */}
+          <div className="relative z-10">
+            <Link to="/" className="inline-flex items-center gap-3">
+              <span className="w-10 h-10 rounded-xl bg-white text-primary grid place-items-center font-bold text-lg">C</span>
+              <span className="text-xl font-bold tracking-tight">CareerSync</span>
+            </Link>
+            <p className="mt-2 text-white/70 text-sm font-medium tracking-wide uppercase">Bridging Talent &amp; Opportunity</p>
+          </div>
+
+          {/* Middle Rich Content (Fixed Top Gap) */}
+          <div className="relative z-10 mt-8 mb-auto space-y-6">
+            <div>
+              <h1 className="text-[2.25rem] font-extrabold leading-tight">Create your<br />future with us.</h1>
+              <p className="mt-3 text-white/80 leading-relaxed text-sm max-w-md">
+                Whether you&apos;re a student, industry partner or educator — CareerSync connects you to real projects, mentors, and verified career paths.
+              </p>
+            </div>
+
+            {/* Platform Highlights List */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center gap-3 text-xs sm:text-sm font-medium text-white/90">
+                <div className="p-1.5 rounded-lg bg-white/15 text-emerald-300 shrink-0">
+                  <span className="material-symbols-outlined text-[18px] block">verified</span>
+                </div>
+                <span>AI-Powered Skill Gap Analysis &amp; Progress Tracking</span>
+              </div>
+              <div className="flex items-center gap-3 text-xs sm:text-sm font-medium text-white/90">
+                <div className="p-1.5 rounded-lg bg-white/15 text-emerald-300 shrink-0">
+                  <span className="material-symbols-outlined text-[18px] block">auto_stories</span>
+                </div>
+                <span>Personalized Learning Roadmaps &amp; Industry Courses</span>
+              </div>
+              <div className="flex items-center gap-3 text-xs sm:text-sm font-medium text-white/90">
+                <div className="p-1.5 rounded-lg bg-white/15 text-emerald-300 shrink-0">
+                  <span className="material-symbols-outlined text-[18px] block">work</span>
+                </div>
+                <span>Direct Verified Internship &amp; Entry-Level Job Matching</span>
+              </div>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-3 gap-3 text-center pt-2">
               <div className="rounded-2xl bg-white/10 border border-white/15 p-4"><p className="text-2xl font-bold">10k+</p><p className="text-xs text-white/70 mt-1">Students</p></div>
               <div className="rounded-2xl bg-white/10 border border-white/15 p-4"><p className="text-2xl font-bold">500+</p><p className="text-xs text-white/70 mt-1">Companies</p></div>
               <div className="rounded-2xl bg-white/10 border border-white/15 p-4"><p className="text-2xl font-bold">1.2k</p><p className="text-xs text-white/70 mt-1">Mentors</p></div>
             </div>
-            <div className="mt-8 rounded-2xl bg-white/10 backdrop-blur border border-white/15 p-5">
+
+            {/* Testimonial Quote */}
+            <div className="rounded-2xl bg-white/10 backdrop-blur border border-white/15 p-5">
               <blockquote className="text-white text-sm leading-relaxed">“We hired 12 interns through CareerSync — all pre-vetted and project-ready.”</blockquote>
               <div className="mt-3 flex items-center gap-3">
-                <img src="https://i.pravatar.cc/100?img=15" alt="" className="w-9 h-9 rounded-full border border-white/20" />
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80" alt="" className="w-9 h-9 rounded-full border border-white/20 object-cover" />
                 <div><p className="text-sm font-semibold">Rajesh Verma</p><p className="text-xs text-white/60">HR Lead — Infosys</p></div>
               </div>
             </div>
           </div>
+
+          <div className="relative z-10 text-xs text-white/70 flex items-center justify-between">
+            <span>CareerSync Platform &copy; 2026</span>
+            <span className="flex items-center gap-1.5 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />
+              Trusted by 50+ Universities
+            </span>
+          </div>
         </div>
-      </div>
 
-      <div className="lg:hidden bg-primary text-white px-6 py-5 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2.5"><span className="w-9 h-9 rounded-xl bg-white text-primary grid place-items-center font-bold">C</span><span className="font-bold">CareerSync</span></Link>
-        <Link to="/login" className="text-sm font-medium underline underline-offset-4 decoration-white/30">Sign in</Link>
-      </div>
+        {/* Mobile Header */}
+        <div className="lg:hidden bg-primary text-white px-6 py-5 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2.5"><span className="w-9 h-9 rounded-xl bg-white text-primary grid place-items-center font-bold">C</span><span className="font-bold">CareerSync</span></Link>
+          <Link to="/login" className="text-sm font-medium underline underline-offset-4 decoration-white/30">Sign in</Link>
+        </div>
 
-      <div className="flex-1 flex items-start lg:items-center justify-center p-6 sm:p-8 lg:p-8 bg-background overflow-y-auto">
-        <div className="w-full max-w-[640px] my-6">
-          {toast && (
-            <div role="alert" className={`mb-6 rounded-xl border px-4 py-3 text-sm flex gap-3 items-start ${toast.type === "success" ? "bg-success/10 border-success/20 text-success" : "bg-primary/5 border-primary/20 text-primary"}`}>
-              <span className="material-symbols-outlined text-[20px] shrink-0">{toast.type === "success" ? "check_circle" : "info"}</span>
-              <span className="leading-relaxed">{toast.message}</span>
-              <button onClick={() => setToast(null)} className="ml-auto opacity-60 hover:opacity-100" aria-label="Dismiss">✕</button>
+        {/* Right Column — Form Panel (50% Width, Full Height, Top Aligned) */}
+        <div className="flex flex-col justify-start p-6 sm:p-8 lg:p-10 bg-surface h-full">
+          <div className="w-full max-w-lg mx-auto py-2">
+            {toast && (
+              <div role="alert" className={`mb-6 rounded-xl border px-4 py-3 text-sm flex gap-3 items-start ${toast.type === "success" ? "bg-success/10 border-success/20 text-success" : "bg-primary/5 border-primary/20 text-primary"}`}>
+                <span className="material-symbols-outlined text-[20px] shrink-0">{toast.type === "success" ? "check_circle" : "info"}</span>
+                <span className="leading-relaxed">{toast.message}</span>
+                <button onClick={() => setToast(null)} className="ml-auto opacity-60 hover:opacity-100" aria-label="Dismiss">✕</button>
+              </div>
+            )}
+
+            {/* Top Role Selector Tabs */}
+            <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1.5 rounded-2xl mb-6 border border-border/60">
+              {ROLE_TABS.map((tab) => {
+                const isActive = activeRole === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => {
+                      setActiveRole(tab.id);
+                      navigate(`/register/${tab.id}`, { replace: true });
+                    }}
+                    className={`flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 px-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                      isActive
+                        ? "bg-white text-primary shadow-sm border border-border/40 font-bold"
+                        : "text-charcoal/70 hover:text-charcoal hover:bg-white/50"
+                    }`}
+                  >
+                    <span className={`material-symbols-outlined text-[18px] ${isActive ? "text-primary" : "text-charcoal/50"}`}>
+                      {tab.icon}
+                    </span>
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
             </div>
-          )}
 
-          <div className="bg-surface rounded-2xl border border-border shadow-card p-6 sm:p-8">
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-charcoal tracking-tight">
+              <h2 className="text-2xl font-extrabold text-charcoal tracking-tight">
                 {activeRole === "student" ? "Create Student Account" : activeRole === "industry" ? "Create Industry Account" : "Create Academia Account"}
               </h2>
-              <p className="mt-1.5 text-sm text-muted">
+              <p className="mt-1.5 text-sm text-charcoal/70">
                 {activeRole === "student" ? "Join as a learner — get skills, assessments & internships." : activeRole === "industry" ? "Hire verified talent — post internships & jobs." : "Manage your college — track skills & placements."}{" "}
-                <Link to="/login" className="text-primary font-medium hover:underline underline-offset-4">Sign in</Link>
+                <Link to="/login" className="text-primary font-semibold hover:underline underline-offset-4">Sign in</Link>
               </p>
             </div>
 
@@ -276,7 +345,7 @@ export default function Register() {
               <p className="mb-4 rounded-xl bg-amber-50 border border-amber-200 px-3.5 py-2.5 text-xs leading-relaxed text-amber-800"><span className="font-bold">Note:</span> {activeRole === "industry" ? "Industry accounts require admin verification (24–48h) before posting." : "Academia accounts are verified against college domain."}</p>
             ) : null}
 
-            <form onSubmit={handleSubmit} noValidate className="space-y-5">
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
               {activeRole === "student" && (
                 <>
                   <div className="grid sm:grid-cols-2 gap-4">
@@ -383,35 +452,9 @@ export default function Register() {
               </label>
 
               <Button type="submit" variant="primary" size="lg" className="w-full rounded-xl mt-1" disabled={loading}>{loading ? "Creating account…" : `Create ${activeRole === "student" ? "Student" : activeRole === "industry" ? "Industry" : "Academia"} account`}</Button>
-              <p className="text-center text-xs text-muted">Already have an account? <Link to="/login" className="font-semibold text-primary hover:underline">Sign in</Link> • Admin? <Link to="/admin/login" className="font-medium text-charcoal hover:text-primary underline decoration-border">Admin login</Link></p>
+              <p className="text-center text-xs text-charcoal/60 mt-4">Already have an account? <Link to="/login" className="font-semibold text-primary hover:underline">Sign in</Link> • Admin? <Link to="/admin/login" className="font-medium text-charcoal hover:text-primary underline decoration-border">Admin login</Link></p>
             </form>
-
-            {/* Extra quick signup buttons for other roles */}
-            <div className="mt-6 pt-6 border-t border-border">
-              <p className="text-center text-xs font-semibold uppercase tracking-widest text-muted mb-3">Or sign up as</p>
-              <div className="grid grid-cols-2 gap-3">
-                {activeRole !== "industry" && (
-                  <Link to="/register/industry" onClick={() => setActiveRole("industry")} className="flex items-center justify-center gap-2 rounded-xl border border-border bg-white px-4 py-2.5 text-sm font-medium text-charcoal hover:border-primary/30 hover:bg-primary/5">
-                    <span className="material-symbols-outlined text-[18px]">business</span> Industry
-                  </Link>
-                )}
-                {activeRole !== "academia" && (
-                  <Link to="/register/academia" onClick={() => setActiveRole("academia")} className="flex items-center justify-center gap-2 rounded-xl border border-border bg-white px-4 py-2.5 text-sm font-medium text-charcoal hover:border-primary/30 hover:bg-primary/5">
-                    <span className="material-symbols-outlined text-[18px]">apartment</span> Academia
-                  </Link>
-                )}
-                {activeRole !== "student" && (
-                  <Link to="/register/student" onClick={() => setActiveRole("student")} className="flex items-center justify-center gap-2 rounded-xl border border-border bg-white px-4 py-2.5 text-sm font-medium text-charcoal hover:border-primary/30 hover:bg-primary/5">
-                    <span className="material-symbols-outlined text-[18px]">school</span> Student
-                  </Link>
-                )}
-                <Link to="/login" className="flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-dark">
-                  <span className="material-symbols-outlined text-[18px]">login</span> Sign in instead
-                </Link>
-              </div>
-            </div>
           </div>
-          <p className="mt-6 text-center text-xs text-muted">Need help? <a href="#" className="font-medium text-primary hover:underline">Contact support</a></p>
         </div>
       </div>
     </div>
