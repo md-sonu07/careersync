@@ -7,6 +7,7 @@ import { ProgressBar } from '../../components/ui/Progress'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/Tabs'
 import PageHeader from '../../components/common/PageHeader'
 import { mockAIQuestions } from '../../utils/mockData'
+import AppIcon from '../../components/ui/AppIcon';
 
 export default function AIPractice() {
   const [tab, setTab] = useState('setup')
@@ -84,7 +85,7 @@ export default function AIPractice() {
                 <span className="text-sm text-muted">Q {idx + 1} / {mockAIQuestions.length}</span>
               </div>
               <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-bold ${timeLeft < 60 ? 'bg-danger text-white border-danger' : 'bg-white border-border text-charcoal'}`}>
-                <span className="material-symbols-outlined text-[18px]">timer</span> {formatTime(timeLeft)}
+                <AppIcon name="timer" className="text-[18px]" /> {formatTime(timeLeft)}
               </span>
             </div>
 

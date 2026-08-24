@@ -3,6 +3,7 @@ import { NavLink, Outlet } from 'react-router-dom'
 import Drawer from '../ui/Drawer'
 import InstituteSidebar from './InstituteSidebar'
 import InstituteHeader from './InstituteHeader'
+import AppIcon from '../ui/AppIcon';
 
 export default function InstituteLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -32,7 +33,7 @@ export default function InstituteLayout() {
                 { icon: 'analytics', label: 'Analytics', path: '/institute/analytics' },
               ].map((it) => (
                 <NavLink key={it.path + it.label} to={it.path} className={({ isActive }) => `flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 text-[11px] font-medium ${isActive ? 'text-primary' : 'text-muted'}`}>
-                  <span className="material-symbols-outlined text-[22px]">{it.icon}</span>
+                  <AppIcon name={it.icon} className="text-[22px]" />
                   {it.label}
                 </NavLink>
               ))}

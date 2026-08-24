@@ -6,6 +6,7 @@ import Select from '../../components/ui/Select'
 import Badge from '../../components/ui/Badge'
 import Modal from '../../components/ui/Modal'
 import Textarea from '../../components/ui/Textarea'
+import AppIcon from '../../components/ui/AppIcon';
 
 const STATUSES = ['Applied', 'Screening', 'Shortlisted', 'Interview', 'Selected', 'Rejected']
 
@@ -49,7 +50,7 @@ function AppCard({ app, onStatusChange, onNotes, onCompare }) {
         >
           {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
-        <button onClick={() => onCompare(app)} className="rounded-lg border border-border bg-white p-1.5 text-muted hover:text-charcoal" title="Compare resume"><span className="material-symbols-outlined text-[16px]">compare</span></button>
+        <button onClick={() => onCompare(app)} className="rounded-lg border border-border bg-white p-1.5 text-muted hover:text-charcoal" title="Compare resume"><AppIcon name="compare" className="text-[16px]" /></button>
       </div>
       {app.notes && <p className="rounded-lg bg-amber-50 border border-amber-200 px-2 py-1 text-xs text-amber-800">📝 {app.notes}</p>}
       <button onClick={() => onNotes(app)} className="text-xs font-semibold text-primary hover:underline">+ Notes / Resume</button>

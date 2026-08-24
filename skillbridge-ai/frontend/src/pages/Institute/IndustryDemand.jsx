@@ -2,6 +2,7 @@ import ChartCard from '../../components/common/ChartCard'
 import Card from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
 import { ProgressBar } from '../../components/ui/Progress'
+import AppIcon from '../../components/ui/AppIcon';
 
 const skills = [
   { name: 'React', demand: 82, trend: 'Growing', change: '+12%', color: 'bg-primary' },
@@ -44,7 +45,7 @@ export default function IndustryDemand() {
 
         <div className="space-y-6">
           <Card>
-            <h3 className="font-bold text-charcoal flex items-center gap-2"><span className="material-symbols-outlined text-primary">trending_up</span> Key Takeaways</h3>
+            <h3 className="font-bold text-charcoal flex items-center gap-2"><AppIcon name="trending_up" className="text-primary" /> Key Takeaways</h3>
             <ul className="mt-3 space-y-2">
               <li className="flex gap-2 text-sm text-charcoal"><span className="text-success">●</span> Frontend (React, TS) remains #1 demand driver.</li>
               <li className="flex gap-2 text-sm text-charcoal"><span className="text-accent">●</span> Cloud & Docker demand surging +15-18%.</li>

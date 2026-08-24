@@ -9,6 +9,7 @@ import PageHeader from '../../components/common/PageHeader'
 import { selectCurrentUser } from '../../features/auth/authSlice'
 import { profileApi } from '../../api/profile.api'
 import { mockUser, mockSkills, mockProjects, mockCertificates } from '../../utils/mockData'
+import AppIcon from '../../components/ui/AppIcon';
 
 export default function Profile() {
   const currentUser = useSelector(selectCurrentUser)
@@ -86,8 +87,8 @@ export default function Profile() {
               <Button variant="outline" className="flex-1" size="sm">Download Resume</Button>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
-              <a href="#" className="rounded-xl border border-border bg-white px-3 py-2.5 flex items-center justify-center gap-2 hover:bg-background text-xs font-medium text-charcoal"><span className="material-symbols-outlined text-primary text-[18px]">link</span> LinkedIn</a>
-              <a href="#" className="rounded-xl border border-border bg-white px-3 py-2.5 flex items-center justify-center gap-2 hover:bg-background text-xs font-medium text-charcoal"><span className="material-symbols-outlined text-primary text-[18px]">code</span> GitHub</a>
+              <a href="#" className="rounded-xl border border-border bg-white px-3 py-2.5 flex items-center justify-center gap-2 hover:bg-background text-xs font-medium text-charcoal"><AppIcon name="link" className="text-primary text-[18px]" /> LinkedIn</a>
+              <a href="#" className="rounded-xl border border-border bg-white px-3 py-2.5 flex items-center justify-center gap-2 hover:bg-background text-xs font-medium text-charcoal"><AppIcon name="code" className="text-primary text-[18px]" /> GitHub</a>
             </div>
           </Card>
 
@@ -126,7 +127,7 @@ export default function Profile() {
               <div className="rounded-xl bg-background border border-border px-4 py-3"><p className="text-xs font-semibold uppercase tracking-wider text-muted">Graduation Year</p><p className="text-sm font-semibold text-charcoal mt-1">{gradYear}</p></div>
             </div>
             <div className="mt-3 rounded-xl bg-sage border border-sage p-3 flex items-center gap-3">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white border border-border text-primary"><span className="material-symbols-outlined text-[18px]">school</span></span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white border border-border text-primary"><AppIcon name="school" className="text-[18px]" /></span>
               <div><p className="text-sm font-semibold text-charcoal">CGPA 8.4 / 10</p><p className="text-xs text-muted">Expected graduation {gradYear}</p></div>
             </div>
           </Card>
@@ -134,7 +135,7 @@ export default function Profile() {
           <Card>
             <h3 className="font-bold text-charcoal">Career Info</h3>
             <div className="mt-4 rounded-2xl bg-sage border border-sage p-4 flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-white shrink-0"><span className="material-symbols-outlined">flag</span></div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-white shrink-0"><AppIcon name="flag" /></div>
               <div>
                 <p className="font-bold text-charcoal">{careerGoal}</p>
                 <p className="text-sm text-charcoal/70">82% readiness — target 85% for top internship matches</p>

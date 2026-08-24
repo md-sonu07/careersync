@@ -3,6 +3,7 @@ import Badge from '../../components/ui/Badge'
 import Button from '../../components/ui/Button'
 import PageHeader from '../../components/common/PageHeader'
 import EmptyState from '../../components/ui/EmptyState'
+import AppIcon from '../../components/ui/AppIcon';
 
 const View = () => {
   return (
@@ -12,7 +13,7 @@ const View = () => {
         <Card>
           <div className="flex items-center gap-3 mb-4">
             <div className="h-10 w-10 rounded-xl bg-sage flex items-center justify-center text-primary">
-              <span className="material-symbols-outlined">verified</span>
+              <AppIcon name="verified" />
             </div>
             <div>
               <h3 className="font-bold text-charcoal">Modules</h3>

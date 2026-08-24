@@ -3,6 +3,7 @@ import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import PageHeader from '../../components/common/PageHeader'
 import { ProgressRing, ProgressBar } from '../../components/ui/Progress'
+import AppIcon from '../../components/ui/AppIcon';
 
 export default function AssessmentResult(){
   return (
@@ -64,7 +65,7 @@ export default function AssessmentResult(){
         </Card>
 
         <Card className="!bg-sage !border-sage">
-          <h3 className="font-bold text-charcoal flex items-center gap-2"><span className="material-symbols-outlined text-primary">auto_awesome</span> AI Feedback</h3>
+          <h3 className="font-bold text-charcoal flex items-center gap-2"><AppIcon name="auto_awesome" className="text-primary" /> AI Feedback</h3>
           <div className="mt-4 space-y-4">
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-success">Strengths</p>

@@ -4,6 +4,7 @@ import Badge from '../../components/ui/Badge'
 import Button from '../../components/ui/Button'
 import PageHeader from '../../components/common/PageHeader'
 import { mockRoadmap } from '../../utils/mockData'
+import AppIcon from '../../components/ui/AppIcon';
 
 const statusStyles = {
   completed: { dot: 'bg-success border-success', badge: 'bg-success text-white', label: 'Completed', icon: '✓' },
@@ -23,7 +24,7 @@ export default function Roadmap() {
 
       <Card className="!bg-sage !border-sage !p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shrink-0"><span className="material-symbols-outlined">lightbulb</span></div>
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shrink-0"><AppIcon name="lightbulb" /></div>
           <div>
             <p className="text-sm font-bold text-charcoal">AI Recommended Next Step</p>
             <p className="text-sm text-charcoal/80">Complete <strong>Testing (Jest & RTL)</strong> — it’s your most critical gap (38% → 60%). Finish Docker next to hit 85%+ readiness.</p>

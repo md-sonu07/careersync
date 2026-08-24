@@ -3,6 +3,7 @@ import Card from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
 import PageHeader from '../components/common/PageHeader'
+import AppIcon from '../components/ui/AppIcon';
 
 const PublicCourseDetail = () => {
   const { id } = useParams()
@@ -26,7 +27,7 @@ const PublicCourseDetail = () => {
         <div className="lg:col-span-2 space-y-6">
           <Card className="p-0 overflow-hidden">
             <div className="aspect-video bg-sage flex items-center justify-center">
-              <span className="material-symbols-outlined text-5xl text-primary">play_circle</span>
+              <AppIcon name="play_circle" className="text-5xl text-primary" />
             </div>
             <div className="p-6">
               <h4 className="font-bold mb-2">What you will learn</h4>

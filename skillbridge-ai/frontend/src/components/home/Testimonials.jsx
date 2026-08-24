@@ -16,9 +16,9 @@ const testimonials = [
 const Testimonials = () => {
   return (
     <section className="py-24 bg-card-bg border-t border-border-light">
-      <div className="max-w-7xl mx-auto px-6 md:px-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-charcoal mb-12 text-center">Success Stories</h2>
-        <div className="grid md:grid-cols-2 gap-8">
+      <div className="max-w-7xl mx-auto px-6 @3xl:px-8">
+        <h2 className="text-3xl @3xl:text-4xl font-bold text-charcoal mb-12 text-center">Success Stories</h2>
+        <div className="grid @3xl:grid-cols-2 gap-8">
           {testimonials.map((t) => (
             <div key={t.name} className="border border-border-light p-8 rounded-2xl bg-surface">
               <div className="flex gap-1 text-accent mb-4">

@@ -4,6 +4,7 @@ import StatCard from '../../components/common/StatCard'
 import Card from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
 import Button from '../../components/ui/Button'
+import AppIcon from '../../components/ui/AppIcon';
 
 const stats = [
   { label: 'Active Learners', value: '50,000+', trend: 12, trendLabel: 'vs last year', icon: 'group' },
@@ -72,7 +73,7 @@ const About = () => {
         <div className="grid gap-6 lg:grid-cols-2">
           <Card className="p-8">
             <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-white">
-              <span className="material-symbols-outlined">flag</span>
+              <AppIcon name="flag" />
             </div>
             <h3 className="text-xl font-bold text-charcoal">Our Mission</h3>
             <p className="mt-3 text-sm leading-relaxed text-muted">
@@ -86,7 +87,7 @@ const About = () => {
           </Card>
           <Card className="p-8 bg-primary text-white border-primary">
             <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 border border-white/20">
-              <span className="material-symbols-outlined text-white">visibility</span>
+              <AppIcon name="visibility" className="text-white" />
             </div>
             <h3 className="text-xl font-bold">Our Vision</h3>
             <p className="mt-3 text-sm leading-relaxed text-white/80">
@@ -107,7 +108,7 @@ const About = () => {
           {values.map((v) => (
             <Card key={v.title} hover className="p-6">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sage text-primary border border-border">
-                <span className="material-symbols-outlined text-[20px]">{v.icon}</span>
+                <AppIcon name={v.icon} className="text-[20px]" />
               </div>
               <h4 className="mt-4 font-semibold text-charcoal">{v.title}</h4>
               <p className="mt-2 text-sm leading-relaxed text-muted">{v.desc}</p>

@@ -5,6 +5,7 @@ import Button from '../../components/ui/Button'
 import { ProgressBar } from '../../components/ui/Progress'
 import PageHeader from '../../components/common/PageHeader'
 import { mockCourseDetail, mockCourses } from '../../utils/mockData'
+import AppIcon from '../../components/ui/AppIcon';
 
 export default function CourseDetail() {
   const { id } = useParams()
@@ -14,7 +15,7 @@ export default function CourseDetail() {
   return (
     <div className="space-y-6">
       <Link to="/student/learning" className="inline-flex items-center gap-1 text-sm font-medium text-muted hover:text-primary">
-        <span className="material-symbols-outlined text-[18px]">arrow_back</span> Back to Learning
+        <AppIcon name="arrow_back" className="text-[18px]" /> Back to Learning
       </Link>
 
       {/* Header */}
@@ -24,7 +25,7 @@ export default function CourseDetail() {
             <img src={course.thumbnail} alt={course.title} className="h-64 w-full object-cover lg:h-full lg:min-h-[360px]" />
             <div className="absolute inset-0 flex items-center justify-center bg-charcoal/20">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 border border-white shadow-card">
-                <span className="material-symbols-outlined text-primary text-[28px]">play_arrow</span>
+                <AppIcon name="play_arrow" className="text-primary text-[28px]" />
               </div>
             </div>
           </div>
@@ -45,7 +46,7 @@ export default function CourseDetail() {
             </div>
 
             <div className="mt-4 flex items-center gap-3 text-xs text-muted">
-              <span className="inline-flex items-center gap-1"><span className="material-symbols-outlined text-[16px] text-amber-500">star</span> {detail.rating} ({detail.reviewsCount})</span>
+              <span className="inline-flex items-center gap-1"><AppIcon name="star" className="text-[16px] text-amber-500" /> {detail.rating} ({detail.reviewsCount})</span>
               <span>• {detail.students.toLocaleString()} students</span>
               <span>• Updated {detail.lastUpdated}</span>
             </div>
@@ -97,7 +98,7 @@ export default function CourseDetail() {
           <Card>
             <h3 className="font-bold text-charcoal">Certificate</h3>
             <div className="mt-3 rounded-xl border border-border bg-background p-4 text-center">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-white border border-border text-primary"><span className="material-symbols-outlined">workspace_premium</span></div>
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-white border border-border text-primary"><AppIcon name="workspace_premium" /></div>
               <p className="mt-2 text-sm font-semibold text-charcoal">Earn a verified certificate</p>
               <p className="text-xs text-muted">Share on LinkedIn after 100% completion</p>
             </div>

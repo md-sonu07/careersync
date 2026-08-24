@@ -5,6 +5,7 @@ import Badge from '../../components/ui/Badge'
 import Modal from '../../components/ui/Modal'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/Tabs'
 import Textarea from '../../components/ui/Textarea'
+import AppIcon from '../../components/ui/AppIcon';
 
 const data = {
   Pending: [
@@ -120,7 +121,7 @@ export default function Verification() {
       <Modal open={!!action} onClose={() => setAction(null)} title={action?.mode === 'verify' ? `Verify ${action?.name}?` : `Reject ${action?.name}?`} description={action?.mode === 'verify' ? 'This entity will show a verified badge ✓ across the platform.' : 'Provide a reason for rejection.'}>
         {action?.mode === 'verify' ? (
           <div className="space-y-4">
-            <div className="rounded-xl bg-success/5 border border-success/20 p-3 flex gap-2 text-sm text-success"><span className="material-symbols-outlined">verified</span> Verifying will grant <strong className="mx-1">{action.name}</strong> a ✓ badge and enable posting.</div>
+            <div className="rounded-xl bg-success/5 border border-success/20 p-3 flex gap-2 text-sm text-success"><AppIcon name="verified" /> Verifying will grant <strong className="mx-1">{action.name}</strong> a ✓ badge and enable posting.</div>
             <div className="flex gap-2 justify-end">
               <Button variant="outline" onClick={() => setAction(null)}>Cancel</Button>
               <Button className="bg-success hover:bg-success/90" onClick={handleVerify}>Confirm Verify ✓</Button>

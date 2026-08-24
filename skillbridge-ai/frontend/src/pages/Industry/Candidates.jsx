@@ -6,6 +6,7 @@ import Badge from '../../components/ui/Badge'
 import Select from '../../components/ui/Select'
 import Modal from '../../components/ui/Modal'
 import { ProgressBar } from '../../components/ui/Progress'
+import AppIcon from '../../components/ui/AppIcon';
 
 const candidates = [
   {
@@ -108,11 +109,11 @@ export default function Candidates() {
                   </div>
 
                   <div className="mt-3 rounded-xl border border-success/20 bg-success/5 p-3">
-                    <p className="text-xs font-bold text-success flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">check_circle</span> Why this candidate matches</p>
+                    <p className="text-xs font-bold text-success flex items-center gap-1"><AppIcon name="check_circle" className="text-[16px]" /> Why this candidate matches</p>
                     <ul className="mt-1.5 space-y-0.5">
                       {c.strong.map((s) => <li key={s} className="text-xs text-charcoal flex gap-1.5"><span className="text-success">●</span>{s}</li>)}
                     </ul>
-                    <p className="mt-2 text-xs font-bold text-danger flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">warning</span> Needs improvement</p>
+                    <p className="mt-2 text-xs font-bold text-danger flex items-center gap-1"><AppIcon name="warning" className="text-[16px]" /> Needs improvement</p>
                     <ul className="mt-1 space-y-0.5">
                       {c.improve.map((s) => <li key={s} className="text-xs text-muted flex gap-1.5"><span className="text-danger">●</span>{s}</li>)}
                     </ul>

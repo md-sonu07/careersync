@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'assessments',
     'courses',
     'analytics',
+    'ai',
 ]
 
 MIDDLEWARE = [
@@ -171,6 +172,13 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.UserRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '60/min',
+        'ai_chat': '20/min',
+    },
 }
 
 
@@ -189,6 +197,26 @@ SIMPLE_JWT = {
     'USER_ID_CLAIM': 'user_id',
 }
 
+
+# AI Configuration
+AI_PROVIDER = config('AI_PROVIDER', default='mock')
+GEMINI_API_KEY = config('GEMINI_API_KEY', default='')
+OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
+OPENAI_BASE_URL = config('OPENAI_BASE_URL', default='https://opencode.ai/api/chat/completions')
+AI_MODEL = config('AI_MODEL', default='gemini-1.5-flash')
+AI_SYSTEM_PROMPT = """You are SkillBridge AI, a professional learning and career assistant for the CareerSync platform.
+
+Guidelines:
+- Explain concepts clearly and beginner-friendly when appropriate
+- Provide concrete examples relevant to learning and career development
+- Answer learning and career questions thoughtfully
+- Never invent access to user information (courses, jobs, internships, scores, profile data)
+- Never invent courses, jobs, internships, scores, or profile data
+- Clearly distinguish facts from suggestions
+- Remain professional and educational in tone
+- Help users understand topics, prepare for assessments, and plan their careers
+
+You are helpful but grounded. Do not make up specific data about the user's account, enrollments, or achievements."""
 
 # Swagger UI Configuration for drf_yasg
 SWAGGER_SETTINGS = {

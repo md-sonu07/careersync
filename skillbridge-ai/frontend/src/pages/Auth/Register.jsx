@@ -5,6 +5,7 @@ import { registerUser } from "../../features/auth/authSlice";
 import { profileApi } from "../../api/profile.api";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
+import AppIcon from '../../components/ui/AppIcon';
 
 const ROLE_TABS = [
   { id: "student", label: "Student", icon: "school" },
@@ -164,7 +165,7 @@ export default function Register() {
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="w-full max-w-md bg-surface rounded-2xl border border-border shadow-card p-8 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-600">
-            <span className="material-symbols-outlined text-3xl">hourglass_top</span>
+            <AppIcon name="hourglass_top" className="text-3xl" />
           </div>
           <h2 className="mt-4 text-xl font-bold text-charcoal">{pending.title}</h2>
           <p className="mt-2 text-sm leading-relaxed text-muted">{pending.desc}</p>
@@ -185,9 +186,9 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto w-full my-auto grid lg:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl border border-border bg-surface items-stretch">
+      <div className="max-w-7xl mx-auto w-full my-auto grid @5xl:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl border border-border bg-surface items-stretch">
         {/* Left — Branding Panel (50% Width, Equal Height, Fixed Top Gap) */}
-        <div className="relative hidden lg:flex bg-primary text-white flex-col justify-between p-10 xl:p-12 overflow-hidden h-full">
+        <div className="relative hidden @5xl:flex bg-primary text-white flex-col justify-between p-10 xl:p-12 overflow-hidden h-full">
           <div className="absolute inset-0 opacity-[0.07]" aria-hidden style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "28px 28px" }} />
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
           <div className="absolute -bottom-32 -left-20 w-[28rem] h-[28rem] bg-accent/20 rounded-full blur-3xl" />
@@ -214,19 +215,19 @@ export default function Register() {
             <div className="space-y-3 pt-2">
               <div className="flex items-center gap-3 text-xs sm:text-sm font-medium text-white/90">
                 <div className="p-1.5 rounded-lg bg-white/15 text-emerald-300 shrink-0">
-                  <span className="material-symbols-outlined text-[18px] block">verified</span>
+                  <AppIcon name="verified" className="text-[18px] block" />
                 </div>
                 <span>AI-Powered Skill Gap Analysis &amp; Progress Tracking</span>
               </div>
               <div className="flex items-center gap-3 text-xs sm:text-sm font-medium text-white/90">
                 <div className="p-1.5 rounded-lg bg-white/15 text-emerald-300 shrink-0">
-                  <span className="material-symbols-outlined text-[18px] block">auto_stories</span>
+                  <AppIcon name="auto_stories" className="text-[18px] block" />
                 </div>
                 <span>Personalized Learning Roadmaps &amp; Industry Courses</span>
               </div>
               <div className="flex items-center gap-3 text-xs sm:text-sm font-medium text-white/90">
                 <div className="p-1.5 rounded-lg bg-white/15 text-emerald-300 shrink-0">
-                  <span className="material-symbols-outlined text-[18px] block">work</span>
+                  <AppIcon name="work" className="text-[18px] block" />
                 </div>
                 <span>Direct Verified Internship &amp; Entry-Level Job Matching</span>
               </div>
@@ -259,7 +260,7 @@ export default function Register() {
         </div>
 
         {/* Mobile Header */}
-        <div className="lg:hidden bg-primary text-white px-6 py-5 flex items-center justify-between">
+        <div className="@5xl:hidden bg-primary text-white px-6 py-5 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
             <span className="w-9 h-9 rounded-xl bg-white text-primary grid place-items-center font-bold">C</span>
             <span className="font-bold">CareerSync</span>
@@ -279,7 +280,7 @@ export default function Register() {
             )}
 
             {/* Top Role Selector Tabs */}
-            <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1.5 rounded-2xl mb-6 border border-border/60">
+            <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1.5 rounded-xl mb-6 border border-border/60">
               {ROLE_TABS.map((tab) => {
                 const isActive = activeRole === tab.id;
                 return (
@@ -290,15 +291,16 @@ export default function Register() {
                       setActiveRole(tab.id);
                       navigate(`/register/${tab.id}`, { replace: true });
                     }}
-                    className={`flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 px-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                    className={`flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 px-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-all ${
                       isActive
                         ? "bg-white text-primary shadow-sm border border-border/40 font-bold"
                         : "text-charcoal/70 hover:text-charcoal hover:bg-white/50"
                     }`}
                   >
-                    <span className={`material-symbols-outlined text-[18px] ${isActive ? "text-primary" : "text-charcoal/50"}`}>
-                      {tab.icon}
-                    </span>
+                    <AppIcon 
+                      name={tab.icon} 
+                      className={`text-[18px] ${isActive ? "text-primary" : "text-charcoal/50"}`} 
+                    />
                     <span>{tab.label}</span>
                   </button>
                 );

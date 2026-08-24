@@ -4,6 +4,7 @@ import Input from '../../components/ui/Input'
 import Select from '../../components/ui/Select'
 import Badge from '../../components/ui/Badge'
 import { ProgressBar } from '../../components/ui/Progress'
+import AppIcon from '../../components/ui/AppIcon';
 
 const students = [
   { id: 1, name: 'Rahul Sharma', avatar: 'https://i.pravatar.cc/150?img=12', dept: 'CSE', sem: '6th', skill: 'React', course: 64, assess: 82, growth: '+8%', streak: 12, internship: 'Flipkart', performance: 'Strong' },
@@ -78,7 +79,7 @@ export default function InstituteStudents() {
                   <td className="px-4 py-3 w-36"><div className="flex items-center gap-2"><ProgressBar value={s.course} size="sm" className="flex-1" barClassName={s.course >= 70 ? 'bg-success' : s.course >= 40 ? 'bg-primary' : 'bg-danger'} /><span className="text-xs font-bold text-charcoal">{s.course}%</span></div></td>
                   <td className="px-4 py-3 text-sm font-bold text-charcoal">{s.assess}%</td>
                   <td className="px-4 py-3"><span className={`rounded-full px-2 py-0.5 text-xs font-bold ${s.growth.startsWith('+') ? 'bg-success/10 text-success' : s.growth.startsWith('-') ? 'bg-danger/10 text-danger' : 'bg-background text-muted'}`}>{s.growth}</span></td>
-                  <td className="px-4 py-3"><span className="inline-flex items-center gap-1 text-sm font-bold text-charcoal"><span className="material-symbols-outlined text-[16px] text-orange-500">local_fire_department</span>{s.streak}</span></td>
+                  <td className="px-4 py-3"><span className="inline-flex items-center gap-1 text-sm font-bold text-charcoal"><AppIcon name="local_fire_department" className="text-[16px] text-orange-500" />{s.streak}</span></td>
                   <td className="px-4 py-3 text-xs font-medium text-muted">{s.internship}</td>
                   <td className="px-6 py-3"><span className={`rounded-full px-2.5 py-1 text-xs font-bold ${s.performance === 'Strong' ? 'bg-success/10 text-success' : s.performance === 'Average' ? 'bg-accent/10 text-accent' : 'bg-danger/10 text-danger'}`}>{s.performance}</span></td>
                 </tr>

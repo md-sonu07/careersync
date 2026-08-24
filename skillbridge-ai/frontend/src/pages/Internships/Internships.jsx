@@ -5,6 +5,7 @@ import Badge from '../../components/ui/Badge'
 import SearchInput from '../../components/ui/SearchInput'
 import Select from '../../components/ui/Select'
 import Button from '../../components/ui/Button'
+import AppIcon from '../../components/ui/AppIcon';
 
 const mockInternships = [
   { id: 1, role: 'Frontend Developer Intern', company: 'TechNova', logo: 'TN', location: 'Bengaluru', duration: '3 months', stipend: '₹15,000/month', skills: ['React', 'TypeScript', 'Tailwind'], match: 91, deadline: '15 Sep 2026', type: 'Remote', applicants: 124 },
@@ -29,8 +30,8 @@ const InternshipCard = ({ item }) => (
     </div>
 
     <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-      <div className="rounded-xl bg-background border border-border px-3 py-2 flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-muted">schedule</span> {item.duration}</div>
-      <div className="rounded-xl bg-background border border-border px-3 py-2 flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-muted">payments</span> {item.stipend}</div>
+      <div className="rounded-xl bg-background border border-border px-3 py-2 flex items-center gap-2"><AppIcon name="schedule" className="text-[16px] text-muted" /> {item.duration}</div>
+      <div className="rounded-xl bg-background border border-border px-3 py-2 flex items-center gap-2"><AppIcon name="payments" className="text-[16px] text-muted" /> {item.stipend}</div>
     </div>
 
     <div className="mt-4 flex flex-wrap gap-1.5">

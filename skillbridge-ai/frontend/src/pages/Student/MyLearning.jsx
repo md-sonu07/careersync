@@ -6,7 +6,9 @@ import Badge from '../../components/ui/Badge'
 import { ProgressBar } from '../../components/ui/Progress'
 import PageHeader from '../../components/common/PageHeader'
 import { courseApi } from '../../api/course.api'
+import { toast } from 'react-hot-toast'
 import { mockCourses } from '../../utils/mockData'
+import AppIcon from '../../components/ui/AppIcon';
 
 export default function MyLearning() {
   const [resources, setResources] = useState([])
@@ -18,8 +20,26 @@ export default function MyLearning() {
     const fetchData = async () => {
       try {
         const [resData, recData] = await Promise.all([
-          courseApi.getResources().catch(() => null),
-          courseApi.getRecommendations().catch(() => null),
+          courseApi.getResources().catch(() => {
+            if (isMounted) {
+              toast({
+                title: 'Failed to load resources',
+                description: 'Could not load learning resources. Please try again.',
+                variant: 'destructive',
+              })
+            }
+            return []
+          }),
+          courseApi.getRecommendations().catch(() => {
+            if (isMounted) {
+              toast({
+                title: 'Failed to load recommendations',
+                description: 'Could not load recommendations. Please try again.',
+                variant: 'destructive',
+              })
+            }
+            return []
+          }),
         ])
 
         if (isMounted) {
@@ -27,7 +47,13 @@ export default function MyLearning() {
           if (recData && recData.length > 0) setRecommendations(recData)
         }
       } catch {
-        // Fallback
+        if (isMounted) {
+          toast({
+            title: 'Error',
+            description: 'An unexpected error occurred. Please try again.',
+            variant: 'destructive',
+          })
+        }
       } finally {
         if (isMounted) setLoading(false)
       }
@@ -42,8 +68,17 @@ export default function MyLearning() {
       setRecommendations((prev) =>
         prev.map((r) => (r.id === id ? { ...r, status } : r))
       )
+      toast({
+        title: 'Updated',
+        description: 'Recommendation status updated successfully.',
+        variant: 'success',
+      })
     } catch {
-      // Fallback
+      toast({
+        title: 'Failed',
+        description: 'Failed to update recommendation status. Please try again.',
+        variant: 'destructive',
+      })
     }
   }
 
@@ -78,7 +113,7 @@ export default function MyLearning() {
       <Card>
         <div className="flex items-center justify-between">
           <h3 className="font-bold text-charcoal flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary">auto_awesome</span> Personalized Gap Recommendations
+            <AppIcon name="auto_awesome" className="text-primary" /> Personalized Gap Recommendations
           </h3>
           <Badge variant="default">{recommendations.length} Active</Badge>
         </div>

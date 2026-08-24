@@ -7,6 +7,7 @@ import Select from '../../components/ui/Select'
 import Badge from '../../components/ui/Badge'
 import Modal from '../../components/ui/Modal'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/Tabs'
+import AppIcon from '../../components/ui/AppIcon';
 
 const ALL_SKILLS = ['React', 'Node.js', 'Python', 'JavaScript', 'TypeScript', 'SQL', 'MongoDB', 'AWS', 'Docker', 'Git', 'Java', 'Figma', 'Express.js', 'Next.js', 'Tailwind CSS']
 
@@ -104,7 +105,7 @@ function AIJobDescriptionAssistant({ onExtract }) {
   return (
     <div className="rounded-2xl border border-border bg-white shadow-subtle overflow-hidden">
       <div className="flex items-center gap-2 px-5 py-3 border-b border-border bg-background/60">
-        <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-white"><span className="material-symbols-outlined text-[18px]">auto_awesome</span></span>
+        <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-white"><AppIcon name="auto_awesome" className="text-[18px]" /></span>
         <div>
           <p className="text-sm font-bold text-charcoal">AI Job Description Assistant</p>
           <p className="text-xs text-muted">Paste a JD — AI extracts role, skills, experience & keywords</p>
@@ -272,7 +273,7 @@ export default function PostInternship() {
               {form.description && <p className="text-sm text-charcoal/80 leading-relaxed">{form.description}</p>}
             </div>
             <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800 flex gap-2">
-              <span className="material-symbols-outlined text-[20px]">info</span>
+              <AppIcon name="info" className="text-[20px]" />
               <span>Review all details carefully. Once published, candidates with matching skills will be notified automatically.</span>
             </div>
           </div>
@@ -290,7 +291,7 @@ export default function PostInternship() {
 
       <Modal open={showPublish} onClose={() => setShowPublish(false)} title="Internship Published!" description="Your opportunity is now live and visible to matching candidates.">
         <div className="space-y-4 text-sm text-charcoal">
-          <div className="flex items-center justify-center h-16 w-16 rounded-full bg-success/10 text-success mx-auto"><span className="material-symbols-outlined text-[32px]">check_circle</span></div>
+          <div className="flex items-center justify-center h-16 w-16 rounded-full bg-success/10 text-success mx-auto"><AppIcon name="check_circle" className="text-[32px]" /></div>
           <p className="text-center text-muted"><strong>{form.title}</strong> is live. <strong>~248</strong> matching students have been notified. Track applications in the pipeline.</p>
           <div className="flex gap-2 justify-center">
             <Button onClick={() => setShowPublish(false)}>Go to Applications</Button>

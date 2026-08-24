@@ -26,11 +26,12 @@ import Categories from '../pages/Admin/Categories'
 import Documents from '../pages/Admin/Documents'
 
 import ProtectedRoute from './ProtectedRoute'
+import AppIcon from '../components/ui/AppIcon';
 
 const Placeholder = ({ title, subtitle }) => (
   <div className="py-16 text-center">
     <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-sage text-primary mb-4">
-      <span className="material-symbols-outlined text-2xl">construction</span>
+      <AppIcon name="construction" className="text-2xl" />
     </div>
     <h2 className="text-2xl font-bold text-charcoal">{title || 'Coming soon'}</h2>
     <p className="text-muted mt-2 max-w-md mx-auto">{subtitle || 'This section follows the same design system. Uses centralized tokens.'}</p>

@@ -1,4 +1,5 @@
 import { cn } from '../../utils/helpers'
+import AppIcon from './AppIcon';
 
 const EmptyState = ({
   icon,
@@ -13,7 +14,7 @@ const EmptyState = ({
   <div className={cn('flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-white px-8 py-12 text-center shadow-subtle', className)} {...props}>
     {icon && (
       <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-background border border-border text-muted">
-        {typeof icon === 'string' ? <span className="material-symbols-outlined text-[28px]">{icon}</span> : icon}
+        {typeof icon === 'string' ? <AppIcon name={icon} className="text-[28px]" /> : icon}
       </div>
     )}
     <h3 className="text-base font-semibold text-charcoal">{title}</h3>

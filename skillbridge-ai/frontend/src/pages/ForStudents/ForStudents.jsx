@@ -4,6 +4,7 @@ import Card from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
 import Button from '../../components/ui/Button'
 import { ProgressBar } from '../../components/ui/Progress'
+import AppIcon from '../../components/ui/AppIcon';
 
 const features = [
   {
@@ -108,7 +109,7 @@ const ForStudents = () => {
               {/* floating mini card */}
               <Card className="absolute -bottom-6 -left-4 hidden p-3 shadow-card sm:flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-success/10 text-success border border-success/10">
-                  <span className="material-symbols-outlined text-[18px]">verified</span>
+                  <AppIcon name="verified" className="text-[18px]" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-charcoal">Assessment verified</p>
@@ -128,7 +129,7 @@ const ForStudents = () => {
             <Card key={f.title} className="p-6 flex flex-col">
               <div className="flex items-start gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-white">
-                  <span className="material-symbols-outlined text-[20px]">{f.icon}</span>
+                  <AppIcon name={f.icon} className="text-[20px]" />
                 </div>
                 <div>
                   <h3 className="font-bold text-charcoal">{f.title}</h3>

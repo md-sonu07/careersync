@@ -5,6 +5,7 @@ import Badge from '../../components/ui/Badge'
 import FileUpload from '../../components/ui/FileUpload'
 import PageHeader from '../../components/common/PageHeader'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/Tabs'
+import AppIcon from '../../components/ui/AppIcon';
 
 const assignments = [
   { id:'a1', title:'Build a Responsive Portfolio', course:'Complete React Mastery', due:'2026-03-05', status:'In Progress', instructions:'Create a portfolio with 3 sections (Hero, Projects, Contact) using React + Tailwind. Deploy to Vercel.', resources:['Brief.pdf','Figma-Reference.fig'], feedback:null },
@@ -50,7 +51,7 @@ export default function Assignments() {
                     <div className="mt-3 flex flex-wrap gap-2">
                       {a.resources.map(r=>(
                         <a key={r} href="#" className="inline-flex items-center gap-1.5 rounded-full bg-white border border-border px-3 py-1.5 text-xs font-medium text-charcoal hover:bg-sage">
-                          <span className="material-symbols-outlined text-[16px]">download</span> {r}
+                          <AppIcon name="download" className="text-[16px]" /> {r}
                         </a>
                       ))}
                     </div>

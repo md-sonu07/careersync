@@ -1,4 +1,5 @@
 import { cn } from '../../utils/helpers'
+import AppIcon from './AppIcon';
 
 /**
  * Centralized Button - uses :root theme colors (primary/accent)
@@ -26,7 +27,7 @@ const Button = ({ children, variant = 'primary', size = 'md', className, icon, .
   return (
     <button className={cn(base, variants[variant], sizes[size], className)} {...props}>
       {children}
-      {icon && <span className="material-symbols-outlined text-[20px]">{icon}</span>}
+      {icon && <AppIcon name={icon} className="text-[20px]" />}
     </button>
   )
 }

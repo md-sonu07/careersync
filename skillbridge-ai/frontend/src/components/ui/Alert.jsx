@@ -1,4 +1,5 @@
 import { cn } from '../../utils/helpers'
+import AppIcon from './AppIcon';
 
 const variants = {
   info: 'bg-primary/5 border-primary/20 text-primary',
@@ -22,7 +23,7 @@ const Alert = ({ variant = 'info', title, children, icon, onClose, className, ..
   >
     <span className="shrink-0 mt-0.5">
       {icon ? (
-        typeof icon === 'string' ? <span className="material-symbols-outlined text-[20px]">{icon}</span> : icon
+        typeof icon === 'string' ? <AppIcon name={icon} className="text-[20px]" /> : icon
       ) : (
         <span className="material-symbols-outlined text-[20px]">{iconMap[variant]}</span>
       )}

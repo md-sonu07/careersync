@@ -43,7 +43,7 @@ const Drawer = ({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex">
+    <div className="absolute inset-0 z-50 flex overflow-hidden">
       <div
         onClick={() => closeOnOverlay && onClose?.()}
         className="absolute inset-0 bg-charcoal/40 backdrop-blur-sm"

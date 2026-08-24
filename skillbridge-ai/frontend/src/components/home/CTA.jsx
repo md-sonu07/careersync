@@ -4,7 +4,7 @@ const CTA = () => {
   return (
     <section className="py-24 bg-primary text-white text-center">
       <div className="max-w-3xl mx-auto px-6">
-        <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
+        <h2 className="text-4xl @3xl:text-5xl font-bold mb-6 tracking-tight">
           Build skills that industry values.
           <br />
           Join CareerSync.

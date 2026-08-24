@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import AppIcon from '../ui/AppIcon';
 
 export default function AdminHeader({ onMenuClick }) {
   const navigate = useNavigate()
@@ -15,7 +16,7 @@ export default function AdminHeader({ onMenuClick }) {
     <header className="sticky top-0 z-20 flex h-[68px] items-center gap-3 border-b border-border bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/70 px-4 sm:px-6 shadow-sm">
       {/* Mobile menu */}
       <button onClick={onMenuClick} aria-label="Open navigation" className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-white text-charcoal shadow-soft hover:bg-background lg:hidden">
-        <span className="material-symbols-outlined">menu</span>
+        <AppIcon name="menu" />
       </button>
 
       {/* Left — Title + breadcrumb on desktop */}
@@ -29,7 +30,7 @@ export default function AdminHeader({ onMenuClick }) {
       <div className="flex flex-1 items-center justify-center px-2 sm:px-4 lg:px-8">
         <div className="relative w-full max-w-[560px]">
           <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted">
-            <span className="material-symbols-outlined text-[20px]">search</span>
+            <AppIcon name="search" className="text-[20px]" />
           </span>
           <input
             value={query}
@@ -42,7 +43,7 @@ export default function AdminHeader({ onMenuClick }) {
           </span>
           {query && (
             <button onClick={() => setQuery('')} className="absolute right-12 top-1/2 -translate-y-1/2 hidden h-6 w-6 items-center justify-center rounded-lg bg-border text-muted hover:text-charcoal sm:inline-flex">
-              <span className="material-symbols-outlined text-[16px]">close</span>
+              <AppIcon name="close" className="text-[16px]" />
             </button>
           )}
         </div>
@@ -51,12 +52,12 @@ export default function AdminHeader({ onMenuClick }) {
       {/* Right — Actions */}
       <div className="flex items-center gap-1.5 sm:gap-2">
         <Link to="/admin/courses" className="hidden items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white hover:bg-slate-800 shadow-soft lg:inline-flex">
-          <span className="material-symbols-outlined text-[18px]">add</span> New
+          <AppIcon name="add" className="text-[18px]" /> New
         </Link>
 
         <div className="relative">
           <button onClick={() => setNotifOpen((v) => !v)} className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-white text-charcoal hover:bg-background shadow-soft">
-            <span className="material-symbols-outlined text-[20px]">notifications</span>
+            <AppIcon name="notifications" className="text-[20px]" />
             <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-lg bg-danger px-1 text-[11px] font-bold text-white shadow-sm">3</span>
           </button>
           {notifOpen && (
@@ -73,7 +74,7 @@ export default function AdminHeader({ onMenuClick }) {
                 ].map((n) => (
                   <div key={n.t} className="flex gap-3 p-3 hover:bg-background">
                     <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0">
-                      <span className="material-symbols-outlined text-[18px]">{n.c}</span>
+                      <AppIcon name={n.c} className="text-[18px]" />
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium leading-tight text-charcoal">{n.t}</p>
@@ -101,10 +102,10 @@ export default function AdminHeader({ onMenuClick }) {
           </div>
           <span className="hidden h-6 w-px bg-border sm:block" />
           <button onClick={handleLogout} className="hidden h-7 w-7 items-center justify-center rounded-lg text-muted hover:bg-background hover:text-charcoal sm:inline-flex" aria-label="Log out">
-            <span className="material-symbols-outlined text-[18px]">logout</span>
+            <AppIcon name="logout" className="text-[18px]" />
           </button>
           <button onClick={handleLogout} className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-muted hover:bg-background hover:text-danger sm:hidden" aria-label="Log out">
-            <span className="material-symbols-outlined text-[18px]">logout</span>
+            <AppIcon name="logout" className="text-[18px]" />
           </button>
         </div>
       </div>

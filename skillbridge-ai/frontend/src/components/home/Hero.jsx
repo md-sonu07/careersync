@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import Button from '../ui/Button'
+import AppIcon from '../ui/AppIcon';
 
 const Hero = () => {
   return (
@@ -7,17 +8,17 @@ const Hero = () => {
       {/* Background ambient lighting */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-primary/10 blur-[120px] rounded-full pointer-events-none -z-10" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full grid lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full grid @5xl:grid-cols-12 gap-10 @5xl:gap-8 items-center">
         {/* Left Side Content - 7 cols on lg */}
-        <div className="lg:col-span-7 flex flex-col gap-5 max-w-2xl mx-auto lg:mx-0 text-center lg:text-left">
+        <div className="@5xl:col-span-7 flex flex-col gap-5 max-w-2xl mx-auto @5xl:mx-0 text-center @5xl:text-left">
           {/* Top Pill Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-semibold text-xs sm:text-sm self-center lg:self-start transition-all hover:bg-primary/15">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-semibold text-xs @2xl:text-sm self-center @5xl:self-start transition-all hover:bg-primary/15">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             Bridging Institute & Industry with AI
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-charcoal leading-[1.2] tracking-tight">
+          <h1 className="text-3xl @2xl:text-4xl @5xl:text-5xl font-extrabold text-charcoal leading-[1.2] tracking-tight">
             Learn the right skills.{' '}
             <span className="text-primary bg-gradient-to-r from-primary via-emerald-600 to-teal-700 bg-clip-text text-transparent">
               Build your career.
@@ -26,13 +27,13 @@ const Hero = () => {
           </h1>
 
           {/* Subtitle / Paragraph */}
-          <p className="text-base sm:text-lg text-charcoal/70 leading-relaxed max-w-xl mx-auto lg:mx-0">
+          <p className="text-base @2xl:text-lg text-charcoal/70 leading-relaxed max-w-xl mx-auto @5xl:mx-0">
             CareerSync combines AI skill gap analysis, personalized roadmaps, real-world industry assessments, and
             intelligent internship matching in one unified platform.
           </p>
 
           {/* Action CTA Buttons */}
-          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+          <div className="flex flex-wrap items-center justify-center @5xl:justify-start gap-3 pt-2">
             <Link to="/register">
               <Button size="md" icon="arrow_forward" className="shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all">
                 Start Learning Free
@@ -46,7 +47,7 @@ const Hero = () => {
           </div>
 
           {/* Social Proof & Trust Badges */}
-          <div className="flex items-center justify-center lg:justify-start gap-4 pt-4 mt-2 border-t border-border/70">
+          <div className="flex items-center justify-center @5xl:justify-start gap-4 pt-4 mt-2 border-t border-border/70">
             <div className="flex -space-x-3">
               <img
                 className="w-9 h-9 rounded-full border-2 border-white object-cover shadow-sm"
@@ -66,11 +67,11 @@ const Hero = () => {
             </div>
             <div className="text-left">
               <div className="flex items-center gap-1 text-amber-500 text-xs">
-                <span className="material-symbols-outlined text-[16px] fill-1">star</span>
-                <span className="material-symbols-outlined text-[16px] fill-1">star</span>
-                <span className="material-symbols-outlined text-[16px] fill-1">star</span>
-                <span className="material-symbols-outlined text-[16px] fill-1">star</span>
-                <span className="material-symbols-outlined text-[16px] fill-1">star</span>
+                <AppIcon name="star" className="text-[16px] fill-1" />
+                <AppIcon name="star" className="text-[16px] fill-1" />
+                <AppIcon name="star" className="text-[16px] fill-1" />
+                <AppIcon name="star" className="text-[16px] fill-1" />
+                <AppIcon name="star" className="text-[16px] fill-1" />
                 <span className="font-bold text-charcoal ml-1 text-xs">4.9/5</span>
               </div>
               <p className="text-xs font-medium text-charcoal/70">Joined by 10,000+ ambitious learners</p>
@@ -79,7 +80,7 @@ const Hero = () => {
         </div>
 
         {/* Right Side Visual - Crisp Light-Mode Code UI Mockup */}
-        <div className="lg:col-span-5 relative mt-4 lg:mt-0 flex justify-center">
+        <div className="@5xl:col-span-5 relative mt-4 @5xl:mt-0 flex justify-center">
           {/* Ambient Soft Glow Aura */}
           <div className="absolute -inset-4 bg-gradient-to-tr from-primary/15 via-emerald-400/10 to-teal-300/15 rounded-3xl blur-2xl opacity-80 -z-10" />
 
@@ -96,7 +97,7 @@ const Hero = () => {
                 <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                 careersync.ai/ai-readiness
               </div>
-              <span className="material-symbols-outlined text-[16px] text-charcoal/40">more_horiz</span>
+              <AppIcon name="more_horiz" className="text-[16px] text-charcoal/40" />
             </div>
 
             {/* Dashboard Content Widget */}
@@ -105,7 +106,7 @@ const Hero = () => {
               <div className="flex items-center justify-between pb-3.5 border-b border-border/60">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                    <span className="material-symbols-outlined text-[22px]">psychology</span>
+                    <AppIcon name="psychology" className="text-[22px]" />
                   </div>
                   <div>
                     <div className="text-[11px] uppercase tracking-wider font-semibold text-charcoal/50">AI Career Target</div>
@@ -126,7 +127,7 @@ const Hero = () => {
                 <div>
                   <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
                     <span className="text-charcoal flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-[16px] text-primary">code</span>
+                      <AppIcon name="code" className="text-[16px] text-primary" />
                       Python & Machine Learning
                     </span>
                     <span className="text-primary font-bold">92%</span>
@@ -139,7 +140,7 @@ const Hero = () => {
                 <div>
                   <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
                     <span className="text-charcoal flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-[16px] text-primary">web</span>
+                      <AppIcon name="web" className="text-[16px] text-primary" />
                       React & Modern Web Architecture
                     </span>
                     <span className="text-primary font-bold">88%</span>
@@ -152,7 +153,7 @@ const Hero = () => {
                 <div>
                   <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
                     <span className="text-charcoal flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-[16px] text-amber-500">cloud_sync</span>
+                      <AppIcon name="cloud_sync" className="text-[16px] text-amber-500" />
                       System Design & MLOps
                     </span>
                     <span className="text-amber-600 font-bold">74% <span className="text-[10px] font-normal text-amber-600/80">(Gap Identified)</span></span>
@@ -167,7 +168,7 @@ const Hero = () => {
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <div className="p-3 rounded-xl bg-slate-50 border border-border/80 hover:bg-slate-100/60 transition-colors flex items-start gap-2.5">
                   <div className="p-1.5 rounded-lg bg-primary/10 text-primary shrink-0">
-                    <span className="material-symbols-outlined text-[18px]">auto_stories</span>
+                    <AppIcon name="auto_stories" className="text-[18px]" />
                   </div>
                   <div>
                     <div className="text-[10px] font-semibold uppercase text-charcoal/50">AI Recommendation</div>
@@ -178,7 +179,7 @@ const Hero = () => {
 
                 <div className="p-3 rounded-xl bg-slate-50 border border-border/80 hover:bg-slate-100/60 transition-colors flex items-start gap-2.5">
                   <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 shrink-0">
-                    <span className="material-symbols-outlined text-[18px]">work</span>
+                    <AppIcon name="work" className="text-[18px]" />
                   </div>
                   <div>
                     <div className="text-[10px] font-semibold uppercase text-charcoal/50">Internship Match</div>

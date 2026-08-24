@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../features/auth/authSlice";
 import Button from "../../components/ui/Button";
+import AppIcon from '../../components/ui/AppIcon';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -78,7 +79,7 @@ export default function AdminLogin() {
         <div className="relative z-10 p-10 xl:p-12">
           <Link to="/" className="inline-flex items-center gap-3">
             <span className="w-10 h-10 rounded-xl bg-white text-slate-900 grid place-items-center">
-              <span className="material-symbols-outlined text-[22px]">shield</span>
+              <AppIcon name="shield" className="text-[22px]" />
             </span>
             <span className="text-white">
               <span className="font-bold tracking-tight">CareerSync</span>{" "}
@@ -104,19 +105,19 @@ export default function AdminLogin() {
 
           <div className="mt-8 grid grid-cols-2 gap-3 max-w-md">
             <div className="rounded-xl bg-slate-800 border border-slate-700 p-4">
-              <span className="material-symbols-outlined text-slate-300">verified_user</span>
+              <AppIcon name="verified_user" className="text-slate-300" />
               <p className="mt-2 text-sm font-medium text-white">Verification queue</p>
               <p className="text-xs text-slate-400 mt-1">Approve industry &amp; Institute accounts</p>
             </div>
             <div className="rounded-xl bg-slate-800 border border-slate-700 p-4">
-              <span className="material-symbols-outlined text-slate-300">monitoring</span>
+              <AppIcon name="monitoring" className="text-slate-300" />
               <p className="mt-2 text-sm font-medium text-white">Platform analytics</p>
               <p className="text-xs text-slate-400 mt-1">Users, projects, placements</p>
             </div>
           </div>
 
           <p className="mt-8 text-xs text-slate-500 flex items-center gap-2">
-            <span className="material-symbols-outlined text-[16px]">lock</span>
+            <AppIcon name="lock" className="text-[16px]" />
             Protected by enterprise-grade encryption • Session timeout 30m
           </p>
         </div>
@@ -126,7 +127,7 @@ export default function AdminLogin() {
       <div className="lg:hidden bg-slate-900 text-white px-6 py-5 flex items-center justify-between border-b border-slate-800">
         <Link to="/" className="flex items-center gap-2.5">
           <span className="w-9 h-9 rounded-xl bg-white text-slate-900 grid place-items-center">
-            <span className="material-symbols-outlined text-[20px]">shield</span>
+            <AppIcon name="shield" className="text-[20px]" />
           </span>
           <span className="font-bold">CareerSync Admin</span>
         </Link>
@@ -162,7 +163,7 @@ export default function AdminLogin() {
           <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl p-6 sm:p-8">
             <div className="flex flex-col items-center text-center mb-6">
               <div className="w-14 h-14 rounded-2xl bg-white text-slate-900 grid place-items-center shadow-lg">
-                <span className="material-symbols-outlined text-[28px]">shield</span>
+                <AppIcon name="shield" className="text-[28px]" />
               </div>
               <h2 className="mt-4 text-xl font-bold text-white tracking-tight">Admin sign in</h2>
               <p className="mt-1.5 text-sm text-slate-400">Restricted to authorized personnel only</p>
@@ -175,7 +176,7 @@ export default function AdminLogin() {
                 </label>
                 <div className="relative mt-1.5">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
-                    <span className="material-symbols-outlined text-[20px]">mail</span>
+                    <AppIcon name="mail" className="text-[20px]" />
                   </span>
                   <input
                     id="admin-email"
@@ -217,7 +218,7 @@ export default function AdminLogin() {
                 </div>
                 <div className="relative mt-1.5">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
-                    <span className="material-symbols-outlined text-[20px]">lock</span>
+                    <AppIcon name="lock" className="text-[20px]" />
                   </span>
                   <input
                     id="admin-password"
@@ -270,7 +271,7 @@ export default function AdminLogin() {
               </Button>
 
               <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 px-3.5 py-3 flex gap-2.5">
-                <span className="material-symbols-outlined text-amber-400 text-[18px] shrink-0 mt-0.5">warning</span>
+                <AppIcon name="warning" className="text-amber-400 text-[18px] shrink-0 mt-0.5" />
                 <p className="text-xs leading-relaxed text-amber-200/90">
                   This is a secure area. Unauthorized access is monitored and will be reported.
                 </p>

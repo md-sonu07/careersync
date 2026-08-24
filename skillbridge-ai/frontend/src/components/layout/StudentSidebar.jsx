@@ -1,5 +1,6 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import AppIcon from '../ui/AppIcon';
 
 const navSections = [
   { label: 'Overview', items: [{ label: 'Dashboard', icon: 'dashboard', path: '/student' }] },
@@ -20,7 +21,7 @@ const navSections = [
       { label: 'Assignments', icon: 'assignment', path: '/student/assignments' },
       { label: 'Quizzes', icon: 'help', path: '/student/quizzes' },
       { label: 'AI Practice', icon: 'smart_toy', path: '/student/ai-practice' },
-      { label: 'AI Assistant', icon: 'chat', path: '/student/ai-assistant' },
+      { label: 'Career AI', icon: 'chat', path: '/student/ai-assistant' },
       { label: 'Certificates', icon: 'workspace_premium', path: '/student/certificates' },
     ]
   },
@@ -59,7 +60,7 @@ const navSections = [
 function NavItem({ item, active, onClick }) {
   return (
     <NavLink to={item.path} onClick={onClick} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${active ? 'bg-white text-slate-900 shadow-soft' : 'text-slate-400 hover:bg-white/10 hover:text-white'}`}>
-      <span className="material-symbols-outlined text-[20px] shrink-0">{item.icon}</span>
+      <AppIcon name={item.icon} className="text-[20px] shrink-0" />
       <span className="truncate">{item.label}</span>
       {item.label === 'Skill Gap' && <span className={`ml-auto rounded-full px-1.5 py-0.5 text-[10px] font-bold ${active ? 'bg-slate-900 text-white' : 'bg-danger text-white'}`}>!</span>}
     </NavLink>
@@ -78,14 +79,14 @@ export default function StudentSidebar({ onNavigate }) {
     <div className="flex h-full flex-col">
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-slate-800 bg-slate-900 px-4 lg:hidden">
         <button onClick={onNavigate} aria-label="Close navigation" className="rounded-xl border border-white/10 bg-white/10 p-2 text-white">
-          <span className="material-symbols-outlined">menu</span>
+          <AppIcon name="menu" />
         </button>
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-slate-900 font-bold text-xs">SB</div>
           <span className="text-sm font-bold text-white truncate max-w-[130px]">{displayName}</span>
         </div>
         <button onClick={handleLogout} className="p-2 rounded-xl border border-white/20 text-rose-400 hover:bg-rose-500/10">
-          <span className="material-symbols-outlined text-[20px]">logout</span>
+          <AppIcon name="logout" className="text-[20px]" />
         </button>
       </header>
       <div className="hidden lg:flex h-[68px] shrink-0 items-center gap-3 px-5 border-b border-white/10">
@@ -124,7 +125,7 @@ export default function StudentSidebar({ onNavigate }) {
           </div>
         </div>
         <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 py-2 text-xs font-semibold text-rose-400 hover:bg-rose-500/10 transition-colors">
-          <span className="material-symbols-outlined text-[16px]">logout</span> Log out
+          <AppIcon name="logout" className="text-[16px]" /> Log out
         </button>
         <p className="text-center text-[11px] text-slate-500">© 2026 CareerSync</p>
       </div>

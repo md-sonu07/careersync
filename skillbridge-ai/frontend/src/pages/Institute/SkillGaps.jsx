@@ -1,5 +1,6 @@
 import Card from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
+import AppIcon from '../../components/ui/AppIcon';
 
 const gaps = [
   { skill: 'Cloud / AWS', demand: 72, proficiency: 31, gap: 41 },
@@ -52,7 +53,7 @@ export default function SkillGaps() {
       </Card>
 
       <Card className="!border-danger/20 !bg-danger/[0.04]">
-        <h3 className="font-bold text-danger flex items-center gap-2"><span className="material-symbols-outlined">warning</span> Critical Gaps (Gap &gt; 25%)</h3>
+        <h3 className="font-bold text-danger flex items-center gap-2"><AppIcon name="warning" /> Critical Gaps (Gap &gt; 25%)</h3>
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {gaps.filter((g) => g.gap > 25).map((g) => (
             <div key={g.skill} className="rounded-xl bg-white border border-border p-3">
@@ -71,7 +72,7 @@ export default function SkillGaps() {
             <Card key={a.title} className="hover:shadow-card transition-shadow">
               <div className="flex gap-3">
                 <div className={`flex h-10 w-10 items-center justify-center rounded-xl shrink-0 border ${a.priority === 'Critical' ? 'bg-danger/10 text-danger border-danger/20' : a.priority === 'High' ? 'bg-accent/10 text-accent border-accent/20' : 'bg-primary/10 text-primary border-primary/20'}`}>
-                  <span className="material-symbols-outlined text-[22px]">{a.icon}</span>
+                  <AppIcon name={a.icon} className="text-[22px]" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">

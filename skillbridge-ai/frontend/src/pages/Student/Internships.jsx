@@ -8,6 +8,7 @@ import Select from '../../components/ui/Select'
 import PageHeader from '../../components/common/PageHeader'
 import { opportunityApi } from '../../api/opportunity.api'
 import { applicationApi } from '../../api/application.api'
+import { toast } from 'react-hot-toast'
 import { mockInternships } from '../../utils/mockData'
 
 export default function Internships() {
@@ -21,8 +22,26 @@ export default function Internships() {
   useEffect(() => {
     let isMounted = true
     Promise.all([
-      opportunityApi.getOpportunities({ type: 'internship' }).catch(() => []),
-      applicationApi.getMyApplications().catch(() => []),
+      opportunityApi.getOpportunities({ type: 'internship' }).catch(() => {
+        if (isMounted) {
+          toast({
+            title: 'Failed to load internships',
+            description: 'Could not load internship opportunities. Please try again.',
+            variant: 'destructive',
+          })
+        }
+        return []
+      }),
+      applicationApi.getMyApplications().catch(() => {
+        if (isMounted) {
+          toast({
+            title: 'Failed to load applications',
+            description: 'Could not load your applications. Please try again.',
+            variant: 'destructive',
+          })
+        }
+        return []
+      }),
     ]).then(([opps, myApps]) => {
       if (isMounted) {
         if (opps && opps.length > 0) setOpportunities(opps)
@@ -47,13 +66,17 @@ export default function Internships() {
         cover_letter: 'I am highly interested in applying for this internship opportunity via CareerSync.',
       })
       setAppliedMap((prev) => ({ ...prev, [oppId]: true }))
-      alert('Application submitted successfully!')
-    } catch (err) {
-      if (err.response?.data?.detail) {
-        alert(err.response.data.detail)
-      } else {
-        alert('Application submitted!')
-      }
+      toast({
+        title: 'Application submitted',
+        description: 'Your application has been submitted successfully.',
+        variant: 'success',
+      })
+    } catch {
+      toast({
+        title: 'Application failed',
+        description: 'Failed to submit application. Please try again.',
+        variant: 'destructive',
+      })
     }
   }
 

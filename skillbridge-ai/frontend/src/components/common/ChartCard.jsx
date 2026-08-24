@@ -1,4 +1,5 @@
 import { cn } from '../../utils/helpers'
+import AppIcon from '../ui/AppIcon';
 
 const ChartCard = ({
   title,
@@ -34,7 +35,7 @@ const ChartCard = ({
           aria-label="Chart placeholder"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white border border-border text-muted mb-3">
-            <span className="material-symbols-outlined text-[22px]">bar_chart</span>
+            <AppIcon name="bar_chart" className="text-[22px]" />
           </div>
           <p className="text-sm font-medium text-muted">Chart preview</p>
           <p className="text-xs text-muted/70">Canvas area {height}px</p>

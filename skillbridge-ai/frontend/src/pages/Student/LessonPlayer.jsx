@@ -1,6 +1,7 @@
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import PageHeader from '../../components/common/PageHeader'
+import AppIcon from '../../components/ui/AppIcon';
 
 const LessonPlayer = () => {
   return (
@@ -10,7 +11,7 @@ const LessonPlayer = () => {
         <div className="lg:col-span-2 space-y-4">
           <Card className="p-0 overflow-hidden">
             <div className="aspect-video bg-charcoal flex items-center justify-center text-white">
-              <span className="material-symbols-outlined text-5xl">play_circle</span>
+              <AppIcon name="play_circle" className="text-5xl" />
             </div>
             <div className="p-6 space-y-4">
               <h3 className="font-bold">Understanding useState & useEffect</h3>
@@ -45,7 +46,7 @@ const LessonPlayer = () => {
             ].map((m) => (
               <div key={m} className="flex items-center justify-between p-2 rounded-lg hover:bg-background">
                 <span className={m.includes('✓') ? 'font-semibold text-success' : ''}>{m}</span>
-                <span className="material-symbols-outlined text-[18px] text-muted">chevron_right</span>
+                <AppIcon name="chevron_right" className="text-[18px] text-muted" />
               </div>
             ))}
           </div>

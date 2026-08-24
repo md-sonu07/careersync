@@ -3,14 +3,27 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import Button from '../ui/Button'
 import Drawer from '../ui/Drawer'
+import Logo from '../ui/Logo'
+import { useChatContext } from '../../context/ChatContext'
+import AppIcon from '../ui/AppIcon';
 
 const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const { toggleChat } = useChatContext()
   const [scrolled, setScrolled] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [isReturning, setIsReturning] = useState(false)
+
+  useEffect(() => {
+    if (localStorage.getItem('hasVisited')) {
+      setIsReturning(true)
+    } else {
+      setTimeout(() => localStorage.setItem('hasVisited', 'true'), 2000)
+    }
+  }, [])
 
   // Close dropdowns & mobile menu on route change
   useEffect(() => {
@@ -60,16 +73,14 @@ const Navbar = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 shrink-0">
-            <span className="text-xl md:text-2xl font-bold text-primary tracking-tight">CareerSync</span>
-          </Link>
+          <Logo />
 
           {/* Desktop Nav Items */}
-          <div className="hidden lg:flex items-center gap-7">
+          <div className="hidden @5xl:flex items-center gap-7">
             <Link
               to="/"
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                location.pathname === '/' ? 'text-primary font-semibold' : 'text-charcoal'
+              className={`relative text-sm font-medium transition-colors py-1 hover:text-primary after:content-[''] after:absolute after:left-0 after:-bottom-1.5 after:w-full after:h-[2px] after:bg-primary after:rounded-full after:transition-transform after:duration-300 ${
+                location.pathname === '/' ? 'text-primary font-bold after:scale-x-100' : 'text-charcoal/80 after:scale-x-0 hover:after:scale-x-100'
               }`}
             >
               Home
@@ -77,8 +88,8 @@ const Navbar = () => {
 
             <Link
               to="/about"
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                location.pathname === '/about' ? 'text-primary font-semibold' : 'text-charcoal'
+              className={`relative text-sm font-medium transition-colors py-1 hover:text-primary after:content-[''] after:absolute after:left-0 after:-bottom-1.5 after:w-full after:h-[2px] after:bg-primary after:rounded-full after:transition-transform after:duration-300 ${
+                location.pathname === '/about' ? 'text-primary font-bold after:scale-x-100' : 'text-charcoal/80 after:scale-x-0 hover:after:scale-x-100'
               }`}
             >
               About
@@ -86,8 +97,8 @@ const Navbar = () => {
 
             <Link
               to="/how-it-works"
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                location.pathname === '/how-it-works' ? 'text-primary font-semibold' : 'text-charcoal'
+              className={`relative text-sm font-medium transition-colors py-1 hover:text-primary after:content-[''] after:absolute after:left-0 after:-bottom-1.5 after:w-full after:h-[2px] after:bg-primary after:rounded-full after:transition-transform after:duration-300 ${
+                location.pathname === '/how-it-works' ? 'text-primary font-bold after:scale-x-100' : 'text-charcoal/80 after:scale-x-0 hover:after:scale-x-100'
               }`}
             >
               How It Works
@@ -109,13 +120,12 @@ const Navbar = () => {
                 aria-expanded={activeDropdown === 'explore'}
               >
                 <span>Explore</span>
-                <span
-                  className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${
+                <AppIcon 
+                  name="keyboard_arrow_down" 
+                  className={`text-[18px] transition-transform duration-200 ${
                     activeDropdown === 'explore' ? 'rotate-180 text-primary' : 'text-charcoal/60'
                   }`}
-                >
-                  keyboard_arrow_down
-                </span>
+                />
               </button>
 
               {activeDropdown === 'explore' && (
@@ -128,7 +138,7 @@ const Navbar = () => {
                         className="flex items-start gap-3.5 p-2.5 rounded-xl hover:bg-primary/5 transition-colors group"
                       >
                         <div className="p-2 h-10 w-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors shrink-0">
-                          <span className="material-symbols-outlined text-[20px] block">{item.icon}</span>
+                          <AppIcon name={item.icon} className="text-[20px] block" />
                         </div>
                         <div>
                           <div className="text-sm font-semibold text-charcoal group-hover:text-primary transition-colors">
@@ -147,37 +157,86 @@ const Navbar = () => {
           {/* Right Action Buttons */}
           <div className="flex items-center gap-3">
             <button
-              className="lg:hidden p-2 rounded-xl border border-border hover:bg-background transition-colors"
+              className="@5xl:hidden p-2 flex justify-center items-center cursor-pointer rounded-lg border border-border hover:bg-background transition-colors"
               onClick={() => setMobileOpen(true)}
               aria-label="Menu"
             >
-              <span className="material-symbols-outlined block">menu</span>
+              <AppIcon name="menu" className="block" />
             </button>
-            <div className="hidden sm:flex items-center gap-3">
+            <div className="hidden @2xl:flex items-center gap-3">
               {isAuthenticated ? (
                 <>
-                  <Link to="/student/dashboard" className="hidden md:inline text-sm font-medium text-charcoal hover:text-primary">
+                  <Link to="/student/dashboard" className="hidden @3xl:inline text-sm font-medium text-charcoal hover:text-primary px-3">
                     Dashboard
                   </Link>
-                  <span className="hidden md:inline text-sm text-charcoal/60 truncate max-w-[150px]">
-                    {user?.full_name || user?.name || user?.email}
-                  </span>
-                  <Button variant="outline" size="sm" onClick={handleLogout} className="gap-1">
-                    <span className="material-symbols-outlined text-[18px]">logout</span> Log out
-                  </Button>
+                  
+                  {/* User Profile Section */}
+                  <div className="flex items-center gap-3 pl-3 border-l border-border/80">
+                    <div className="flex items-center gap-3">
+                      {user?.avatar_url || user?.profile_image ? (
+                        <img src={user.avatar_url || user.profile_image} alt="Profile" className="w-9 h-9 rounded-full object-cover border-2 border-primary/20 shadow-sm" />
+                      ) : (
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/20 to-emerald-500/20 text-primary flex items-center justify-center font-bold text-sm border border-primary/30 shadow-sm">
+                          {(user?.full_name || user?.name || user?.email || '?').charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div className="hidden @4xl:flex flex-col text-left">
+                        <span className="text-sm font-bold text-charcoal leading-tight max-w-[120px] truncate">
+                          {user?.full_name || user?.name || 'User'}
+                        </span>
+                        <span className="text-[10px] uppercase font-semibold tracking-wider text-primary truncate max-w-[120px]">
+                          {user?.role || 'Student'}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <button 
+                      onClick={handleLogout} 
+                      className="ml-2 w-9 h-9 rounded-xl border border-border flex items-center justify-center text-charcoal/60 hover:text-danger hover:border-danger/30 hover:bg-danger/5 transition-all cursor-pointer"
+                      title="Log out"
+                    >
+                      <AppIcon name="logout" className="text-[18px]" />
+                    </button>
+                  </div>
                 </>
               ) : (
                 <>
-                  <Link to="/login">
-                    <button className="text-sm font-medium px-4 py-2 rounded-xl text-primary hover:bg-primary/5 transition-colors">
-                      Log In
-                    </button>
-                  </Link>
-                  <Link to="/register">
-                    <Button size="md">Get Started</Button>
-                  </Link>
+                  {isReturning ? (
+                    <>
+                      <Link to="/register">
+                        <button className="text-sm font-medium px-4 py-2.5 rounded-lg text-primary hover:bg-primary/5 transition-colors cursor-pointer">
+                          Sign Up
+                        </button>
+                      </Link>
+                      <Link to="/login">
+                        <Button size="md">Log In</Button>
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <Link to="/login">
+                        <button className="text-sm font-medium px-4 py-2.5 rounded-lg text-primary hover:bg-primary/5 transition-colors cursor-pointer">
+                          Log In
+                        </button>
+                      </Link>
+                      <Link to="/register">
+                        <Button size="md">Get Started</Button>
+                      </Link>
+                    </>
+                  )}
                 </>
               )}
+
+              {/* Chat Icon Button - Moved to Far Right */}
+              <div className="pl-3 border-l border-border/80">
+                <button
+                  onClick={toggleChat}
+                  className="group flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-primary/10 to-emerald-500/10 text-primary border border-primary/20 hover:border-primary/40 hover:shadow-sm transition-all cursor-pointer"
+                  title="Chat with AI"
+                >
+                  <img src="/logo.png" alt="Career AI" className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -193,7 +252,7 @@ const Navbar = () => {
               onClick={() => setMobileOpen(false)}
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-charcoal hover:bg-primary/5 hover:text-primary"
             >
-              <span className="material-symbols-outlined text-[20px] text-primary">home</span>
+              <AppIcon name="home" className="text-[20px] text-primary" />
               Home
             </Link>
             <Link
@@ -201,7 +260,7 @@ const Navbar = () => {
               onClick={() => setMobileOpen(false)}
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-charcoal hover:bg-primary/5 hover:text-primary"
             >
-              <span className="material-symbols-outlined text-[20px] text-primary">info</span>
+              <AppIcon name="info" className="text-[20px] text-primary" />
               About
             </Link>
             <Link
@@ -209,9 +268,19 @@ const Navbar = () => {
               onClick={() => setMobileOpen(false)}
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-charcoal hover:bg-primary/5 hover:text-primary"
             >
-              <span className="material-symbols-outlined text-[20px] text-primary">alt_route</span>
+              <AppIcon name="alt_route" className="text-[20px] text-primary" />
               How It Works
             </Link>
+            <button
+              onClick={() => {
+                setMobileOpen(false)
+                toggleChat()
+              }}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-charcoal hover:bg-primary/5 hover:text-primary w-full text-left"
+            >
+              <img src="/logo.png" alt="Career AI" className="w-5 h-5 text-primary" />
+              Chat with AI
+            </button>
           </div>
 
           <hr className="border-border" />
@@ -227,7 +296,7 @@ const Navbar = () => {
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-charcoal hover:bg-primary/5 hover:text-primary"
                 >
-                  <span className="material-symbols-outlined text-[20px] text-primary">{item.icon}</span>
+                  <AppIcon name={item.icon} className="text-[20px] text-primary" />
                   {item.label}
                 </Link>
               ))}
@@ -250,7 +319,7 @@ const Navbar = () => {
                 onClick={handleLogout}
                 className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-medium bg-danger/10 text-danger"
               >
-                <span className="material-symbols-outlined text-[18px]">logout</span> Log out
+                <AppIcon name="logout" className="text-[18px]" /> Log out
               </button>
             </div>
           ) : (

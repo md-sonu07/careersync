@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { cn } from '../../utils/helpers'
+import AppIcon from './AppIcon';
 
 const Toast = ({ message, variant = 'default', onClose, duration = 3000 }) => {
   useEffect(() => {
@@ -21,7 +22,7 @@ const Toast = ({ message, variant = 'default', onClose, duration = 3000 }) => {
       <span className="text-sm font-medium">{message}</span>
       {onClose && (
         <button onClick={onClose} className="ml-2 rounded-lg bg-white/20 p-1">
-          <span className="material-symbols-outlined text-[18px]">close</span>
+          <AppIcon name="close" className="text-[18px]" />
         </button>
       )}
     </div>

@@ -64,6 +64,11 @@ export const ENDPOINTS = {
     COMPANY: '/analytics/company/',
     ACADEMICIAN: '/analytics/institute/',
   },
+  AI: {
+    CONVERSATIONS: '/ai/conversations/',
+    CONVERSATION_DETAIL: (id) => `/ai/conversations/${id}/`,
+    CHAT: '/ai/chat/',
+  },
 }
 
 

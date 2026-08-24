@@ -1,4 +1,5 @@
 import { cn } from '../../utils/helpers'
+import AppIcon from '../ui/AppIcon';
 
 const StatCard = ({ icon, label, value, trend, trendLabel, className, ...props }) => {
   const isPositive = trend !== undefined && trend !== null ? trend >= 0 : null
@@ -38,7 +39,7 @@ const StatCard = ({ icon, label, value, trend, trendLabel, className, ...props }
         </div>
         {icon && (
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/10 text-primary">
-            {typeof icon === 'string' ? <span className="material-symbols-outlined text-[22px]">{icon}</span> : icon}
+            {typeof icon === 'string' ? <AppIcon name={icon} className="text-[22px]" /> : icon}
           </div>
         )}
       </div>

@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import { cn } from '../../utils/helpers'
+import AppIcon from './AppIcon';
 
 const FileUpload = ({
   label,
@@ -71,7 +72,7 @@ const FileUpload = ({
         )}
       >
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background border border-border text-muted mb-3">
-          <span className="material-symbols-outlined text-[22px]">cloud_upload</span>
+          <AppIcon name="cloud_upload" className="text-[22px]" />
         </div>
         <p className="text-sm font-medium text-charcoal">{hint}</p>
         <p className="mt-1 text-xs text-muted">
@@ -100,7 +101,7 @@ const FileUpload = ({
             >
               <div className="flex items-center gap-2 min-w-0">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-background border border-border text-muted">
-                  <span className="material-symbols-outlined text-[18px]">description</span>
+                  <AppIcon name="description" className="text-[18px]" />
                 </span>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-charcoal">{f.name}</p>

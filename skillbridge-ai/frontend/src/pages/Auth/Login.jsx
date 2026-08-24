@@ -5,6 +5,7 @@ import { setCredentials, loginUser } from "../../features/auth/authSlice";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import Select from "../../components/ui/Select";
+import AppIcon from '../../components/ui/AppIcon';
 
 const ROLE_ROUTES = {
   student: "/student/dashboard",
@@ -101,9 +102,9 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto w-full my-auto grid lg:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl border border-border bg-surface items-stretch">
+      <div className="max-w-7xl mx-auto w-full my-auto grid @5xl:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl border border-border bg-surface items-stretch">
         {/* Left — Branding / Testimonial (50% Width, Equal Height) */}
-        <div className="relative hidden lg:flex bg-primary text-white flex-col justify-between p-10 xl:p-12 overflow-hidden h-full">
+        <div className="relative hidden @5xl:flex bg-primary text-white flex-col justify-between p-10 xl:p-12 overflow-hidden h-full">
           {/* subtle pattern */}
           <div
             className="absolute inset-0 opacity-[0.07]"
@@ -181,7 +182,7 @@ export default function Login() {
         </div>
 
         {/* Mobile top brand bar */}
-        <div className="lg:hidden bg-primary text-white px-6 py-5 flex items-center justify-between">
+        <div className="@5xl:hidden bg-primary text-white px-6 py-5 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
             <span className="w-9 h-9 rounded-xl bg-white text-primary grid place-items-center font-bold">
               C
@@ -344,24 +345,7 @@ export default function Login() {
                 className="w-full rounded-xl bg-white border-border hover:bg-background gap-3"
                 onClick={handleGooglePlaceholder}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.02 5.02 0 0 1-2.18 3.3v2.75h3.53c2.07-1.9 3.27-4.7 3.27-8.06Z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.95 0 5.43-1 7.24-2.69l-3.53-2.75c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23Z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09A6.97 6.97 0 0 1 5.47 12c0-.73.13-1.43.36-2.09V7.07H2.18A10.99 11.99 0 0 0 1 12c0 1.78.42 3.45 1.18 4.93l3.66-2.84Z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.6 0 3.05.55 4.19 1.64l3.14-3.14C17.5 2.09 15.02 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84C6.69 7.3 9.11 5.38 12 5.38Z"
-                  />
-                </svg>
+                <AppIcon name="google" className="w-[18px] h-[18px]" />
                 Continue with Google
               </Button>
             </form>

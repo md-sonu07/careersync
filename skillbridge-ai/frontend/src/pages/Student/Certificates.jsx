@@ -2,6 +2,7 @@ import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import PageHeader from '../../components/common/PageHeader'
 import { mockCertificates } from '../../utils/mockData'
+import AppIcon from '../../components/ui/AppIcon';
 
 export default function Certificates() {
   return (
@@ -12,7 +13,7 @@ export default function Certificates() {
         {mockCertificates.map((cert) => (
           <Card key={cert.id} hover className="flex flex-col">
             <div className="flex h-28 items-center justify-center rounded-xl bg-sage border border-sage">
-              <span className="material-symbols-outlined text-primary text-[40px]">workspace_premium</span>
+              <AppIcon name="workspace_premium" className="text-primary text-[40px]" />
             </div>
             <h3 className="mt-4 text-sm font-bold text-charcoal">{cert.title}</h3>
             <p className="text-xs text-muted">Issued by {cert.issuer} • {cert.date}</p>

@@ -4,6 +4,7 @@ import ChartCard from '../../components/common/ChartCard'
 import Card from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
 import Button from '../../components/ui/Button'
+import AppIcon from '../../components/ui/AppIcon';
 
 const insights = [
   { title: 'Student Analytics', icon: 'analytics', desc: 'Cohort readiness, assessment trends and at-risk flags — live, not end-of-term.', bullets: ['Readiness distribution by department', 'Weekly engagement & streaks', 'Assessment vs project correlation'] },
@@ -73,7 +74,7 @@ const ForInstitute = () => {
           {insights.map((ins) => (
             <Card key={ins.title} hover className="p-6">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sage text-primary border border-border">
-                <span className="material-symbols-outlined text-[20px]">{ins.icon}</span>
+                <AppIcon name={ins.icon} className="text-[20px]" />
               </div>
               <h3 className="mt-4 font-bold text-charcoal">{ins.title}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-muted">{ins.desc}</p>

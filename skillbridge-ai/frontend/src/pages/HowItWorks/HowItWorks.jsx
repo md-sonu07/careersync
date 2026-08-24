@@ -3,6 +3,7 @@ import SectionHeading from '../../components/common/SectionHeading'
 import Card from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
 import Button from '../../components/ui/Button'
+import AppIcon from '../../components/ui/AppIcon';
 
 const steps = [
   {
@@ -93,7 +94,7 @@ const HowItWorks = () => {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold tracking-widest text-muted">{s.n}</span>
                 <span className={`flex h-9 w-9 items-center justify-center rounded-lg border border-border text-primary ${s.color}`}>
-                  <span className="material-symbols-outlined text-[20px]">{s.icon}</span>
+                  <AppIcon name={s.icon} className="text-[20px]" />
                 </span>
               </div>
               <h3 className="mt-3 text-base font-bold text-charcoal">{s.title}</h3>
@@ -165,7 +166,7 @@ const HowItWorks = () => {
           {benefits.map((b) => (
             <Card key={b.role} className="p-6">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white">
-                <span className="material-symbols-outlined text-[20px]">{b.icon}</span>
+                <AppIcon name={b.icon} className="text-[20px]" />
               </div>
               <h4 className="mt-4 font-bold text-charcoal">{b.role}</h4>
               <ul className="mt-3 space-y-2.5">

@@ -3,6 +3,7 @@ import SectionHeading from '../../components/common/SectionHeading'
 import Card from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
 import Button from '../../components/ui/Button'
+import AppIcon from '../../components/ui/AppIcon';
 
 const steps = [
   { title: 'Post Opportunities', icon: 'post_add', desc: 'Create internships and jobs in minutes. Rich editor with role templates and skill suggestions from live market data.' },
@@ -90,7 +91,7 @@ const ForIndustry = () => {
             <Card key={s.title} hover className="p-6 relative">
               <span className="absolute right-4 top-4 text-4xl font-bold text-border/60">0{i + 1}</span>
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white">
-                <span className="material-symbols-outlined text-[20px]">{s.icon}</span>
+                <AppIcon name={s.icon} className="text-[20px]" />
               </div>
               <h3 className="mt-4 pr-6 font-semibold text-charcoal leading-tight">{s.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">{s.desc}</p>

@@ -1,5 +1,6 @@
 import SectionHeading from '../common/SectionHeading'
 import Card from '../ui/Card'
+import AppIcon from '../ui/AppIcon';
 
 const steps = [
   {
@@ -41,18 +42,18 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="py-16 sm:py-20 bg-surface">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="how-it-works" className="py-16 @2xl:py-20 bg-surface">
+      <div className="max-w-7xl mx-auto px-4 @2xl:px-6 @5xl:px-8">
         <SectionHeading title="How CareerSync Works" subtitle="A seamless journey from academic learning to professional success." />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3.5 lg:gap-4">
+        <div className="grid grid-cols-1 @2xl:grid-cols-2 @3xl:grid-cols-3 @5xl:grid-cols-5 gap-3.5 @5xl:gap-4">
           {steps.map((s) => (
-            <Card key={s.title} hover className="text-center p-3.5 sm:p-4 lg:p-4 flex flex-col justify-between h-full">
+            <Card key={s.title} hover className="text-center p-3.5 @2xl:p-4 @5xl:p-4 flex flex-col justify-between h-full">
               <div>
                 <div className={`w-11 h-11 ${s.bg} rounded-xl flex items-center justify-center ${s.color} mx-auto mb-3.5`}>
-                  <span className="material-symbols-outlined text-[22px]">{s.icon}</span>
+                  <AppIcon name={s.icon} className="text-[22px]" />
                 </div>
-                <h3 className="text-xs sm:text-sm lg:text-[14px] font-bold text-charcoal mb-2 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">
+                <h3 className="text-xs @2xl:text-sm @5xl:text-[14px] font-bold text-charcoal mb-2 tracking-tight whitespace-nowrap overflow-hidden text-ellipsis">
                   {s.title}
                 </h3>
                 <p className="text-xs text-charcoal/70 leading-relaxed min-h-[3.75rem] flex items-center justify-center">

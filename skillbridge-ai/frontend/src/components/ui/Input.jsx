@@ -1,4 +1,5 @@
 import { cn } from '../../utils/helpers'
+import AppIcon from './AppIcon';
 
 const Input = ({
   label,
@@ -25,7 +26,7 @@ const Input = ({
       <div className="relative flex items-center">
         {icon && iconPosition === 'left' && (
           <span className="absolute left-3 text-muted pointer-events-none flex items-center text-[18px]">
-            {typeof icon === 'string' ? <span className="material-symbols-outlined text-[20px]">{icon}</span> : icon}
+            {typeof icon === 'string' ? <AppIcon name={icon} className="text-[20px]" /> : icon}
           </span>
         )}
         <input
@@ -45,7 +46,7 @@ const Input = ({
         />
         {icon && iconPosition === 'right' && (
           <span className="absolute right-3 text-muted pointer-events-none flex items-center text-[18px]">
-            {typeof icon === 'string' ? <span className="material-symbols-outlined text-[20px]">{icon}</span> : icon}
+            {typeof icon === 'string' ? <AppIcon name={icon} className="text-[20px]" /> : icon}
           </span>
         )}
       </div>

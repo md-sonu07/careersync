@@ -6,6 +6,7 @@ import SearchInput from '../../components/ui/SearchInput'
 import Select from '../../components/ui/Select'
 import Pagination from '../../components/ui/Pagination'
 import Button from '../../components/ui/Button'
+import AppIcon from '../../components/ui/AppIcon';
 
 const mockCourses = [
   { id: 1, title: 'Advanced React Patterns & Performance', instructor: 'Sarah Kim', rating: 4.8, students: 12400, difficulty: 'Advanced', duration: '8 weeks', category: 'Frontend', level: 'Advanced', skills: ['React', 'Performance', 'Patterns'], certificate: true, thumb: 'bg-[#E8F0FE]' },
@@ -27,7 +28,7 @@ const CourseCard = ({ course }) => (
     <Card hover className="p-0 overflow-hidden flex flex-col h-full">
       <div className={`h-36 ${course.thumb} border-b border-border flex items-center justify-center relative`}>
         <span className="text-xs font-bold uppercase tracking-widest text-charcoal/40">thumbnail</span>
-        {course.certificate && <span className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-white border border-border px-2.5 py-1 text-xs font-semibold shadow-soft"><span className="material-symbols-outlined text-[14px] text-success">verified</span> Certificate</span>}
+        {course.certificate && <span className="absolute top-3 right-3 inline-flex items-center gap-1 rounded-full bg-white border border-border px-2.5 py-1 text-xs font-semibold shadow-soft"><AppIcon name="verified" className="text-[14px] text-success" /> Certificate</span>}
         <span className="absolute bottom-3 left-3 rounded-full bg-charcoal text-white text-xs px-2.5 py-1 font-medium">{course.duration}</span>
       </div>
       <div className="p-5 flex flex-col flex-1">

@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux'
 import { selectCurrentUser, selectIsAuthenticated } from '../features/auth/authSlice'
 import ErrorBoundary from '../components/ui/ErrorBoundary'
 import AdminLogin from '../pages/Admin/AdminLogin'
+import RootLayout from '../components/layout/RootLayout'
+import ChatFull from '../pages/Chat/ChatFull'
 
 import { publicRoutes } from './publicRoutes'
 import { studentRoutes } from './studentRoutes'
@@ -24,13 +26,22 @@ function DashboardRedirect() {
 }
 
 const router = createBrowserRouter([
-  publicRoutes,
-  { path: '/admin/login', element: <AdminLogin />, errorElement: <ErrorBoundary /> },
-  studentRoutes,
-  industryRoutes,
-  InstituteRoutes,
-  adminRoutes,
-  { path: '/dashboard', element: <DashboardRedirect /> },
+  {
+    element: <RootLayout />,
+    children: [
+      publicRoutes,
+      { path: '/admin/login', element: <AdminLogin />, errorElement: <ErrorBoundary /> },
+      studentRoutes,
+      industryRoutes,
+      InstituteRoutes,
+      adminRoutes,
+      { path: '/dashboard', element: <DashboardRedirect /> },
+    ]
+  },
+  {
+    path: '/chat',
+    element: <ChatFull />
+  }
 ])
 
 export default router

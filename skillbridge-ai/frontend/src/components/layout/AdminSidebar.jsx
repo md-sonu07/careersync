@@ -1,5 +1,6 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import AppIcon from '../ui/AppIcon';
 
 const navSections = [
   { label: 'Overview', items: [{ label: 'Dashboard', icon: 'dashboard', path: '/admin' }] },
@@ -72,7 +73,7 @@ const navSections = [
 function NavItem({ item, active, onClick }) {
   return (
     <NavLink to={item.path} onClick={onClick} className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${active ? 'bg-white text-slate-900 shadow-soft' : 'text-slate-400 hover:bg-white/10 hover:text-white'}`}>
-      <span className="material-symbols-outlined text-[20px] shrink-0">{item.icon}</span>
+      <AppIcon name={item.icon} className="text-[20px] shrink-0" />
       <span className="truncate">{item.label}</span>
     </NavLink>
   )
@@ -124,7 +125,7 @@ export default function AdminSidebar({ onNavigate }) {
           </div>
         </div>
         <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 py-2 text-xs font-semibold text-rose-400 hover:bg-rose-500/10 transition-colors">
-          <span className="material-symbols-outlined text-[16px]">logout</span> Log out
+          <AppIcon name="logout" className="text-[16px]" /> Log out
         </button>
         <p className="text-center text-[11px] text-slate-500">© 2026 CareerSync</p>
       </div>

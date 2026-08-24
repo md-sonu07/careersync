@@ -1,6 +1,7 @@
 import Card from '../../components/ui/Card'
 import PageHeader from '../../components/common/PageHeader'
 import StatCard from '../../components/common/StatCard'
+import AppIcon from '../../components/ui/AppIcon';
 
 const weekBars = [3,5,2,6,4,1,5] // hours
 const calendarDays = Array.from({length:42},(_,i)=>{
@@ -58,7 +59,7 @@ export default function Streak(){
           </Card>
 
           <Card className="!bg-sage !border-sage">
-            <h3 className="font-bold text-charcoal flex items-center gap-2"><span className="material-symbols-outlined text-primary">lightbulb</span> Keep your streak!</h3>
+            <h3 className="font-bold text-charcoal flex items-center gap-2"><AppIcon name="lightbulb" className="text-primary" /> Keep your streak!</h3>
             <p className="text-sm text-charcoal/80 mt-2 leading-relaxed">You’re 2 days away from your longest streak (28). Complete a 15-min quiz today to keep it alive.</p>
             <button className="mt-4 w-full rounded-xl bg-primary py-2.5 text-sm font-semibold text-white hover:bg-primary-dark">Start Quick Quiz →</button>
           </Card>

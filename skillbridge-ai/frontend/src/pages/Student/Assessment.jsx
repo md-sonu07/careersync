@@ -6,8 +6,10 @@ import { Table, THead, TBody, TR, TH, TD } from '../../components/ui/Table'
 import PageHeader from '../../components/common/PageHeader'
 import Modal from '../../components/ui/Modal'
 import { ProgressBar } from '../../components/ui/Progress'
+import { toast } from 'react-hot-toast'
 import { assessmentApi } from '../../api/assessment.api'
 import { mockAssessments } from '../../utils/mockData'
+import AppIcon from '../../components/ui/AppIcon';
 
 export default function Assessment() {
   const [assessments, setAssessments] = useState([])
@@ -28,8 +30,22 @@ export default function Assessment() {
     try {
       setLoading(true)
       const [assData, attemptsData] = await Promise.all([
-        assessmentApi.getAssessments().catch(() => null),
-        assessmentApi.getMyAttempts().catch(() => null),
+        assessmentApi.getAssessments().catch(() => {
+          toast({
+            title: 'Failed to load assessments',
+            description: 'Could not load assessments. Please try again.',
+            variant: 'destructive',
+          })
+          return []
+        }),
+        assessmentApi.getMyAttempts().catch(() => {
+          toast({
+            title: 'Failed to load attempts',
+            description: 'Could not load assessment attempts. Please try again.',
+            variant: 'destructive',
+          })
+          return []
+        }),
       ])
 
       if (assData && assData.length > 0) {
@@ -41,7 +57,11 @@ export default function Assessment() {
         setAttempts(attemptsData)
       }
     } catch {
-      // Fallback
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred. Please try again.',
+        variant: 'destructive',
+      })
     } finally {
       setLoading(false)
     }
@@ -59,7 +79,11 @@ export default function Assessment() {
       const detail = await assessmentApi.getAssessmentDetail(selectedAssessment.id)
       const questions = detail.questions || []
       if (questions.length === 0) {
-        alert('No questions currently available for this assessment.')
+        toast({
+          title: 'No questions available',
+          description: 'There are no questions currently available for this assessment.',
+          variant: 'destructive',
+        })
         return
       }
 
@@ -71,8 +95,12 @@ export default function Assessment() {
       setUserAnswers({})
       setResultSummary(null)
       setQuizModalOpen(true)
-    } catch (err) {
-      alert(err.response?.data?.detail || 'Failed to start assessment attempt.')
+    } catch {
+      toast({
+        title: 'Failed to start assessment',
+        description: 'Failed to start assessment attempt.',
+        variant: 'destructive',
+      })
     } finally {
       setSubmitting(false)
     }
@@ -100,8 +128,17 @@ export default function Assessment() {
 
       setResultSummary(result)
       loadData()
-    } catch (err) {
-      alert(err.response?.data?.detail || 'Failed to submit assessment.')
+      toast({
+        title: 'Assessment submitted',
+        description: 'Your assessment has been submitted successfully.',
+        variant: 'success',
+      })
+    } catch {
+      toast({
+        title: 'Failed to submit',
+        description: 'Failed to submit assessment.',
+        variant: 'destructive',
+      })
     } finally {
       setSubmitting(false)
     }
@@ -121,7 +158,7 @@ export default function Assessment() {
         <Card className="lg:col-span-1 space-y-4">
           <div className="flex items-center gap-3 border-b border-border pb-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white">
-              <span className="material-symbols-outlined">quiz</span>
+              <AppIcon name="quiz" />
             </div>
             <div>
               <h3 className="font-bold text-charcoal">Available Assessments</h3>

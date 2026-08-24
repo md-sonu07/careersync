@@ -5,6 +5,7 @@ import ChartCard from '../../components/common/ChartCard'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/Tabs'
 import { ProgressBar } from '../../components/ui/Progress'
 import { skillApi } from '../../api/skill.api'
+import { toast } from 'react-hot-toast'
 import { mockSkills } from '../../utils/mockData'
 
 const categories = ['All', 'Programming', 'Frontend', 'Backend', 'Database', 'DevOps', 'Cloud', 'AI/ML', 'Soft Skill']
@@ -20,8 +21,26 @@ export default function SkillProgress() {
     const fetchData = async () => {
       try {
         const [mySkillsData, historyData] = await Promise.all([
-          skillApi.getMySkills().catch(() => null),
-          skillApi.getMySkillHistory().catch(() => null),
+          skillApi.getMySkills().catch(() => {
+            if (isMounted) {
+              toast({
+                title: 'Failed to load skills',
+                description: 'Could not load skill data. Please try again.',
+                variant: 'destructive',
+              })
+            }
+            return null
+          }),
+          skillApi.getMySkillHistory().catch(() => {
+            if (isMounted) {
+              toast({
+                title: 'Failed to load history',
+                description: 'Could not load skill history. Please try again.',
+                variant: 'destructive',
+              })
+            }
+            return null
+          }),
         ])
 
         if (isMounted) {
@@ -47,7 +66,13 @@ export default function SkillProgress() {
           }
         }
       } catch {
-        if (isMounted) setSkills(mockSkills)
+        if (isMounted) {
+          toast({
+            title: 'Error',
+            description: 'An unexpected error occurred. Please try again.',
+            variant: 'destructive',
+          })
+        }
       } finally {
         if (isMounted) setLoading(false)
       }

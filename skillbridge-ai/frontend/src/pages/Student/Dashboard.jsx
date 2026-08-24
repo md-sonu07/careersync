@@ -10,6 +10,7 @@ import StatCard from '../../components/common/StatCard'
 import { skillApi } from '../../api/skill.api'
 import { opportunityApi } from '../../api/opportunity.api'
 import { courseApi } from '../../api/course.api'
+import AppIcon from '../../components/ui/AppIcon';
 
 export default function Dashboard() {
   const user = useSelector(selectCurrentUser)
@@ -78,11 +79,11 @@ export default function Dashboard() {
         </div>
         <div className="flex items-center gap-2">
           <Link to="/student/notifications" className="relative rounded-xl border border-border bg-white p-2.5 text-charcoal hover:bg-background">
-            <span className="material-symbols-outlined">notifications</span>
+            <AppIcon name="notifications" />
             <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">1</span>
           </Link>
-          <Link to="/student/ai-assistant" className="rounded-xl bg-primary p-2.5 text-white hover:bg-primary-dark" title="AI Assistant">
-            <span className="material-symbols-outlined">smart_toy</span>
+          <Link to="/student/ai-assistant" className="rounded-xl bg-primary p-2.5 text-white hover:bg-primary-dark" title="Career AI">
+            <AppIcon name="smart_toy" />
           </Link>
         </div>
       </div>
@@ -134,7 +135,7 @@ export default function Dashboard() {
                 })
               ) : (
                 <div className="py-6 text-center bg-background rounded-2xl border border-border/80 p-4">
-                  <span className="material-symbols-outlined text-3xl text-muted">military_tech</span>
+                  <AppIcon name="military_tech" className="text-3xl text-muted" />
                   <p className="mt-2 text-sm font-bold text-charcoal">No skills added yet</p>
                   <p className="mt-1 text-xs text-muted leading-relaxed">Add your technical skills or take an assessment to calculate your profile readiness.</p>
                   <Link to="/student/skills" className="mt-4 inline-block">
@@ -152,7 +153,7 @@ export default function Dashboard() {
         <Card className="lg:col-span-6 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-amber-500">warning</span>
+              <AppIcon name="warning" className="text-amber-500" />
               <h3 className="text-base font-bold text-charcoal">Biggest Skill Gaps</h3>
               <Badge variant="default" className="ml-auto !bg-amber-500 !text-white">
                 {gapsList.length > 0 ? `${gapsList.length} gaps` : 'None'}
@@ -175,7 +176,7 @@ export default function Dashboard() {
                 ))
               ) : (
                 <div className="py-6 text-center bg-background rounded-2xl border border-border/80 p-4">
-                  <span className="material-symbols-outlined text-3xl text-muted">compare</span>
+                  <AppIcon name="compare" className="text-3xl text-muted" />
                   <p className="mt-2 text-sm font-bold text-charcoal">No skill gaps detected</p>
                   <p className="mt-1 text-xs text-muted leading-relaxed">Select your target career goal to generate a real-time gap analysis.</p>
                   <Link to="/student/career-goal" className="mt-4 inline-block">

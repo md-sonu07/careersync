@@ -5,6 +5,7 @@ import Badge from '../../components/ui/Badge'
 import SearchInput from '../../components/ui/SearchInput'
 import Select from '../../components/ui/Select'
 import Button from '../../components/ui/Button'
+import AppIcon from '../../components/ui/AppIcon';
 
 const mockJobs = [
   { id: 1, role: 'Frontend Engineer', company: 'TechNova', logo: 'TN', location: 'Bengaluru', salary: '₹8–12 LPA', exp: '0–2 years', type: 'Full-time', mode: 'Remote', skills: ['React', 'TypeScript', 'Testing'], match: 93, posted: '2 days ago', applicants: 312 },
@@ -29,8 +30,8 @@ const JobCard = ({ item }) => (
     </div>
 
     <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-      <div className="rounded-xl bg-background border border-border px-3 py-2 flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-muted">payments</span> {item.salary}</div>
-      <div className="rounded-xl bg-background border border-border px-3 py-2 flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-muted">work_history</span> {item.exp}</div>
+      <div className="rounded-xl bg-background border border-border px-3 py-2 flex items-center gap-2"><AppIcon name="payments" className="text-[16px] text-muted" /> {item.salary}</div>
+      <div className="rounded-xl bg-background border border-border px-3 py-2 flex items-center gap-2"><AppIcon name="work_history" className="text-[16px] text-muted" /> {item.exp}</div>
     </div>
 
     <div className="mt-3 flex flex-wrap gap-1.5">

@@ -7,6 +7,7 @@ import Modal from '../../components/ui/Modal'
 import { Table, THead, TBody, TR, TH, TD } from '../../components/ui/Table'
 import { assessmentApi } from '../../api/assessment.api'
 import { mockAssessments } from '../../utils/mockData'
+import AppIcon from '../../components/ui/AppIcon';
 
 export default function Quizzes() {
   const [assessments, setAssessments] = useState([])
@@ -114,7 +115,7 @@ export default function Quizzes() {
             <Card key={a.id} hover className="flex flex-col">
               <div className="flex items-start justify-between">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sage border border-sage text-primary">
-                  <span className="material-symbols-outlined">quiz</span>
+                  <AppIcon name="quiz" />
                 </div>
                 <Badge variant="muted">{a.question_count || 3} Qs</Badge>
               </div>
@@ -136,7 +137,7 @@ export default function Quizzes() {
             <Card key={t.id} hover className="flex flex-col">
               <div className="flex items-start justify-between">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sage border border-sage text-primary">
-                  <span className="material-symbols-outlined">quiz</span>
+                  <AppIcon name="quiz" />
                 </div>
                 <Badge variant="muted">{t.count} Qs</Badge>
               </div>

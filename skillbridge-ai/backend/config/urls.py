@@ -59,6 +59,7 @@ urlpatterns = [
     path('api/company/applications/', CompanyApplicationListView.as_view(), name='company_applications'),
     path('api/applications/<uuid:pk>/status/', ApplicationStatusUpdateView.as_view(), name='application_status_update'),
     path('api/analytics/', include('analytics.urls')),
+    path('api/ai/', include('ai.urls', namespace='ai')),
 
     # Swagger & ReDoc Documentation Routes
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),

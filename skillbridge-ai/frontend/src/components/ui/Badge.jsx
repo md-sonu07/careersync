@@ -1,4 +1,5 @@
 import { cn } from '../../utils/helpers'
+import AppIcon from './AppIcon';
 
 const Badge = ({ children, variant = 'default', className, icon, ...props }) => {
   const variants = {
@@ -17,7 +18,7 @@ const Badge = ({ children, variant = 'default', className, icon, ...props }) => 
       )}
       {...props}
     >
-      {icon && <span className="material-symbols-outlined text-[14px]">{icon}</span>}
+      {icon && <AppIcon name={icon} className="text-[14px]" />}
       {children}
     </span>
   )
