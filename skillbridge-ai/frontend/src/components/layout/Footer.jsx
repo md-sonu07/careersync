@@ -76,7 +76,7 @@ const Footer = () => {
               </li>
               <li>
                 <a href="#" className="hover:text-accent transition-colors">
-                  For Academia
+                  For Institute
                 </a>
               </li>
               <li>

@@ -13,10 +13,10 @@ const stats = [
 ]
 
 const timeline = [
-  { year: '2022', title: 'The Idea', desc: 'Identified the growing skill-gap between academia and industry. Started researching AI-driven assessment models.' },
+  { year: '2022', title: 'The Idea', desc: 'Identified the growing skill-gap between Institute and industry. Started researching AI-driven assessment models.' },
   { year: '2023', title: 'CareerSync MVP', desc: 'Launched early access with 3 universities and 20 hiring partners. First 1,000 skill profiles created.' },
   { year: '2024', title: 'AI Matching Engine', desc: 'Introduced adaptive assessments and gap-based roadmaps. 15k learners placed in internships.' },
-  { year: '2026', title: 'Ecosystem Scale', desc: 'Tri-sided platform for students, industry and academia — analytics, pipelines and verified certificates.' },
+  { year: '2026', title: 'Ecosystem Scale', desc: 'Tri-sided platform for students, industry and Institute — institutes, pipelines and verified certificates.' },
 ]
 
 const values = [

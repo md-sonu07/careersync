@@ -9,8 +9,8 @@ import Select from "../../components/ui/Select";
 const ROLE_ROUTES = {
   student: "/student/dashboard",
   industry: "/industry/dashboard",
-  academia: "/academia/dashboard",
-  academician: "/academia/dashboard",
+  Institute: "/Institute/dashboard",
+  academician: "/Institute/dashboard",
   admin: "/admin/dashboard",
 };
 

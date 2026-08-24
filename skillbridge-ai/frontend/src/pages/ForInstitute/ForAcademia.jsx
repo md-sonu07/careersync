@@ -12,7 +12,7 @@ const insights = [
   { title: 'Training Recommendations', icon: 'lightbulb', desc: 'Actionable bridge programs — what to run, for whom, and expected lift.', bullets: ['Suggested workshops & courses', 'Estimated match % lift', 'Resource & timeline plan'] },
 ]
 
-const ForAcademia = () => {
+const ForInstitute = () => {
   return (
     <div className="bg-background">
       {/* Hero */}
@@ -20,7 +20,7 @@ const ForAcademia = () => {
         <div className="mx-auto max-w-7xl px-6 py-14 lg:py-16">
           <div className="grid items-center gap-10 lg:grid-cols-2">
             <div>
-              <Badge variant="default">For Academia</Badge>
+              <Badge variant="default">For Institute</Badge>
               <h1 className="mt-3 text-4xl font-bold tracking-tight text-charcoal md:text-5xl">
                 Turn <span className="text-primary">curriculum</span> into career outcomes
               </h1>
@@ -164,4 +164,4 @@ const ForAcademia = () => {
   )
 }
 
-export default ForAcademia
+export default ForInstitute

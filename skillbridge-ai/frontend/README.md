@@ -39,20 +39,20 @@ src/
 ├── components/
 │   ├── ui/              # Button, Input, Select, Textarea, Tabs, Modal, Drawer, Table, Pagination, Progress, Skeleton, EmptyState, Alert, FileUpload, SearchInput, FilterBar, Card, Badge
 │   ├── common/          # PageHeader, StatCard, ChartCard, SectionHeading, Loader
-│   ├── layout/          # Layout (public Navbar+Footer), StudentLayout, IndustryLayout, AcademiaLayout, AdminLayout (dark)
+│   ├── layout/          # Layout (public Navbar+Footer), StudentLayout, IndustryLayout, InstituteLayout, AdminLayout (dark)
 │   └── home/            # Hero, Metrics, HowItWorks, Courses, Jobs, Testimonials, CTA
 ├── pages/
 │   ├── Home/Home.jsx
-│   ├── About/, HowItWorks/, ForStudents/, ForIndustry/, ForAcademia/
+│   ├── About/, HowItWorks/, ForStudents/, ForIndustry/, ForInstitute/
 │   ├── Courses/, Internships/, Jobs/, PublicCourseDetail.jsx
-│   ├── Auth/            # Login (role radiogroup), Register (tabs Student|Industry|Academia + pending), AdminLogin (dark)
+│   ├── Auth/            # Login (role radiogroup), Register (tabs Student|Industry|Institute + pending), AdminLogin (dark)
 │   ├── Student/         # Dashboard, Skills, Assessment, SkillGap (strongest), Learning, CourseDetail, LessonPlayer, AIPractice, AIAssistant, Roadmap, Internships, InternshipDetail, Jobs, JobDetail, Applications (pipeline stepper), Profile, MyLearning, Projects, Certificates, Notifications, Settings
 │   ├── Industry/        # Dashboard, PostInternship/Job (6-step + AI JD assistant), Candidates (ranking + match explanation), Applications (Kanban)
-│   ├── Academia/        # Dashboard, IndustryDemand, SkillGaps (critical gaps + actions), Students
+│   ├── Institute/        # Dashboard, IndustryDemand, SkillGaps (critical gaps + actions), Students
 │   └── Admin/           # Dashboard, Users, Verification, CourseManagement, SkillManagement, AdminLogin
 ├── hooks/useAuth.js
 ├── utils/helpers.js, constants.js, storage.js, mockData.js
-├── routes/index.jsx     # 60+ routes (public + student + industry + academia + admin)
+├── routes/index.jsx     # 60+ routes (public + student + industry + Institute + admin)
 ├── styles/theme.css
 └── index.css
 tests/setup.js, src/__tests__/App.test.jsx
@@ -62,13 +62,13 @@ tests/setup.js, src/__tests__/App.test.jsx
 
 ## Routes (Spec §59)
 
-**Public:** `/`, `/about`, `/how-it-works`, `/students`, `/industry`, `/academia`, `/courses`, `/courses/:id`, `/internships`, `/internships/:id`, `/jobs`, `/jobs/:id`, `/login`, `/register`, `/admin/login`
+**Public:** `/`, `/about`, `/how-it-works`, `/students`, `/industry`, `/Institute`, `/courses`, `/courses/:id`, `/internships`, `/internships/:id`, `/jobs`, `/jobs/:id`, `/login`, `/register`, `/admin/login`
 
 **Student:** `/student`, `/student/dashboard`, `/student/profile`, `/student/skills`, `/student/assessment`, `/student/skill-gap`, `/student/learning`, `/student/courses/:id`, `/student/lesson/:id`, `/student/my-learning`, `/student/ai-practice`, `/student/ai-assistant`, `/student/roadmap`, `/student/internships`, `/student/jobs`, `/student/applications`, `/student/projects`, `/student/certificates`
 
 **Industry:** `/industry`, `/industry/profile`, `/industry/internships`, `/industry/internship/new`, `/industry/jobs`, `/industry/job/new`, `/industry/candidates`, `/industry/applications`, `/industry/analytics`
 
-**Academia:** `/academia`, `/academia/students`, `/academia/industry-demand`, `/academia/skill-gaps`, etc
+**Institute:** `/Institute`, `/Institute/students`, `/Institute/industry-demand`, `/Institute/skill-gaps`, etc
 
 **Admin:** `/admin`, `/admin/users`, `/admin/skills`, `/admin/courses`, `/admin/verification`, etc
 

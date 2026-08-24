@@ -16,7 +16,7 @@ const students = [
   { id: 8, name: 'Arjun Mehta', avatar: 'https://i.pravatar.cc/150?img=14', dept: 'CSE', sem: '6th', skill: 'React', course: 72, assess: 86, growth: '+10%', streak: 15, internship: 'Postman', performance: 'Strong' },
 ]
 
-export default function AcademiaStudents() {
+export default function InstituteStudents() {
   const [search, setSearch] = useState('')
   const [dept, setDept] = useState('All')
   const [sem, setSem] = useState('All')

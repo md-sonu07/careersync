@@ -14,8 +14,8 @@ export const ENDPOINTS = {
   COMPANIES: {
     PROFILE: '/companies/profile/',
   },
-  ACADEMICIANS: {
-    PROFILE: '/academicians/profile/',
+  INSTITUTES: {
+    PROFILE: '/institutes/profile/',
   },
   INSTITUTIONS: {
     LIST: '/institutions/',
@@ -62,7 +62,7 @@ export const ENDPOINTS = {
   ANALYTICS: {
     STUDENT: '/analytics/student/',
     COMPANY: '/analytics/company/',
-    ACADEMICIAN: '/analytics/academician/',
+    ACADEMICIAN: '/analytics/institute/',
   },
 }
 

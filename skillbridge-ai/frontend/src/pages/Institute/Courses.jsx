@@ -7,7 +7,7 @@ import EmptyState from '../../components/ui/EmptyState'
 const View = () => {
   return (
     <div className="space-y-6">
-      <PageHeader title="Courses" subtitle="Academia courses and progress." actions={<Button>Primary Action</Button>} />
+      <PageHeader title="Courses" subtitle="Institute courses and progress." actions={<Button>Primary Action</Button>} />
       <div className="grid gap-6">
         <Card>
           <div className="flex items-center gap-3 mb-4">
@@ -16,7 +16,7 @@ const View = () => {
             </div>
             <div>
               <h3 className="font-bold text-charcoal">Courses</h3>
-              <p className="text-sm text-muted">Academia courses and progress.</p>
+              <p className="text-sm text-muted">Institute courses and progress.</p>
             </div>
             <Badge className="ml-auto" variant="success">Live</Badge>
           </div>

@@ -106,7 +106,7 @@ export default function AdminLogin() {
             <div className="rounded-xl bg-slate-800 border border-slate-700 p-4">
               <span className="material-symbols-outlined text-slate-300">verified_user</span>
               <p className="mt-2 text-sm font-medium text-white">Verification queue</p>
-              <p className="text-xs text-slate-400 mt-1">Approve industry &amp; academician accounts</p>
+              <p className="text-xs text-slate-400 mt-1">Approve industry &amp; Institute accounts</p>
             </div>
             <div className="rounded-xl bg-slate-800 border border-slate-700 p-4">
               <span className="material-symbols-outlined text-slate-300">monitoring</span>

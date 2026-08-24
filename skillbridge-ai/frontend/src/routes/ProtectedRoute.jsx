@@ -6,7 +6,7 @@ const getRoleDashboard = (role) => {
   const normalizedRole = (role || '').toLowerCase()
   if (normalizedRole === 'student') return '/student/dashboard'
   if (normalizedRole === 'industry') return '/industry/dashboard'
-  if (['academician', 'academia'].includes(normalizedRole)) return '/academia/dashboard'
+  if (['academician', 'Institute'].includes(normalizedRole)) return '/Institute/dashboard'
   if (normalizedRole === 'admin') return '/admin/dashboard'
   return '/login'
 }

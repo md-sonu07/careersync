@@ -8,7 +8,7 @@ Is guide se aapki team ya koi bhi tester easily **CareerSync** platform ko step-
 
 | Service / Portal | URL Link | Description |
 | :--- | :--- | :--- |
-| **Frontend Web Portal** | [`http://localhost:5173/`](http://localhost:5173/) | Main Website (Students, Industry & Academia ke liye) |
+| **Frontend Web Portal** | [`http://localhost:5173/`](http://localhost:5173/) | Main Website (Students, Industry & Institute ke liye) |
 | **Backend REST API** | [`http://127.0.0.1:8000/api/`](http://127.0.0.1:8000/api/) | Django REST API Base Root |
 | **Swagger Interactive Docs** | [`http://127.0.0.1:8000/swagger/`](http://127.0.0.1:8000/swagger/) | API Testing UI with Authorization |
 | **ReDoc Clean Docs** | [`http://127.0.0.1:8000/redoc/`](http://127.0.0.1:8000/redoc/) | Clean API Reference Page |
@@ -35,7 +35,7 @@ Testing karne ke liye niche diye gaye pre-seeded accounts use karein:
 | **Postman** | `hiring@postman.com` | `Password123!` | `industry` |
 
 ### 🎓 3. Academician / Institute Account
-- **Email**: `academia@skillbridge.ai` (ya `prof@university.edu`)
+- **Email**: `Institute@skillbridge.ai` (ya `prof@university.edu`)
 - **Password**: `Password123!`
 - **Role**: `academician`
 
@@ -133,11 +133,11 @@ Institute / Academician ka main goal hai College ke sabhi Students ka Skill Leve
 
 #### Step C1: Academician Login
 1. [`http://localhost:5173/login`](http://localhost:5173/login) par jayein.
-2. Email: `academia@skillbridge.ai` aur Password: `Password123!` daalein.
+2. Email: `Institute@skillbridge.ai` aur Password: `Password123!` daalein.
 3. **Login** click karein.
 
 #### Step C2: Institutional Analytics Overview (Phase 13)
-1. **Academia Dashboard** ([`http://localhost:5173/academia/dashboard`](http://localhost:5173/academia/dashboard)) open karein.
+1. **Institute Dashboard** ([`http://localhost:5173/institute/dashboard`](http://localhost:5173/institute/dashboard)) open karein.
 2. **Student Readiness Distribution** dekhein:
    - **Job Ready** (Skills Score >= 75%)
    - **Improving** (Skills Score 50-74%)

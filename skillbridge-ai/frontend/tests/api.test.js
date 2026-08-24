@@ -12,6 +12,6 @@ describe('API endpoints', () => {
   it('has profile endpoints defined', () => {
     expect(ENDPOINTS.STUDENTS.PROFILE).toBe('/students/profile/')
     expect(ENDPOINTS.COMPANIES.PROFILE).toBe('/companies/profile/')
-    expect(ENDPOINTS.ACADEMICIANS.PROFILE).toBe('/academicians/profile/')
+    expect(ENDPOINTS.INSTITUTES.PROFILE).toBe('/institutes/profile/')
   })
 })

@@ -2,53 +2,53 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 
 const navSections = [
-  { label: 'Overview', items: [{ label: 'Dashboard', icon: 'dashboard', path: '/academia' }] },
+  { label: 'Overview', items: [{ label: 'Dashboard', icon: 'dashboard', path: '/institute' }] },
   {
     label: 'Students', items: [
-      { label: 'Student Overview', icon: 'group', path: '/academia/students' },
-      { label: 'Performance', icon: 'trending_up', path: '/academia/performance' },
-      { label: 'Skill Distribution', icon: 'pie_chart', path: '/academia/skill-distribution' },
+      { label: 'Student Overview', icon: 'group', path: '/institute/students' },
+      { label: 'Performance', icon: 'trending_up', path: '/institute/performance' },
+      { label: 'Skill Distribution', icon: 'pie_chart', path: '/institute/skill-distribution' },
     ]
   },
   {
     label: 'Learning', items: [
-      { label: 'Courses', icon: 'menu_book', path: '/academia/courses' },
-      { label: 'Progress', icon: 'timeline', path: '/academia/progress' },
-      { label: 'Assessments', icon: 'quiz', path: '/academia/assessments' },
+      { label: 'Courses', icon: 'menu_book', path: '/institute/courses' },
+      { label: 'Progress', icon: 'timeline', path: '/institute/progress' },
+      { label: 'Assessments', icon: 'quiz', path: '/institute/assessments' },
     ]
   },
   {
     label: 'Industry Intelligence', items: [
-      { label: 'Industry Demand', icon: 'show_chart', path: '/academia/industry-demand' },
-      { label: 'Skill Gaps', icon: 'compare', path: '/academia/skill-gaps' },
-      { label: 'Trending Skills', icon: 'trending_up', path: '/academia/trending-skills' },
-      { label: 'Industry Partners', icon: 'handshake', path: '/academia/industry-partners' },
+      { label: 'Industry Demand', icon: 'show_chart', path: '/institute/industry-demand' },
+      { label: 'Skill Gaps', icon: 'compare', path: '/institute/skill-gaps' },
+      { label: 'Trending Skills', icon: 'trending_up', path: '/institute/trending-skills' },
+      { label: 'Industry Partners', icon: 'handshake', path: '/institute/industry-partners' },
     ]
   },
   {
     label: 'Career', items: [
-      { label: 'Internships', icon: 'work', path: '/academia/internships' },
-      { label: 'Jobs', icon: 'business_center', path: '/academia/jobs' },
-      { label: 'Placements', icon: 'workspace_premium', path: '/academia/placements' },
+      { label: 'Internships', icon: 'work', path: '/institute/internships' },
+      { label: 'Jobs', icon: 'business_center', path: '/institute/jobs' },
+      { label: 'Placements', icon: 'workspace_premium', path: '/institute/placements' },
     ]
   },
   {
     label: 'Training', items: [
-      { label: 'Skill Recommendations', icon: 'lightbulb', path: '/academia/training-recommendations' },
-      { label: 'Workshops', icon: 'event', path: '/academia/workshops' },
-      { label: 'Training Programs', icon: 'school', path: '/academia/training-programs' },
+      { label: 'Skill Recommendations', icon: 'lightbulb', path: '/institute/training-recommendations' },
+      { label: 'Workshops', icon: 'event', path: '/institute/workshops' },
+      { label: 'Training Programs', icon: 'school', path: '/institute/training-programs' },
     ]
   },
   {
     label: 'Reports', items: [
-      { label: 'Reports', icon: 'description', path: '/academia/reports' },
-      { label: 'Analytics', icon: 'analytics', path: '/academia/analytics' },
+      { label: 'Reports', icon: 'description', path: '/institute/reports' },
+      { label: 'Analytics', icon: 'analytics', path: '/institute/analytics' },
     ]
   },
   {
     label: 'Account', items: [
-      { label: 'Notifications', icon: 'notifications', path: '/academia/notifications' },
-      { label: 'Settings', icon: 'settings', path: '/academia/settings' },
+      { label: 'Notifications', icon: 'notifications', path: '/institute/notifications' },
+      { label: 'Settings', icon: 'settings', path: '/institute/settings' },
     ]
   },
 ]
@@ -62,12 +62,12 @@ function NavItem({ item, active, onClick }) {
   )
 }
 
-export default function AcademiaSidebar({ onNavigate }) {
+export default function InstituteSidebar({ onNavigate }) {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const { user, logout } = useAuth()
-  const isActive = (p) => pathname === p || (p !== '/academia' && pathname.startsWith(p))
-  const displayName = user?.full_name || (user?.first_name ? `${user.first_name} ${user.last_name}` : 'Academia Admin')
+  const isActive = (p) => pathname === p || (p !== '/institute' && pathname.startsWith(p))
+  const displayName = user?.full_name || (user?.first_name ? `${user.first_name} ${user.last_name}` : 'Institute Admin')
   const email = user?.email || 'prof.singh@iitb.ac.in'
   const handleLogout = async () => { await logout(); if (onNavigate) onNavigate(); navigate('/login') }
   return (
@@ -88,7 +88,7 @@ export default function AcademiaSidebar({ onNavigate }) {
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-slate-900 font-bold text-sm">CS</div>
         <div className="min-w-0">
           <p className="text-sm font-bold text-white leading-none">CareerSync</p>
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">Academia Portal</p>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">Institute Portal</p>
         </div>
         <span className="ml-auto hidden items-center gap-1 rounded-full bg-white/10 border border-white/10 px-2 py-0.5 text-[10px] font-bold text-white lg:inline-flex">
           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" /> LIVE
@@ -98,7 +98,7 @@ export default function AcademiaSidebar({ onNavigate }) {
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-slate-900 font-bold text-sm">CS</div>
         <div className="min-w-0">
           <p className="text-sm font-bold text-white leading-none">CareerSync</p>
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">Academia Portal</p>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">Institute Portal</p>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-5">

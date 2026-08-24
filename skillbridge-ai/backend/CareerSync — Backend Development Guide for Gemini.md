@@ -206,7 +206,7 @@ There should be one common User model.
 ```text
 student
 industry
-academician
+Institute
 admin
 ```
 
@@ -340,8 +340,8 @@ PATCH  /api/students/profile/
 GET    /api/companies/profile/
 PATCH  /api/companies/profile/
 
-GET    /api/academicians/profile/
-PATCH  /api/academicians/profile/
+GET    /api/Institutes/profile/
+PATCH  /api/Institutes/profile/
 ```
 
 ---
@@ -1104,7 +1104,7 @@ Admin
 /api/auth/
 /api/students/
 /api/companies/
-/api/academicians/
+/api/Institutes/
 /api/institutions/
 /api/skills/
 /api/careers/

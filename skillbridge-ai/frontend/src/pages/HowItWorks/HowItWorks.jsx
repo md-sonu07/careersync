@@ -61,7 +61,7 @@ const benefits = [
     points: ['Candidates filtered by real skill signals', 'Shorter time-to-hire', 'Pipeline with skill-fit analytics'],
   },
   {
-    role: 'For Academia',
+    role: 'For Institute',
     icon: 'account_balance',
     points: ['Live view of demand vs curriculum', 'Skill-gap cohorts', 'Data to design bridge programs'],
   },

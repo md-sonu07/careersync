@@ -7,7 +7,7 @@ const navSections = [
     label: 'User Management', items: [
       { label: 'Students', icon: 'school', path: '/admin/students' },
       { label: 'Industry', icon: 'business', path: '/admin/industries' },
-      { label: 'Academicians', icon: 'person', path: '/admin/academicians' },
+      { label: 'Institutes', icon: 'person', path: '/admin/institutes' },
       { label: 'Colleges', icon: 'apartment', path: '/admin/colleges' },
       { label: 'Administrators', icon: 'admin_panel_settings', path: '/admin/administrators' },
     ]

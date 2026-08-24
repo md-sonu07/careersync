@@ -6,7 +6,7 @@ import About from '../pages/About/About'
 import HowItWorksPage from '../pages/HowItWorks/HowItWorks'
 import ForStudents from '../pages/ForStudents/ForStudents'
 import ForIndustry from '../pages/ForIndustry/ForIndustry'
-import ForAcademia from '../pages/ForAcademia/ForAcademia'
+import ForInstitute from '../pages/ForInstitute/ForInstitute'
 import PublicCourses from '../pages/Courses/Courses'
 import PublicInternships from '../pages/Internships/Internships'
 import PublicJobs from '../pages/Jobs/Jobs'
@@ -31,7 +31,7 @@ export const publicRoutes = {
     { path: 'how-it-works', element: <HowItWorksPage /> },
     { path: 'students', element: <ForStudents /> },
     { path: 'industry', element: <ForIndustry /> },
-    { path: 'academia', element: <ForAcademia /> },
+    { path: 'institute', element: <ForInstitute /> },
     { path: 'courses', element: <PublicCourses /> },
     { path: 'courses/:id', element: <PublicCourseDetail /> },
     { path: 'internships', element: <PublicInternships /> },

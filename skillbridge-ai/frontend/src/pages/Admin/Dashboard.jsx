@@ -25,7 +25,7 @@ export default function AdminDashboard() {
   const totalUsers = stats?.total_users ?? 0
   const studentsCount = stats?.students_count ?? 0
   const industryCount = stats?.industry_count ?? 0
-  const academiaCount = stats?.academia_count ?? 0
+  const instituteCount = stats?.institute_count ?? 0
   const coursesCount = stats?.courses_count ?? 0
   const opportunitiesCount = stats?.opportunities_count ?? 0
   const applicationsCount = stats?.applications_count ?? 0
@@ -55,7 +55,7 @@ export default function AdminDashboard() {
         <StatCard label="Total Registered Users" value={totalUsers} icon="group" trend={100} trendLabel="verified" />
         <StatCard label="Students" value={studentsCount} icon="school" trend={100} trendLabel="active" />
         <StatCard label="Industry Partners" value={industryCount} icon="business" trend={100} trendLabel="companies" />
-        <StatCard label="Academia Institutions" value={academiaCount} icon="apartment" trend={100} trendLabel="colleges" />
+        <StatCard label="Institute Institutions" value={instituteCount} icon="apartment" trend={100} trendLabel="colleges" />
         <StatCard label="Active Courses" value={coursesCount} icon="menu_book" trend={100} trendLabel="published" className="col-span-2 xl:col-span-1" />
       </div>
 
@@ -75,7 +75,7 @@ export default function AdminDashboard() {
           {[
             { k: 'Students', active: studentsCount, c: 'text-primary' },
             { k: 'Industries', active: industryCount, c: 'text-accent' },
-            { k: 'Academia', active: academiaCount, c: 'text-success' },
+            { k: 'Institute', active: instituteCount, c: 'text-success' },
             { k: 'Admins', active: 1, c: 'text-charcoal' },
             { k: 'Total', active: totalUsers, c: 'text-charcoal font-bold' },
           ].map((r) => (

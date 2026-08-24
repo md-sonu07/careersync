@@ -7,7 +7,7 @@ import AdminLogin from '../pages/Admin/AdminLogin'
 import { publicRoutes } from './publicRoutes'
 import { studentRoutes } from './studentRoutes'
 import { industryRoutes } from './industryRoutes'
-import { academiaRoutes } from './academiaRoutes'
+import { InstituteRoutes } from './InstituteRoutes'
 import { adminRoutes } from './adminRoutes'
 
 function DashboardRedirect() {
@@ -18,7 +18,7 @@ function DashboardRedirect() {
 
   const role = (user?.role || '').toLowerCase()
   if (role === 'industry') return <Navigate to="/industry/dashboard" replace />
-  if (['academician', 'academia'].includes(role)) return <Navigate to="/academia/dashboard" replace />
+  if (['academician', 'Institute'].includes(role)) return <Navigate to="/Institute/dashboard" replace />
   if (role === 'admin') return <Navigate to="/admin/dashboard" replace />
   return <Navigate to="/student/dashboard" replace />
 }
@@ -28,7 +28,7 @@ const router = createBrowserRouter([
   { path: '/admin/login', element: <AdminLogin />, errorElement: <ErrorBoundary /> },
   studentRoutes,
   industryRoutes,
-  academiaRoutes,
+  InstituteRoutes,
   adminRoutes,
   { path: '/dashboard', element: <DashboardRedirect /> },
 ])

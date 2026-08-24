@@ -6,7 +6,7 @@ import ChartCard from '../../components/common/ChartCard'
 import { ProgressBar } from '../../components/ui/Progress'
 import { analyticsApi } from '../../api/analytics.api'
 
-export default function AcademiaDashboard() {
+export default function InstituteDashboard() {
   const [analytics, setAnalytics] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -33,7 +33,7 @@ export default function AcademiaDashboard() {
     <div className="space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-charcoal sm:text-3xl">Academia Analytics Dashboard</h1>
+          <h1 className="text-2xl font-bold text-charcoal sm:text-3xl">Institute Analytics Dashboard</h1>
           <p className="mt-1 text-sm text-muted">Institutional intelligence connected to live Django ORM aggregate analytics (Privacy Protected).</p>
         </div>
         <Badge icon="apartment" variant="default">CareerSync Academician Portal</Badge>

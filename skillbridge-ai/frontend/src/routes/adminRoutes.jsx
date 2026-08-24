@@ -50,7 +50,7 @@ export const adminRoutes = {
         { path: 'users', element: <AdminUsers /> },
         { path: 'students', element: <AdminUsers /> },
         { path: 'industries', element: <AdminUsers /> },
-        { path: 'academicians', element: <AdminUsers /> },
+        { path: 'institutes', element: <AdminUsers /> },
         { path: 'administrators', element: <Administrators /> },
         { path: 'colleges', element: <Colleges /> },
         { path: 'verification', element: <AdminVerification /> },

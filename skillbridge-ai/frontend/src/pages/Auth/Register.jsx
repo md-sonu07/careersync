@@ -9,7 +9,7 @@ import Input from "../../components/ui/Input";
 const ROLE_TABS = [
   { id: "student", label: "Student", icon: "school" },
   { id: "industry", label: "Industry", icon: "business" },
-  { id: "academia", label: "Academia", icon: "apartment" },
+  { id: "Institute", label: "Institute", icon: "apartment" },
 ];
 
 export default function Register() {
@@ -17,7 +17,7 @@ export default function Register() {
   const { role: paramRole } = useParams();
   const dispatch = useDispatch();
 
-  const initialRole = paramRole && ["student", "industry", "academia"].includes(paramRole) ? paramRole : "student";
+  const initialRole = paramRole && ["student", "industry", "Institute"].includes(paramRole) ? paramRole : "student";
   const [activeRole, setActiveRole] = useState(initialRole);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
@@ -28,10 +28,10 @@ export default function Register() {
   // Short forms as requested:
   // Student: name, email, phone, password
   // Industry: companyName, companyEmail, password
-  // Academia: name, email, password
+  // Institute: name, email, password
   const [studentForm, setStudentForm] = useState({ name: "", email: "", phone: "", password: "" });
   const [industryForm, setIndustryForm] = useState({ companyName: "", companyEmail: "", password: "" });
-  const [academiaForm, setAcademiaForm] = useState({ name: "", email: "", password: "" });
+  const [InstituteForm, setInstituteForm] = useState({ name: "", email: "", password: "" });
 
   const splitName = (fullName) => {
     const parts = (fullName || "").trim().split(/\s+/);
@@ -61,13 +61,13 @@ export default function Register() {
     return e;
   };
 
-  const validateAcademia = () => {
+  const validateInstitute = () => {
     const e = {};
-    if (!academiaForm.name.trim()) e.name = "Full name required";
-    if (!academiaForm.email.trim()) e.email = "Email required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(academiaForm.email)) e.email = "Invalid email";
-    if (!academiaForm.password) e.password = "Password required";
-    else if (academiaForm.password.length < 6) e.password = "At least 6 chars";
+    if (!InstituteForm.name.trim()) e.name = "Full name required";
+    if (!InstituteForm.email.trim()) e.email = "Email required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(InstituteForm.email)) e.email = "Invalid email";
+    if (!InstituteForm.password) e.password = "Password required";
+    else if (InstituteForm.password.length < 6) e.password = "At least 6 chars";
     return e;
   };
 
@@ -76,7 +76,7 @@ export default function Register() {
     let errs = {};
     if (activeRole === "student") errs = validateStudent();
     else if (activeRole === "industry") errs = validateIndustry();
-    else errs = validateAcademia();
+    else errs = validateInstitute();
 
     if (Object.keys(errs).length) {
       setErrors(errs);
@@ -108,14 +108,14 @@ export default function Register() {
         confirm_password: industryForm.password,
       };
     } else {
-      const { first_name, last_name } = splitName(academiaForm.name);
+      const { first_name, last_name } = splitName(InstituteForm.name);
       registerPayload = {
-        email: academiaForm.email,
+        email: InstituteForm.email,
         first_name,
         last_name,
-        role: "academician",
-        password: academiaForm.password,
-        confirm_password: academiaForm.password,
+        role: "Institute",
+        password: InstituteForm.password,
+        confirm_password: InstituteForm.password,
       };
     }
 
@@ -143,9 +143,9 @@ export default function Register() {
           });
         } else {
           setPending({
-            role: "academia",
+            role: "Institute",
             title: "Account Created",
-            desc: "Your academia account has been created. You can complete your institution profile details in your dashboard.",
+            desc: "Your Institute account has been created. You can complete your institution profile details in your dashboard.",
           });
         }
       } else {
@@ -174,7 +174,7 @@ export default function Register() {
           </div>
           <p className="mt-4 text-xs text-muted">
             Demo: also saved locally as {pending.role} — you can still{" "}
-            <Link to={pending.role === "industry" ? "/industry/dashboard" : "/academia/dashboard"} className="text-primary underline">
+            <Link to={pending.role === "industry" ? "/industry/dashboard" : "/Institute/dashboard"} className="text-primary underline">
               view dashboard
             </Link>.
           </p>
@@ -307,7 +307,7 @@ export default function Register() {
 
             <div className="mb-6">
               <h2 className="text-2xl font-extrabold text-charcoal tracking-tight">
-                {activeRole === "student" ? "Create Student Account" : activeRole === "industry" ? "Create Industry Account" : "Create Academia Account"}
+                {activeRole === "student" ? "Create Student Account" : activeRole === "industry" ? "Create Industry/Company Account" : "Create Institute/College Account"}
               </h2>
               <p className="mt-1.5 text-sm text-charcoal/70">
                 {activeRole === "student" ? "Get started in 30 seconds — set up full profile later." : activeRole === "industry" ? "Hire verified talent — complete company profile in dashboard." : "Manage college placements — complete profile in dashboard."}{" "}
@@ -351,14 +351,14 @@ export default function Register() {
                 </>
               )}
 
-              {activeRole === "academia" && (
+              {activeRole === "Institute" && (
                 <>
-                  <Input label="Full name" placeholder="Dr. Priya Singh" autoComplete="name" required value={academiaForm.name} onChange={(e) => setAcademiaForm({ ...academiaForm, name: e.target.value })} error={errors.name} />
-                  <Input label="Email address" type="email" placeholder="priya@college.edu" autoComplete="email" required value={academiaForm.email} onChange={(e) => setAcademiaForm({ ...academiaForm, email: e.target.value })} error={errors.email} />
+                  <Input label="Full name" placeholder="Dr. Priya Singh" autoComplete="name" required value={InstituteForm.name} onChange={(e) => setInstituteForm({ ...InstituteForm, name: e.target.value })} error={errors.name} />
+                  <Input label="Email address" type="email" placeholder="priya@college.edu" autoComplete="email" required value={InstituteForm.email} onChange={(e) => setInstituteForm({ ...InstituteForm, email: e.target.value })} error={errors.email} />
                   <div>
-                    <label htmlFor="academia-password" className="text-sm font-medium text-charcoal">Password <span className="text-danger ml-1">*</span></label>
+                    <label htmlFor="Institute-password" className="text-sm font-medium text-charcoal">Password <span className="text-danger ml-1">*</span></label>
                     <div className="relative mt-1.5">
-                      <Input id="academia-password" type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete="new-password" required value={academiaForm.password} onChange={(e) => setAcademiaForm({ ...academiaForm, password: e.target.value })} error={errors.password} wrapperClassName="!gap-0" className="pr-11" />
+                      <Input id="Institute-password" type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete="new-password" required value={InstituteForm.password} onChange={(e) => setInstituteForm({ ...InstituteForm, password: e.target.value })} error={errors.password} wrapperClassName="!gap-0" className="pr-11" />
                       <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 grid place-items-center rounded-lg text-muted hover:text-charcoal hover:bg-background">
                         <span className="material-symbols-outlined text-[20px]">{showPassword ? "visibility_off" : "visibility"}</span>
                       </button>
@@ -374,7 +374,7 @@ export default function Register() {
               </label>
 
               <Button type="submit" variant="primary" size="lg" className="w-full rounded-xl mt-2" disabled={loading}>
-                {loading ? "Creating account…" : `Create ${activeRole === "student" ? "Student" : activeRole === "industry" ? "Industry" : "Academia"} account`}
+                {loading ? "Creating account…" : `Create ${activeRole === "student" ? "Student" : activeRole === "industry" ? "Industry" : "Institute"} account`}
               </Button>
               <p className="text-center text-xs text-charcoal/60 mt-4">
                 Already have an account? <Link to="/login" className="font-semibold text-primary hover:underline">Sign in</Link> • Admin? <Link to="/admin/login" className="font-medium text-charcoal hover:text-primary underline decoration-border">Admin login</Link>

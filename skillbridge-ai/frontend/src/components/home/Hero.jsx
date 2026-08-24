@@ -13,7 +13,7 @@ const Hero = () => {
           {/* Top Pill Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-semibold text-xs sm:text-sm self-center lg:self-start transition-all hover:bg-primary/15">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Bridging Academia & Industry with AI
+            Bridging Institute & Industry with AI
           </div>
 
           {/* Main Headline */}
