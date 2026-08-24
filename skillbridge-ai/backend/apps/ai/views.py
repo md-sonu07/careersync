@@ -42,7 +42,7 @@ class AIConversationViewSet(viewsets.ModelViewSet):
     serializer_class = AIConversationSerializer
 
     def get_permissions(self):
-        if self.action == 'retrieve':
+        if self.action in ['retrieve', 'list', 'create', 'send_message', 'destroy']:
             return [permissions.AllowAny()]
         return [permissions.IsAuthenticated()]
 
@@ -54,13 +54,23 @@ class AIConversationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.request.user.is_authenticated:
             return AIConversation.objects.filter(user=self.request.user).order_by('-updated_at')
-        return AIConversation.objects.filter(user__isnull=True).order_by('-updated_at')
+        guest_id = self.request.META.get('HTTP_X_GUEST_ID')
+        if guest_id:
+            return AIConversation.objects.filter(guest_id=guest_id).order_by('-updated_at')
+        return AIConversation.objects.filter(user__isnull=True, guest_id__isnull=True).order_by('-updated_at')
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
+        if instance.user and instance.user != request.user:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You do not have access to this conversation.")
+        guest_id = request.META.get('HTTP_X_GUEST_ID')
+        if not instance.user and instance.guest_id and instance.guest_id != guest_id:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You do not have access to this conversation.")
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
@@ -69,6 +79,9 @@ class AIConversationViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+        if 'guest_id' in validated_data:
+            validated_data.pop('guest_id')
         self.perform_update(serializer)
         return Response(serializer.data)
 
@@ -96,6 +109,7 @@ class AIChatView(generics.GenericAPIView):
         message_text = serializer.validated_data['message']
 
         user = request.user if request.user.is_authenticated else None
+        guest_id = request.META.get('HTTP_X_GUEST_ID')
 
         # If conversation_id provided, verify ownership; otherwise create new
         conversation = None
@@ -104,8 +118,18 @@ class AIChatView(generics.GenericAPIView):
             if conversation.user and conversation.user != user:
                 from rest_framework.exceptions import PermissionDenied
                 raise PermissionDenied("You do not have access to this conversation.")
+            if not conversation.user and conversation.guest_id and conversation.guest_id != guest_id:
+                from rest_framework.exceptions import PermissionDenied
+                raise PermissionDenied("You do not have access to this conversation.")
+            if not conversation.user and not conversation.guest_id and guest_id:
+                conversation.guest_id = guest_id
+                conversation.save(update_fields=['guest_id'])
         else:
-            conversation = AIConversation.objects.create(user=user, title='New Conversation')
+            conversation = AIConversation.objects.create(
+                user=user,
+                guest_id=guest_id if not user else None,
+                title='New Conversation'
+            )
 
         # Save user message
         user_message = AIMessage.objects.create(
@@ -127,6 +151,7 @@ class AIChatView(generics.GenericAPIView):
                 conversation=conversation,
                 role='assistant',
                 content=response_data.get('message', ''),
+                suggestions=response_data.get('suggestions', []),
             )
 
             # Build response

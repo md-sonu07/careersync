@@ -145,7 +145,7 @@ class GeminiProvider(AIProvider):
 
     def __init__(self):
         self.api_key = getattr(settings, 'GEMINI_API_KEY', None)
-        self.model = getattr(settings, 'AI_MODEL', 'gemini-1.5-flash')
+        self.model = getattr(settings, 'AI_MODEL', 'gemini-3.6-flash')
         self.base_url = 'https://generativelanguage.googleapis.com/v1beta/models'
         print(f"[DEBUG] GeminiProvider initialized with model: {self.model}, api_key starts with: {str(self.api_key)[:10]}")
 
@@ -179,7 +179,7 @@ class GeminiProvider(AIProvider):
                 'temperature': 0.7,
                 'topP': 1,
                 'topK': 40,
-                'maxOutputTokens': 2048,
+                'maxOutputTokens': 512,
             }
         }
         
@@ -250,82 +250,116 @@ class GeminiProvider(AIProvider):
 
 
 class OpenAIProvider(AIProvider):
-    """OpenAI compatible provider (e.g. for opencode.ai keys).
+    """OpenAI compatible provider with automatic model fallback.
     
-    Uses OpenAI API REST endpoint.
-    API key must be set via OPENAI_API_KEY environment variable (or GEMINI_API_KEY fallback).
+    Tries the configured model first, then falls back through a list of
+    known-working free models on OpenCode Zen until one responds.
     """
+
+    # Ordered list of free models to try (fastest first)
+    FALLBACK_MODELS = [
+        'mimo-v2.5-free',
+        'laguna-s-2.1-free',
+        'nemotron-3.5-lightning-free',
+        'muse-spark-1.2-contributor-free',
+        'x-preview-f-free',
+        'hy3-free',
+        'nemotron-3-ultra-free',
+        'deepseek-v4-flash-free',
+    ]
 
     def __init__(self):
         self.api_key = getattr(settings, 'OPENAI_API_KEY', getattr(settings, 'GEMINI_API_KEY', None))
-        self.model = getattr(settings, 'AI_MODEL', 'gpt-3.5-turbo')
-        # Default to opencode API if not specified
-        self.base_url = getattr(settings, 'OPENAI_BASE_URL', 'https://opencode.ai/api/chat/completions')
+        self.model = getattr(settings, 'AI_MODEL', 'nemotron-3.5-lightning-free')
+        self.base_url = getattr(settings, 'OPENAI_BASE_URL', 'https://opencode.ai/zen/v1/chat/completions')
         print(f"[DEBUG] OpenAIProvider initialized with model: {self.model}, base_url: {self.base_url}, api_key starts with: {str(self.api_key)[:10]}")
 
     def get_model_name(self):
         return self.model
 
-    def generate(self, messages):
-        if not self.api_key:
-            raise ValueError("API key not configured for OpenAIProvider")
-
-        # OpenAI format is just a list of messages
+    def _call_api(self, model, messages):
+        """Make a single API call with the given model. Returns result dict or raises."""
         openai_messages = []
         for msg in messages:
             role = msg.get('role', 'user')
-            # Map 'assistant' to 'assistant', 'system' to 'system', 'user' to 'user'
             if role == 'model':
                 role = 'assistant'
-            
             openai_messages.append({
                 'role': role,
                 'content': msg.get('content', '')
             })
 
         payload = {
-            'model': self.model,
+            'model': model,
             'messages': openai_messages,
             'temperature': 0.7,
+            'max_tokens': 512,
         }
 
-        try:
-            req = urllib.request.Request(
-                self.base_url,
-                data=json.dumps(payload).encode('utf-8'),
-                headers={
-                    'Content-Type': 'application/json',
-                    'Authorization': f'Bearer {self.api_key}',
-                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-                },
-                method='POST',
-            )
+        req = urllib.request.Request(
+            self.base_url,
+            data=json.dumps(payload).encode('utf-8'),
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {self.api_key}',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            },
+            method='POST',
+        )
 
-            with urllib.request.urlopen(req, timeout=30) as response:
-                result = json.loads(response.read().decode('utf-8'))
+        with urllib.request.urlopen(req, timeout=45) as response:
+            result = json.loads(response.read().decode('utf-8'))
 
-            message = ''
-            if result.get('choices'):
-                message = result['choices'][0].get('message', {}).get('content', '')
+        message = ''
+        if result.get('choices'):
+            message = result['choices'][0].get('message', {}).get('content', '')
 
-            # Note: OpenAI doesn't natively return structured 'suggestions' unless explicitly asked for in the prompt.
-            # We'll rely on the default fallback suggestions in chat_service.py if none are found.
+        return {
+            'message': message or 'I apologize, but I encountered an issue generating the response.',
+            'suggestions': [],
+            'actions': [],
+        }
 
-            return {
-                'message': message or 'I apologize, but I encountered an issue generating the response.',
-                'suggestions': [],
-                'actions': [],
-            }
+    def generate(self, messages):
+        if not self.api_key:
+            raise ValueError("API key not configured for OpenAIProvider")
 
-        except urllib.error.HTTPError as e:
-            error_body = e.fp.read().decode('utf-8') if getattr(e, 'fp', None) else str(e)
-            print(f"[DEBUG] OpenAI API HTTP error: {e.code} - {error_body}")
-            if e.code == 401 or e.code == 403:
-                raise ValueError("AI API access denied. Check API key and permissions.")
-            raise ValueError(f"AI API error: {e.code}")
-        except Exception as e:
-            logger.error(f"OpenAI API unexpected error: {e}")
-            raise
+        # Build list of models to try: configured model first, then fallbacks
+        models_to_try = [self.model]
+        for m in self.FALLBACK_MODELS:
+            if m != self.model:
+                models_to_try.append(m)
+
+        last_error = None
+        for model in models_to_try:
+            try:
+                print(f"[DEBUG] Trying model: {model}")
+                result = self._call_api(model, messages)
+                print(f"[DEBUG] Success with model: {model}")
+                return result
+            except urllib.error.HTTPError as e:
+                error_body = e.fp.read().decode('utf-8') if getattr(e, 'fp', None) else str(e)
+                print(f"[DEBUG] Model {model} failed ({e.code}): {error_body}")
+                last_error = e
+                # Don't retry on auth errors (wrong API key)
+                if e.code == 401 and 'ModelError' not in error_body:
+                    raise ValueError("AI API key is invalid. Check OPENAI_API_KEY.")
+                if e.code == 403 and 'Cloudflare' not in str(error_body) and '1010' not in str(error_body):
+                    raise ValueError("AI API access denied. Check API key and permissions.")
+                continue
+            except urllib.error.URLError as e:
+                print(f"[DEBUG] Model {model} network error: {e.reason}")
+                last_error = e
+                continue
+            except Exception as e:
+                print(f"[DEBUG] Model {model} unexpected error: {e}")
+                last_error = e
+                continue
+
+        # All models failed — raise the last error
+        logger.error(f"All AI models failed. Last error: {last_error}")
+        raise ValueError("AI service temporarily unavailable. All models failed. Please try again later.")
+
 
 def get_ai_provider():
     """Factory function to get the configured AI provider instance."""

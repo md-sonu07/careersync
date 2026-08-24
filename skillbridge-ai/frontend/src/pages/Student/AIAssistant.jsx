@@ -23,8 +23,10 @@ export default function AIAssistant() {
   const [activeConversationId, setActiveConversationId] = useState(null)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
-const [isSending, setIsSending] = useState(false)
+  const [isSending, setIsSending] = useState(false)
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
+  const [error, setError] = useState(null)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   const bottomRef = useRef(null)
 

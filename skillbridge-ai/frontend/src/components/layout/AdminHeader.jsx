@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import AppIcon from '../ui/AppIcon';
+import { useChatContext } from '../../context/ChatContext';
 
 export default function AdminHeader({ onMenuClick }) {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
+  const { toggleChat } = useChatContext()
   const [query, setQuery] = useState('')
   const [notifOpen, setNotifOpen] = useState(false)
   const displayName = user?.full_name || (user?.first_name ? `${user.first_name} ${user.last_name}` : 'Super Admin')
@@ -91,6 +93,10 @@ export default function AdminHeader({ onMenuClick }) {
         </div>
 
         <div className="hidden h-8 w-px bg-border sm:block" />
+
+        <button onClick={toggleChat} className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-white text-charcoal hover:bg-background shadow-soft" title="Chat with AI">
+          <img src="/logo.png" alt="Career AI" className="w-5 h-5" />
+        </button>
 
         <div className="flex items-center gap-2.5 rounded-lg border border-border bg-white pl-1.5 pr-1.5 py-2 shadow-soft sm:pr-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white text-xs font-bold border border-slate-800 shrink-0">

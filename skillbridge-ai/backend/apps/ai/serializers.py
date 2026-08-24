@@ -6,7 +6,7 @@ from .models import AIConversation, AIMessage
 class AIMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = AIMessage
-        fields = ['id', 'role', 'content', 'created_at']
+        fields = ['id', 'role', 'content', 'suggestions', 'created_at']
         read_only_fields = ['id', 'conversation', 'created_at']
 
 
@@ -18,9 +18,9 @@ class AIConversationSerializer(serializers.ModelSerializer):
         model = AIConversation
         fields = [
             'id', 'title', 'created_at', 'updated_at',
-            'message_count', 'last_message_preview',
+            'message_count', 'last_message_preview', 'guest_id',
         ]
-        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at', 'guest_id']
 
     def get_message_count(self, obj):
         return obj.messages_count

@@ -27,9 +27,11 @@ export default function GlobalChatPane() {
   const [isSending, setIsSending] = useState(false)
   const fileInputRef = useRef(null)
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(
-    sessionStorage.getItem('skillbridge_global_chat_sidebar') === 'true'
-  )
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    const stored = sessionStorage.getItem('skillbridge_global_chat_sidebar')
+    if (stored !== null) return stored === 'true'
+    return true
+  })
 
   useEffect(() => {
     sessionStorage.setItem('skillbridge_global_chat_sidebar', sidebarOpen)
@@ -39,10 +41,8 @@ export default function GlobalChatPane() {
 
   // Initial load
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchConversations()
-    }
-  }, [isAuthenticated])
+    fetchConversations()
+  }, [])
 
   // When active conversation changes, fetch its messages
   useEffect(() => {
@@ -123,8 +123,8 @@ export default function GlobalChatPane() {
       
       if (!activeConversationId && response.conversation_id) {
         setActiveConversationId(response.conversation_id)
-        if (isAuthenticated) fetchConversations()
-      } else if (isAuthenticated) {
+        fetchConversations()
+      } else {
         fetchConversations()
       }
     } catch {
@@ -207,23 +207,21 @@ export default function GlobalChatPane() {
 
   return (
     <div className="flex flex-col h-full w-full bg-white relative">
-      {/* Drawer for history (only for authenticated users) */}
-      {isAuthenticated && (
-        <Drawer
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          title="Conversation History"
-          placement="left"
-        >
-          <SidebarContent />
-        </Drawer>
-      )}
+      {/* Drawer for history */}
+      <Drawer
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        title="Conversation History"
+        placement="left"
+      >
+        <SidebarContent />
+      </Drawer>
 
       {/* Chat Header */}
       <div className="flex items-center gap-3 border-b border-border px-4 py-5 bg-sage/10 shrink-0">
         <div className="flex items-center gap-3 flex-1">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-charcoal shrink-0">
-            <img src="/logo.png" alt="Career AI" className="w-5 h-5 object-contain" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lgshrink-0">
+            <img src="/logo.png" alt="Career AI" className="w-10 h-10 object-contain" />
           </div>
           <div className="overflow-hidden">
             <div className="flex items-center gap-2">
@@ -235,15 +233,13 @@ export default function GlobalChatPane() {
         </div>
         
         <div className="flex items-center gap-1 shrink-0">
-          {isAuthenticated && (
-            <button 
-              onClick={() => setSidebarOpen(true)}
-              className="p-1.5 flex items-center justify-center cursor-pointer text-muted hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
-              title="History"
-            >
-              <AppIcon name="history" className="text-[20px]" />
-            </button>
-          )}
+          <button 
+            onClick={() => setSidebarOpen(true)}
+            className="p-1.5 flex items-center justify-center cursor-pointer text-muted hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
+            title="History"
+          >
+            <AppIcon name="history" className="text-[20px]" />
+          </button>
           <button 
             onClick={handleNewChat}
             className="p-1.5 flex items-center justify-center cursor-pointer text-muted hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
@@ -415,7 +411,7 @@ export default function GlobalChatPane() {
         </div>
         {!isAuthenticated && (
           <p className="mt-1.5 text-center text-[10px] text-muted">
-            Sign in to save your conversation history.
+            You are using guest mode. Sign in to save your conversation history.
           </p>
         )}
       </div>

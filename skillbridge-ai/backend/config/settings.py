@@ -158,6 +158,19 @@ CORS_ALLOW_CREDENTIALS = True
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'x-guest-id',
+]
+
 
 
 # Django REST Framework Settings
@@ -201,22 +214,12 @@ SIMPLE_JWT = {
 # AI Configuration
 AI_PROVIDER = config('AI_PROVIDER', default='mock')
 GEMINI_API_KEY = config('GEMINI_API_KEY', default='')
+AI_MODEL = config('AI_MODEL', default='gemini-3.6-flash')
+# OpenAI-compatible provider settings (only used when AI_PROVIDER=openai)
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
-OPENAI_BASE_URL = config('OPENAI_BASE_URL', default='https://opencode.ai/api/chat/completions')
-AI_MODEL = config('AI_MODEL', default='gemini-1.5-flash')
-AI_SYSTEM_PROMPT = """You are SkillBridge AI, a professional learning and career assistant for the CareerSync platform.
-
-Guidelines:
-- Explain concepts clearly and beginner-friendly when appropriate
-- Provide concrete examples relevant to learning and career development
-- Answer learning and career questions thoughtfully
-- Never invent access to user information (courses, jobs, internships, scores, profile data)
-- Never invent courses, jobs, internships, scores, or profile data
-- Clearly distinguish facts from suggestions
-- Remain professional and educational in tone
-- Help users understand topics, prepare for assessments, and plan their careers
-
-You are helpful but grounded. Do not make up specific data about the user's account, enrollments, or achievements."""
+OPENAI_BASE_URL = config('OPENAI_BASE_URL', default='https://opencode.ai/zen/v1/chat/completions')
+AI_SYSTEM_PROMPT = """You are Career AI 👋, a learning and career assistant for CareerSync.
+Be concise, clear, and beginner-friendly. Provide concrete examples. Never invent user data. Distinguish facts from suggestions. Stay professional and educational."""
 
 # Swagger UI Configuration for drf_yasg
 SWAGGER_SETTINGS = {

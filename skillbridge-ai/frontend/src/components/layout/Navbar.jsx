@@ -67,9 +67,8 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`sticky top-0 z-50 w-full border-b border-border transition-all duration-300 ${
-          scrolled ? 'bg-background/98 shadow-card backdrop-blur-md' : 'bg-background/90 backdrop-blur-md'
-        }`}
+        className={`sticky top-0 z-50 w-full border-b border-border transition-all duration-300 ${scrolled ? 'bg-background/98 shadow-card backdrop-blur-md' : 'bg-background/90 backdrop-blur-md'
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           {/* Logo */}
@@ -79,27 +78,24 @@ const Navbar = () => {
           <div className="hidden @5xl:flex items-center gap-7">
             <Link
               to="/"
-              className={`relative text-sm font-medium transition-colors py-1 hover:text-primary after:content-[''] after:absolute after:left-0 after:-bottom-1.5 after:w-full after:h-[2px] after:bg-primary after:rounded-full after:transition-transform after:duration-300 ${
-                location.pathname === '/' ? 'text-primary font-bold after:scale-x-100' : 'text-charcoal/80 after:scale-x-0 hover:after:scale-x-100'
-              }`}
+              className={`relative text-sm font-medium transition-colors py-1 hover:text-primary after:content-[''] after:absolute after:left-0 after:-bottom-1.5 after:w-full after:h-[2px] after:bg-primary after:rounded-full after:transition-transform after:duration-300 ${location.pathname === '/' ? 'text-primary font-bold after:scale-x-100' : 'text-charcoal/80 after:scale-x-0 hover:after:scale-x-100'
+                }`}
             >
               Home
             </Link>
 
             <Link
               to="/about"
-              className={`relative text-sm font-medium transition-colors py-1 hover:text-primary after:content-[''] after:absolute after:left-0 after:-bottom-1.5 after:w-full after:h-[2px] after:bg-primary after:rounded-full after:transition-transform after:duration-300 ${
-                location.pathname === '/about' ? 'text-primary font-bold after:scale-x-100' : 'text-charcoal/80 after:scale-x-0 hover:after:scale-x-100'
-              }`}
+              className={`relative text-sm font-medium transition-colors py-1 hover:text-primary after:content-[''] after:absolute after:left-0 after:-bottom-1.5 after:w-full after:h-[2px] after:bg-primary after:rounded-full after:transition-transform after:duration-300 ${location.pathname === '/about' ? 'text-primary font-bold after:scale-x-100' : 'text-charcoal/80 after:scale-x-0 hover:after:scale-x-100'
+                }`}
             >
               About
             </Link>
 
             <Link
               to="/how-it-works"
-              className={`relative text-sm font-medium transition-colors py-1 hover:text-primary after:content-[''] after:absolute after:left-0 after:-bottom-1.5 after:w-full after:h-[2px] after:bg-primary after:rounded-full after:transition-transform after:duration-300 ${
-                location.pathname === '/how-it-works' ? 'text-primary font-bold after:scale-x-100' : 'text-charcoal/80 after:scale-x-0 hover:after:scale-x-100'
-              }`}
+              className={`relative text-sm font-medium transition-colors py-1 hover:text-primary after:content-[''] after:absolute after:left-0 after:-bottom-1.5 after:w-full after:h-[2px] after:bg-primary after:rounded-full after:transition-transform after:duration-300 ${location.pathname === '/how-it-works' ? 'text-primary font-bold after:scale-x-100' : 'text-charcoal/80 after:scale-x-0 hover:after:scale-x-100'
+                }`}
             >
               How It Works
             </Link>
@@ -112,19 +108,17 @@ const Navbar = () => {
             >
               <button
                 onClick={() => setActiveDropdown(activeDropdown === 'explore' ? null : 'explore')}
-                className={`flex items-center gap-1 text-sm font-medium py-2 transition-colors hover:text-primary ${
-                  ['/courses', '/internships', '/jobs'].includes(location.pathname) || activeDropdown === 'explore'
-                    ? 'text-primary font-semibold'
-                    : 'text-charcoal'
-                }`}
+                className={`flex items-center gap-1 text-sm font-medium py-2 transition-colors hover:text-primary ${['/courses', '/internships', '/jobs'].includes(location.pathname) || activeDropdown === 'explore'
+                  ? 'text-primary font-semibold'
+                  : 'text-charcoal'
+                  }`}
                 aria-expanded={activeDropdown === 'explore'}
               >
                 <span>Explore</span>
-                <AppIcon 
-                  name="keyboard_arrow_down" 
-                  className={`text-[18px] transition-transform duration-200 ${
-                    activeDropdown === 'explore' ? 'rotate-180 text-primary' : 'text-charcoal/60'
-                  }`}
+                <AppIcon
+                  name="keyboard_arrow_down"
+                  className={`text-[18px] transition-transform duration-200 ${activeDropdown === 'explore' ? 'rotate-180 text-primary' : 'text-charcoal/60'
+                    }`}
                 />
               </button>
 
@@ -169,7 +163,7 @@ const Navbar = () => {
                   <Link to="/student/dashboard" className="hidden @3xl:inline text-sm font-medium text-charcoal hover:text-primary px-3">
                     Dashboard
                   </Link>
-                  
+
                   {/* User Profile Section */}
                   <div className="flex items-center gap-3 pl-3 border-l border-border/80">
                     <div className="flex items-center gap-3">
@@ -189,9 +183,9 @@ const Navbar = () => {
                         </span>
                       </div>
                     </div>
-                    
-                    <button 
-                      onClick={handleLogout} 
+
+                    <button
+                      onClick={handleLogout}
                       className="ml-2 w-9 h-9 rounded-xl border border-border flex items-center justify-center text-charcoal/60 hover:text-danger hover:border-danger/30 hover:bg-danger/5 transition-all cursor-pointer"
                       title="Log out"
                     >
@@ -234,7 +228,7 @@ const Navbar = () => {
                   className="group flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-primary/10 to-emerald-500/10 text-primary border border-primary/20 hover:border-primary/40 hover:shadow-sm transition-all cursor-pointer"
                   title="Chat with AI"
                 >
-                  <img src="/logo.png" alt="Career AI" className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  <AppIcon name="smart_toy" className="text-[20px] text-primary" />
                 </button>
               </div>
             </div>
@@ -250,7 +244,7 @@ const Navbar = () => {
             <Link
               to="/"
               onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-charcoal hover:bg-primary/5 hover:text-primary"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-charcoal hover:bg-primary/5 hover:text-primary"
             >
               <AppIcon name="home" className="text-[20px] text-primary" />
               Home
@@ -258,7 +252,7 @@ const Navbar = () => {
             <Link
               to="/about"
               onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-charcoal hover:bg-primary/5 hover:text-primary"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-charcoal hover:bg-primary/5 hover:text-primary"
             >
               <AppIcon name="info" className="text-[20px] text-primary" />
               About
@@ -266,7 +260,7 @@ const Navbar = () => {
             <Link
               to="/how-it-works"
               onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-charcoal hover:bg-primary/5 hover:text-primary"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-charcoal hover:bg-primary/5 hover:text-primary"
             >
               <AppIcon name="alt_route" className="text-[20px] text-primary" />
               How It Works
@@ -276,9 +270,9 @@ const Navbar = () => {
                 setMobileOpen(false)
                 toggleChat()
               }}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium text-charcoal hover:bg-primary/5 hover:text-primary w-full text-left"
+              className="flex items-center gap-2.5 px-3 py-2 cursor-pointer rounded-lg text-sm font-medium text-charcoal hover:bg-primary/5 hover:text-primary w-full text-left"
             >
-              <img src="/logo.png" alt="Career AI" className="w-5 h-5 text-primary" />
+              <AppIcon name="smart_toy" className="text-[20px] text-primary" />
               Chat with AI
             </button>
           </div>

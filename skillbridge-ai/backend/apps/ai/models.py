@@ -16,6 +16,7 @@ class AIConversation(models.Model):
         null=True,
         blank=True,
     )
+    guest_id = models.CharField(max_length=100, null=True, blank=True, db_index=True)
     title = models.CharField(max_length=AI_CONVERSATION_TITLE_MAX_LENGTH, default='New Conversation')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -25,6 +26,7 @@ class AIConversation(models.Model):
         ordering = ['-updated_at']
         indexes = [
             models.Index(fields=['user', '-updated_at']),
+            models.Index(fields=['guest_id', '-updated_at']),
             models.Index(fields=['-updated_at']),
         ]
 
@@ -52,6 +54,7 @@ class AIMessage(models.Model):
     )
     role = models.CharField(max_length=20, choices=[('user', 'User'), ('assistant', 'Assistant')])
     content = models.TextField()
+    suggestions = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
