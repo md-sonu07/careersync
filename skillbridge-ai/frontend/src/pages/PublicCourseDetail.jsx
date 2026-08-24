@@ -72,19 +72,6 @@ const PublicCourseDetail = () => {
         </div>
       </div>
         
-      <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <Card className="p-0 overflow-hidden">
-            <div className="aspect-video bg-sage flex items-center justify-center">
-              <AppIcon name="play_circle" className="text-5xl text-primary" />
-            </div>
-            <span>•</span>
-            <div>{course.students?.toLocaleString()} students enrolled</div>
-            <span>•</span>
-            <div>Duration: {course.duration}</div>
-          </Card>
-        </div>
-      </div>
 
       {/* Main Content & Sidebar */}
       <div className="max-w-7xl mx-auto px-6 md:px-8 py-8">
