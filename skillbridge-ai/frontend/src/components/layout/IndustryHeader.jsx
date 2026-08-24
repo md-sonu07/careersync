@@ -23,7 +23,7 @@ export default function IndustryHeader({ onMenuClick }) {
           <p className="text-sm font-bold leading-none text-charcoal">Industry Workspace</p>
           <p className="text-xs text-muted">Hiring • 12 posts • Verified</p>
         </div>
-        <span className="ml-2 hidden items-center gap-1.5 rounded-full bg-success/10 border border-success/20 px-2.5 py-1 text-xs font-bold text-success xl:inline-flex">
+        <span className="ml-2 hidden items-center gap-1.5 rounded-lg bg-success/10 border border-success/20 px-2.5 py-1 text-xs font-bold text-success xl:inline-flex">
           <span className="material-symbols-outlined text-[14px]">verified</span> Verified
         </span>
       </div>
@@ -32,41 +32,41 @@ export default function IndustryHeader({ onMenuClick }) {
           <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted">
             <span className="material-symbols-outlined text-[20px]">search</span>
           </span>
-          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search candidates, jobs, applications…" className="w-full rounded-full border border-border bg-background pl-10 pr-[88px] py-2.5 text-sm text-charcoal placeholder:text-muted/60 shadow-soft focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-colors" />
-          <span className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 hidden items-center gap-1 rounded-full bg-white border border-border px-2 py-1 text-[11px] font-medium text-muted shadow-sm sm:inline-flex">⌘ K</span>
-          {query && <button onClick={() => setQuery('')} className="absolute right-12 top-1/2 -translate-y-1/2 hidden h-6 w-6 items-center justify-center rounded-full bg-border text-muted hover:text-charcoal sm:inline-flex"><span className="material-symbols-outlined text-[16px]">close</span></button>}
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search candidates, jobs, applications…" className="w-full rounded-lg border border-border bg-background pl-10 pr-[88px] py-2.5 text-sm text-charcoal placeholder:text-muted/60 shadow-soft focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-colors" />
+          <span className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 hidden items-center gap-1 rounded-lg bg-white border border-border px-2 py-1 text-[11px] font-medium text-muted shadow-sm sm:inline-flex">⌘ K</span>
+          {query && <button onClick={() => setQuery('')} className="absolute right-12 top-1/2 -translate-y-1/2 hidden h-6 w-6 items-center justify-center rounded-lg bg-border text-muted hover:text-charcoal sm:inline-flex"><span className="material-symbols-outlined text-[16px]">close</span></button>}
         </div>
       </div>
       <div className="flex items-center gap-1.5 sm:gap-2">
         <div className="relative">
-          <button onClick={() => setNotifOpen((v) => !v)} className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-white text-charcoal hover:bg-background shadow-soft">
+          <button onClick={() => setNotifOpen((v) => !v)} className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-white text-charcoal hover:bg-background shadow-soft">
             <span className="material-symbols-outlined text-[20px]">notifications</span>
-            <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-danger px-1 text-[11px] font-bold text-white shadow-sm">4</span>
+            <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-lg bg-danger px-1 text-[11px] font-bold text-white shadow-sm">4</span>
           </button>
           {notifOpen && (
             <div className="absolute right-0 mt-2 w-80 overflow-hidden rounded-2xl border border-border bg-white shadow-card">
               <div className="flex items-center justify-between border-b border-border px-4 py-3">
                 <p className="text-sm font-bold text-charcoal">Notifications</p>
-                <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-bold text-white">4 new</span>
+                <span className="rounded-lg bg-primary px-2 py-0.5 text-xs font-bold text-white">4 new</span>
               </div>
               <div className="divide-y divide-border">
-                <div className="flex gap-3 p-3 hover:bg-background"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary shrink-0"><span className="material-symbols-outlined text-[18px]">person_search</span></span><div><p className="text-sm font-medium text-charcoal">3 new matching candidates</p><p className="text-xs text-muted">React • 10m ago</p></div></div>
-                <div className="flex gap-3 p-3 hover:bg-background"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-success/10 text-success shrink-0"><span className="material-symbols-outlined text-[18px]">assignment</span></span><div><p className="text-sm font-medium text-charcoal">12 new applications</p><p className="text-xs text-muted">Frontend Intern • 1h ago</p></div></div>
+                <div className="flex gap-3 p-3 hover:bg-background"><span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0"><span className="material-symbols-outlined text-[18px]">person_search</span></span><div><p className="text-sm font-medium text-charcoal">3 new matching candidates</p><p className="text-xs text-muted">React • 10m ago</p></div></div>
+                <div className="flex gap-3 p-3 hover:bg-background"><span className="flex h-8 w-8 items-center justify-center rounded-lg bg-success/10 text-success shrink-0"><span className="material-symbols-outlined text-[18px]">assignment</span></span><div><p className="text-sm font-medium text-charcoal">12 new applications</p><p className="text-xs text-muted">Frontend Intern • 1h ago</p></div></div>
               </div>
               <Link to="/industry/notifications" onClick={() => setNotifOpen(false)} className="block border-t border-border bg-background px-4 py-2.5 text-center text-sm font-semibold text-primary hover:bg-sage">View all →</Link>
             </div>
           )}
         </div>
         <div className="hidden h-8 w-px bg-border sm:block" />
-        <div className="flex items-center gap-2.5 rounded-full border border-border bg-white pl-1.5 pr-1.5 py-1 shadow-soft sm:pr-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white text-xs font-bold shrink-0">{companyName.slice(0, 2).toUpperCase()}</div>
+        <div className="flex items-center gap-2.5 rounded-lg border border-border bg-white pl-1.5 pr-1.5 py-1 shadow-soft sm:pr-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white text-xs font-bold shrink-0">{companyName.slice(0, 2).toUpperCase()}</div>
           <div className="hidden text-left sm:block">
             <p className="text-sm font-semibold leading-none text-charcoal">{companyName}</p>
             <p className="text-xs leading-none text-muted">Verified • Hiring</p>
           </div>
           <span className="hidden h-6 w-px bg-border sm:block" />
-          <button onClick={handleLogout} className="hidden h-7 w-7 items-center justify-center rounded-full text-muted hover:bg-background hover:text-charcoal sm:inline-flex"><span className="material-symbols-outlined text-[18px]">logout</span></button>
-          <button onClick={handleLogout} className="inline-flex h-7 w-7 items-center justify-center rounded-full text-muted hover:bg-background hover:text-danger sm:hidden"><span className="material-symbols-outlined text-[18px]">logout</span></button>
+          <button onClick={handleLogout} className="hidden h-7 w-7 items-center justify-center rounded-lg text-muted hover:bg-background hover:text-charcoal sm:inline-flex"><span className="material-symbols-outlined text-[18px]">logout</span></button>
+          <button onClick={handleLogout} className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-muted hover:bg-background hover:text-danger sm:hidden"><span className="material-symbols-outlined text-[18px]">logout</span></button>
         </div>
       </div>
     </header>

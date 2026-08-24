@@ -143,7 +143,7 @@ const HowItWorks = () => {
           {/* mobile stacked */}
           <div className="mt-6 grid grid-cols-2 gap-3 md:hidden">
             {loop.map((label, idx) => (
-              <div key={label} className="flex items-center gap-3 rounded-xl border border-border bg-white p-3 shadow-subtle">
+              <div key={label} className="flex items-center gap-3 rounded-lg border border-border bg-white p-3 shadow-subtle">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sage text-xs font-bold text-primary">{idx + 1}</span>
                 <span className="text-sm font-semibold text-charcoal">{label}</span>
               </div>

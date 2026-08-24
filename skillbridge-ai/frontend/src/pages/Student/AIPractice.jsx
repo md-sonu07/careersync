@@ -100,7 +100,7 @@ export default function AIPractice() {
                     <button
                       key={i}
                       onClick={() => setAnswers({ ...answers, [idx]: i })}
-                      className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-colors ${selected ? 'bg-primary text-white border-primary' : 'bg-white border-border hover:bg-background text-charcoal'}`}
+                      className={`flex items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-colors ${selected ? 'bg-primary text-white border-primary' : 'bg-white border-border hover:bg-background text-charcoal'}`}
                     >
                       <span className={`flex h-7 w-7 items-center justify-center rounded-full border text-xs font-bold shrink-0 ${selected ? 'bg-white text-primary border-white' : 'bg-background border-border'}`}>{String.fromCharCode(65 + i)}</span>
                       {opt}

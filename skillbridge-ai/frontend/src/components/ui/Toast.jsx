@@ -17,7 +17,7 @@ const Toast = ({ message, variant = 'default', onClose, duration = 3000 }) => {
 
   if (!message) return null
   return (
-    <div className={cn('fixed bottom-6 right-6 z-[100] flex items-center gap-3 rounded-xl px-4 py-3 shadow-card', variants[variant])}>
+    <div className={cn('fixed bottom-6 right-6 z-[100] flex items-center gap-3 rounded-lg px-4 py-3 shadow-card', variants[variant])}>
       <span className="text-sm font-medium">{message}</span>
       {onClose && (
         <button onClick={onClose} className="ml-2 rounded-lg bg-white/20 p-1">

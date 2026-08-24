@@ -9,7 +9,7 @@ export default function StudentLayout() {
   return (
     <div className="min-h-screen bg-background">
       <div className="flex">
-        <aside className="hidden lg:flex lg:w-[240px] lg:shrink-0 lg:flex-col lg:bg-slate-900 lg:sticky lg:top-0 lg:h-screen lg:overflow-hidden">
+        <aside className="hidden lg:flex lg:w-[280px] lg:shrink-0 lg:flex-col lg:bg-slate-900 lg:sticky lg:top-0 lg:h-screen lg:overflow-hidden">
           <StudentSidebar />
         </aside>
         <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} side="left" size="sm" title="" showCloseButton>

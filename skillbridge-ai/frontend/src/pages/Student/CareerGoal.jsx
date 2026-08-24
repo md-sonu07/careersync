@@ -41,7 +41,7 @@ export default function CareerGoal() {
   const selectedRoleObj = careerRoles.find(r => r.title === career)
   const roleSkillRequirements = selectedRoleObj?.skill_requirements || []
 
-  const roleOptions = careerRoles.length > 0 
+  const roleOptions = careerRoles.length > 0
     ? careerRoles.map(r => r.title)
     : ['Full Stack Developer', 'Frontend Developer', 'Backend Developer', 'AI / ML Engineer', 'DevOps Engineer']
 
@@ -73,23 +73,23 @@ export default function CareerGoal() {
                 label="Industry"
                 value={industry}
                 onChange={e => setIndustry(e.target.value)}
-                options={['Technology / SaaS','Fintech','E-commerce','Healthcare','EdTech','AI / ML']}
+                options={['Technology / SaaS', 'Fintech', 'E-commerce', 'Healthcare', 'EdTech', 'AI / ML']}
               />
               <Select
                 label="Preferred Location"
                 value={location}
                 onChange={e => setLocation(e.target.value)}
-                options={['Remote / Bengaluru','Bengaluru','Delhi NCR','Mumbai','Hyderabad','Remote Only']}
+                options={['Remote / Bengaluru', 'Bengaluru', 'Delhi NCR', 'Mumbai', 'Hyderabad', 'Remote Only']}
               />
               <Select
                 label="Work Preference"
                 value={workPref}
                 onChange={e => setWorkPref(e.target.value)}
-                options={['Internship → Full-time','Internship Only','Full-time Only','Part-time / Freelance']}
+                options={['Internship → Full-time', 'Internship Only', 'Full-time Only', 'Part-time / Freelance']}
               />
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button onClick={() => { setSaved(true); setTimeout(()=>setSaved(false),2200)}}>Save Career Goal</Button>
+              <Button onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 2200) }}>Save Career Goal</Button>
               <Button variant="outline">Reset to Recommended</Button>
             </div>
             {saved && <p className="mt-3 text-sm font-medium text-success">Career goal updated — roadmap recalculated!</p>}
@@ -103,9 +103,8 @@ export default function CareerGoal() {
                 roleSkillRequirements.map(req => (
                   <span
                     key={req.id || req.skill?.name}
-                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
-                      req.is_required ? 'bg-sage border-sage text-primary' : 'bg-background border-border text-charcoal'
-                    }`}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${req.is_required ? 'bg-sage border-sage text-primary' : 'bg-background border-border text-charcoal'
+                      }`}
                   >
                     {req.skill?.name} (Min: {req.required_score}%) {req.is_required ? '• required' : '• optional'}
                   </span>
@@ -162,8 +161,8 @@ export default function CareerGoal() {
             <div className="mt-3 space-y-3">
               {gaps.map(g => (
                 <div key={g.skill}>
-                  <div className="flex justify-between text-xs mb-1"><span className="font-medium text-charcoal">{g.skill}</span><span className="font-bold" style={{color: g.status==='critical' ? '#B85450' : '#B78343'}}>{g.yours}% / {g.required}%</span></div>
-                  <ProgressBar value={g.yours} max={g.required} size="sm" barClassName={g.status==='critical' ? 'bg-danger' : 'bg-warning'} />
+                  <div className="flex justify-between text-xs mb-1"><span className="font-medium text-charcoal">{g.skill}</span><span className="font-bold" style={{ color: g.status === 'critical' ? '#B85450' : '#B78343' }}>{g.yours}% / {g.required}%</span></div>
+                  <ProgressBar value={g.yours} max={g.required} size="sm" barClassName={g.status === 'critical' ? 'bg-danger' : 'bg-warning'} />
                 </div>
               ))}
             </div>
@@ -174,8 +173,8 @@ export default function CareerGoal() {
             <h4 className="text-sm font-bold text-charcoal">Matching Opportunities Preview</h4>
             <p className="text-xs text-muted mt-1">Sorted by match for {career} • {mockInternships.length} matches</p>
             <div className="mt-3 space-y-2">
-              {mockInternships.slice(0,3).map(j=>(
-                <div key={j.id} className="flex items-center gap-3 rounded-xl border border-border bg-white px-3 py-2.5">
+              {mockInternships.slice(0, 3).map(j => (
+                <div key={j.id} className="flex items-center gap-3 rounded-lg border border-border bg-white px-3 py-2.5">
                   <div className="h-9 w-9 rounded-xl bg-background border border-border flex items-center justify-center text-base">{j.logo}</div>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-bold text-charcoal truncate">{j.role}</p>
