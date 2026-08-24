@@ -10,16 +10,6 @@ import PaymentModal from '../../components/ui/PaymentModal'
 import { mockCourses } from '../../data/coursesData'
 import AppIcon from '../../components/ui/AppIcon';
 
-const mockCourses = [
-  { id: 1, title: 'Advanced React Patterns & Performance', instructor: 'Sarah Kim', rating: 4.8, students: 12400, difficulty: 'Advanced', duration: '8 weeks', category: 'Frontend', level: 'Advanced', skills: ['React', 'Performance', 'Patterns'], certificate: true, thumb: 'bg-[#E8F0FE]' },
-  { id: 2, title: 'TypeScript Fundamentals to Advanced', instructor: 'Daniel Lee', rating: 4.7, students: 9800, difficulty: 'Intermediate', duration: '6 weeks', category: 'Frontend', level: 'Intermediate', skills: ['TypeScript', 'Typing', 'Tooling'], certificate: true, thumb: 'bg-[#FFF3E0]' },
-  { id: 3, title: 'Data Structures & Algorithms Intensive', instructor: 'Priya Sharma', rating: 4.9, students: 18200, difficulty: 'Intermediate', duration: '10 weeks', category: 'DSA', level: 'Intermediate', skills: ['DSA', 'Problem Solving'], certificate: true, thumb: 'bg-[#E8F5E9]' },
-  { id: 4, title: 'System Design for Beginners', instructor: 'Marcus Chen', rating: 4.6, students: 7600, difficulty: 'Beginner', duration: '4 weeks', category: 'Backend', level: 'Beginner', skills: ['System Design', 'Scalability'], certificate: false, thumb: 'bg-[#F3E5F5]' },
-  { id: 5, title: 'SQL & Data Modeling Mastery', instructor: 'Ananya Gupta', rating: 4.8, students: 5400, difficulty: 'Intermediate', duration: '5 weeks', category: 'Data', level: 'Intermediate', skills: ['SQL', 'Modeling', 'Postgres'], certificate: true, thumb: 'bg-[#FFFDE7]' },
-  { id: 6, title: 'UI/UX Engineering with Figma & Tailwind', instructor: 'Sofia Reyes', rating: 4.7, students: 4300, difficulty: 'Beginner', duration: '6 weeks', category: 'Design', level: 'Beginner', skills: ['Figma', 'Tailwind', 'A11y'], certificate: true, thumb: 'bg-[#E0F2F1]' },
-  { id: 7, title: 'Node.js Backend & APIs', instructor: 'Arjun Patel', rating: 4.6, students: 8900, difficulty: 'Intermediate', duration: '7 weeks', category: 'Backend', level: 'Intermediate', skills: ['Node.js', 'REST', 'Auth'], certificate: true, thumb: 'bg-[#FCE4EC]' },
-  { id: 8, title: 'Python for Data Science', instructor: 'Dr. Aisha Khan', rating: 4.9, students: 21000, difficulty: 'Beginner', duration: '8 weeks', category: 'Data', level: 'Beginner', skills: ['Python', 'Pandas', 'ML Intro'], certificate: true, thumb: 'bg-[#FFF8E1]' },
-]
 
 const categories = ['All', 'Frontend', 'Backend', 'Data', 'DSA', 'Design']
 const levels = ['All', 'Beginner', 'Intermediate', 'Advanced']
