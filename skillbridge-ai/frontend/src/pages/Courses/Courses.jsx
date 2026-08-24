@@ -10,7 +10,6 @@ import PaymentModal from '../../components/ui/PaymentModal'
 import { mockCourses } from '../../data/coursesData'
 import AppIcon from '../../components/ui/AppIcon';
 
-
 const categories = ['All', 'Frontend', 'Backend', 'Data', 'DSA', 'Design']
 const levels = ['All', 'Beginner', 'Intermediate', 'Advanced']
 const durations = ['All', '4 weeks', '5 weeks', '6 weeks', '7 weeks', '8 weeks', '10 weeks']
