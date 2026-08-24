@@ -24,6 +24,7 @@ import AuditLogs from '../pages/Admin/AuditLogs'
 import Administrators from '../pages/Admin/Administrators'
 import Categories from '../pages/Admin/Categories'
 import Documents from '../pages/Admin/Documents'
+import AdminJobApplications from '../pages/Admin/JobApplications'
 
 import ProtectedRoute from './ProtectedRoute'
 
@@ -71,9 +72,9 @@ export const adminRoutes = {
         { path: 'question-bank', element: <QuestionBank /> },
         { path: 'mcqs', element: <Mcqs /> },
         { path: 'results', element: <Results /> },
-        { path: 'internships', element: <Placeholder title="Admin Internships" /> },
-        { path: 'jobs', element: <Placeholder title="Admin Jobs" /> },
-        { path: 'applications', element: <Placeholder title="Admin Applications" /> },
+        { path: 'internships', element: <AdminJobApplications /> },
+        { path: 'jobs', element: <AdminJobApplications /> },
+        { path: 'applications', element: <AdminJobApplications /> },
         { path: 'placements', element: <Placeholder title="Admin Placements" /> },
         { path: 'ai-usage', element: <AiUsage /> },
         { path: 'ai-logs', element: <AiLogs /> },

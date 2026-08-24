@@ -5,6 +5,7 @@ import Badge from '../../components/ui/Badge'
 import SearchInput from '../../components/ui/SearchInput'
 import Select from '../../components/ui/Select'
 import Button from '../../components/ui/Button'
+import JobApplicationModal from '../../components/ui/JobApplicationModal'
 
 const mockJobs = [
   { id: 1, role: 'Frontend Engineer', company: 'TechNova', logo: 'TN', location: 'Bengaluru', salary: '₹8–12 LPA', exp: '0–2 years', type: 'Full-time', mode: 'Remote', skills: ['React', 'TypeScript', 'Testing'], match: 93, posted: '2 days ago', applicants: 312 },
@@ -15,33 +16,41 @@ const mockJobs = [
   { id: 6, role: 'Full-Stack Developer', company: 'BuildStack', logo: 'BS', location: 'Delhi', salary: '₹9–13 LPA', exp: '1–3 years', type: 'Contract', mode: 'Remote', skills: ['React', 'Node.js', 'SQL'], match: 90, posted: '4 days ago', applicants: 221 },
 ]
 
-const JobCard = ({ item }) => (
-  <Card hover className="p-5 flex flex-col">
-    <div className="flex items-start justify-between gap-3">
-      <div className="flex gap-3">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-charcoal text-white font-bold text-sm">{item.logo}</div>
-        <div>
-          <h3 className="font-bold leading-tight text-charcoal">{item.role}</h3>
-          <p className="text-sm text-muted">{item.company} • {item.location} • {item.mode}</p>
+const JobCard = ({ item, onApply }) => (
+  <Card hover className="p-5 flex flex-col justify-between h-full">
+    <div>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex gap-3">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-charcoal text-white font-bold text-sm">{item.logo}</div>
+          <div>
+            <h3 className="font-bold leading-tight text-charcoal">{item.role}</h3>
+            <p className="text-sm text-muted">{item.company} • {item.location} • {item.mode}</p>
+          </div>
         </div>
+        <Badge variant={item.match >= 90 ? 'success' : 'default'}>{item.match}% match</Badge>
       </div>
-      <Badge variant={item.match >= 90 ? 'success' : 'default'}>{item.match}% match</Badge>
+
+      <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+        <div className="rounded-xl bg-background border border-border px-3 py-2 flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-muted">payments</span> {item.salary}</div>
+        <div className="rounded-xl bg-background border border-border px-3 py-2 flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-muted">work_history</span> {item.exp}</div>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        <span className="rounded-full bg-sage border border-border px-2.5 py-1 text-xs font-medium text-primary">{item.type}</span>
+        <span className="rounded-full bg-white border border-border px-2.5 py-1 text-xs">{item.mode}</span>
+        {item.skills.map((s) => <span key={s} className="rounded-full bg-white border border-border px-2.5 py-1 text-xs text-charcoal/70">{s}</span>)}
+      </div>
     </div>
 
-    <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-      <div className="rounded-xl bg-background border border-border px-3 py-2 flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-muted">payments</span> {item.salary}</div>
-      <div className="rounded-xl bg-background border border-border px-3 py-2 flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-muted">work_history</span> {item.exp}</div>
-    </div>
-
-    <div className="mt-3 flex flex-wrap gap-1.5">
-      <span className="rounded-full bg-sage border border-border px-2.5 py-1 text-xs font-medium text-primary">{item.type}</span>
-      <span className="rounded-full bg-white border border-border px-2.5 py-1 text-xs">{item.mode}</span>
-      {item.skills.map((s) => <span key={s} className="rounded-full bg-white border border-border px-2.5 py-1 text-xs text-charcoal/70">{s}</span>)}
-    </div>
-
-    <div className="mt-4 flex items-center justify-between border-t border-border pt-4 text-xs">
+    <div className="mt-5 flex items-center justify-between border-t border-border pt-4 text-xs">
       <span className="text-muted">{item.posted} • {item.applicants} applicants</span>
-      <Link to="#" className="font-semibold text-primary hover:underline">View & Apply →</Link>
+      <button
+        onClick={() => onApply(item)}
+        className="rounded-lg bg-primary px-3.5 py-1.5 font-semibold text-white hover:bg-primary/90 transition-all shadow-sm active:scale-95 text-xs flex items-center gap-1"
+      >
+        <span>Apply Job</span>
+        <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
+      </button>
     </div>
   </Card>
 )
@@ -54,6 +63,7 @@ const Jobs = () => {
   const [location, setLocation] = useState('All')
   const [salary, setSalary] = useState('All')
   const [match, setMatch] = useState('All')
+  const [selectedJobForApply, setSelectedJobForApply] = useState(null)
 
   const filtered = useMemo(() => {
     return mockJobs.filter((j) => {
@@ -78,7 +88,7 @@ const Jobs = () => {
   }, [q, exp, type, mode, location, salary, match])
 
   return (
-    <div className="bg-background">
+    <div className="bg-background min-h-screen">
       <section className="bg-surface border-b border-border">
         <div className="mx-auto max-w-7xl px-6 py-10">
           <h1 className="text-3xl font-bold tracking-tight text-charcoal">Jobs</h1>
@@ -107,7 +117,9 @@ const Jobs = () => {
       <section className="mx-auto max-w-7xl px-6 py-8">
         {filtered.length ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((j) => <JobCard key={j.id} item={j} />)}
+            {filtered.map((j) => (
+              <JobCard key={j.id} item={j} onApply={(job) => setSelectedJobForApply(job)} />
+            ))}
           </div>
         ) : (
           <Card className="p-10 text-center text-muted">No jobs match your filters.</Card>
@@ -123,6 +135,13 @@ const Jobs = () => {
           <Link to="/register"><Button size="lg" className="bg-white text-charcoal border-white hover:bg-white/90">Verify my skills</Button></Link>
         </div>
       </section>
+
+      {/* Application Form Modal */}
+      <JobApplicationModal
+        open={Boolean(selectedJobForApply)}
+        onClose={() => setSelectedJobForApply(null)}
+        job={selectedJobForApply}
+      />
     </div>
   )
 }
