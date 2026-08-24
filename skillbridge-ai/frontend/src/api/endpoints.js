@@ -28,18 +28,41 @@ export const ENDPOINTS = {
     BY_ID: (id) => `/users/${id}/`,
   },
   COURSES: {
-    LIST: '/courses/',
-    CREATE: '/courses/',
-    BY_ID: (id) => `/courses/${id}/`,
-    ENROLL: (id) => `/courses/${id}/enroll/`,
+    RESOURCES: '/courses/resources/',
+    RECOMMENDATIONS: '/courses/recommendations/',
+    RECOMMENDATION_DETAIL: (id) => `/courses/recommendations/${id}/`,
   },
   SKILLS: {
     LIST: '/skills/',
     CAREER_ROLES: '/skills/career-roles/',
+    GAPS: '/skills/gaps/',
+    GAPS_RECALCULATE: '/skills/gaps/recalculate/',
     MY_SKILLS: '/students/my-skills/',
     MY_SKILLS_HISTORY: '/students/my-skills/history/',
     MY_SKILL_DETAIL: (id) => `/students/my-skills/${id}/`,
     RECOMMEND: '/skills/recommend/',
+  },
+  ASSESSMENTS: {
+    LIST: '/assessments/',
+    BY_ID: (id) => `/assessments/${id}/`,
+    START: (id) => `/assessments/${id}/start/`,
+    SUBMIT: (attemptId) => `/assessments/attempts/${attemptId}/submit/`,
+    MY_ATTEMPTS: '/assessments/my-attempts/',
+  },
+  OPPORTUNITIES: {
+    LIST: '/opportunities/',
+    BY_ID: (id) => `/opportunities/${id}/`,
+    APPLY: (id) => `/opportunities/${id}/apply/`,
+  },
+  APPLICATIONS: {
+    MY: '/applications/my/',
+    COMPANY: '/company/applications/',
+    STATUS_UPDATE: (id) => `/applications/${id}/status/`,
+  },
+  ANALYTICS: {
+    STUDENT: '/analytics/student/',
+    COMPANY: '/analytics/company/',
+    ACADEMICIAN: '/analytics/academician/',
   },
 }
 

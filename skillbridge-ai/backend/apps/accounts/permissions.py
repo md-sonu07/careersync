@@ -48,3 +48,14 @@ class IsAdminUserRole(permissions.BasePermission):
             request.user.is_authenticated and 
             (request.user.role == UserRole.ADMIN or request.user.is_staff)
         )
+
+
+class IsCompanyOwner(permissions.BasePermission):
+    """
+    Only the owning company user can edit/delete their opportunity.
+    """
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return hasattr(request.user, 'company_profile') and obj.company == request.user.company_profile
+

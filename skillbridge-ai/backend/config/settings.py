@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'drf_yasg',
 
     # Custom Local Apps
     'accounts',
@@ -53,6 +54,9 @@ INSTALLED_APPS = [
     'companies',
     'academicians',
     'skills',
+    'assessments',
+    'courses',
+    'analytics',
 ]
 
 MIDDLEWARE = [
@@ -184,3 +188,19 @@ SIMPLE_JWT = {
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
 }
+
+
+# Swagger UI Configuration for drf_yasg
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'Enter JWT token in format: Bearer <your_token>'
+        }
+    },
+    'USE_SESSION_AUTH': False,
+    'JSON_EDITOR': True,
+}
+

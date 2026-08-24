@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from skills.models import Skill, CareerRole, CareerSkillRequirement, StudentSkill, SkillScoreHistory
+from skills.models import Skill, CareerRole, CareerSkillRequirement, StudentSkill, SkillScoreHistory, SkillGap
 
 
 class SkillSerializer(serializers.ModelSerializer):
@@ -83,3 +83,24 @@ class SkillScoreHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = SkillScoreHistory
         fields = ['id', 'skill', 'skill_name', 'score', 'source', 'recorded_at']
+
+
+class SkillGapSerializer(serializers.ModelSerializer):
+    skill = SkillSerializer(read_only=True)
+    career_role_title = serializers.CharField(source='career_role.title', read_only=True)
+
+    class Meta:
+        model = SkillGap
+        fields = [
+            'id',
+            'skill',
+            'career_role',
+            'career_role_title',
+            'current_score',
+            'required_score',
+            'gap_score',
+            'severity',
+            'status',
+            'calculated_at'
+        ]
+

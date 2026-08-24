@@ -1,0 +1,1 @@
+from courses.services.recommendation_engine import generate_learning_recommendations

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Card from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
@@ -6,6 +7,8 @@ import { ProgressBar, ProgressRing } from '../../components/ui/Progress'
 import StatCard from '../../components/common/StatCard'
 import ChartCard from '../../components/common/ChartCard'
 import { mockUser, mockSkills, mockCourses, mockInternships, streakData } from '../../utils/mockData'
+import { skillApi } from '../../api/skill.api'
+import { opportunityApi } from '../../api/opportunity.api'
 
 const gapSkills = [
   { name: 'Docker', yours: 42, required: 65, gap: 23, priority: 'Critical' },
@@ -14,22 +17,27 @@ const gapSkills = [
   { name: 'System Design', yours: 40, required: 60, gap: 20, priority: 'High' },
 ]
 
-const recommendedCourses = [
-  { id: 'c3', title: 'Docker & DevOps Essentials', skill: 'Docker', difficulty: 'Beginner', duration: '10h 45m', rating: 4.6, reason: 'Recommended because Docker is one of your biggest skill gaps.' },
-  { id: 'c4', title: 'Testing with Jest & RTL', skill: 'Testing', difficulty: 'Intermediate', duration: '8h 20m', rating: 4.5, reason: 'Fill your testing gap — critical for Full Stack roles.' },
-  { id: 'c6', title: 'TypeScript for React Devs', skill: 'TypeScript', difficulty: 'Intermediate', duration: '9h 15m', rating: 4.9, reason: 'TypeScript required in 70% of matching jobs.' },
-]
-
-const recentActivity = [
-  { id: 1, text: 'Completed React quiz — scored 8/10', time: '2h ago', icon: 'quiz', color: 'bg-success' },
-  { id: 2, text: 'Finished lesson: Hooks Deep Dive', time: '5h ago', icon: 'play_circle', color: 'bg-primary' },
-  { id: 3, text: 'Improved Docker score +6% (assessment)', time: '1 day ago', icon: 'trending_up', color: 'bg-accent' },
-  { id: 4, text: 'Applied to Flipkart — Frontend Intern', time: '1 day ago', icon: 'assignment', color: 'bg-primary' },
-  { id: 5, text: 'Earned certificate: Git & GitHub', time: '2 days ago', icon: 'workspace_premium', color: 'bg-success' },
-  { id: 6, text: 'Started Docker & DevOps Essentials', time: '3 days ago', icon: 'school', color: 'bg-charcoal' },
-]
-
 export default function Dashboard() {
+  const [gapsList, setGapsList] = useState([])
+  const [opportunityMatches, setOpportunityMatches] = useState([])
+
+  useEffect(() => {
+    let isMounted = true
+    skillApi.getSkillGaps()
+      .then((data) => {
+        if (isMounted && data && data.length > 0) setGapsList(data)
+      })
+      .catch(() => {})
+
+    opportunityApi.getOpportunityMatches()
+      .then((data) => {
+        if (isMounted && data && data.length > 0) setOpportunityMatches(data)
+      })
+      .catch(() => {})
+
+    return () => { isMounted = false }
+  }, [])
+
   const topSkills = mockSkills.filter((s) => ['Git & GitHub', 'JavaScript', 'React', 'MongoDB', 'Node.js'].includes(s.name))
 
   return (
@@ -115,19 +123,23 @@ export default function Dashboard() {
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-danger">warning</span>
             <h3 className="text-base font-bold text-charcoal">Biggest Skill Gaps</h3>
-            <Badge variant="default" className="ml-auto !bg-danger !text-white">4 critical</Badge>
+            <Badge variant="default" className="ml-auto !bg-danger !text-white">{gapsList.length > 0 ? `${gapsList.length} gaps` : '4 critical'}</Badge>
           </div>
           <p className="mt-1 text-xs text-muted">Closest to blocking your goal</p>
           <div className="mt-4 space-y-4">
-            {gapSkills.slice(0, 3).map((g) => (
-              <div key={g.name} className="rounded-xl border border-border bg-background p-3">
+            {(gapsList.length > 0 ? gapsList : gapSkills).slice(0, 3).map((g) => (
+              <div key={g.name || g.skill?.name} className="rounded-xl border border-border bg-background p-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-charcoal">{g.name}</span>
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest ${g.priority === 'Critical' ? 'bg-danger text-white' : 'bg-amber-100 text-amber-800'}`}>{g.priority}</span>
+                  <span className="text-sm font-bold text-charcoal">{g.name || g.skill?.name}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest ${(g.priority || g.severity) === 'High' || g.priority === 'Critical' ? 'bg-danger text-white' : 'bg-amber-100 text-amber-800'}`}>
+                    {g.priority || g.severity || 'Medium'}
+                  </span>
                 </div>
-                <p className="mt-1 text-xs text-muted">Your {g.yours}% • Required {g.required}% • Gap {g.gap}%</p>
-                <ProgressBar value={g.yours} size="sm" className="mt-2.5" barClassName="bg-danger" />
-                <Button size="sm" variant="secondary" className="mt-3 w-full">Improve Skill</Button>
+                <p className="mt-1 text-xs text-muted">Your {g.yours ?? g.current_score}% • Required {g.required ?? g.required_score}% • Gap {g.gap ?? g.gap_score}%</p>
+                <ProgressBar value={g.yours ?? g.current_score} size="sm" className="mt-2.5" barClassName="bg-danger" />
+                <Link to="/student/assessment" className="mt-3 block">
+                  <Button size="sm" variant="secondary" className="w-full">Improve Skill</Button>
+                </Link>
               </div>
             ))}
           </div>
@@ -237,10 +249,27 @@ export default function Dashboard() {
             <Link to="/student/internships" className="text-sm font-semibold text-primary hover:underline">View all →</Link>
           </div>
           <div className="space-y-0 divide-y divide-border">
-            {mockInternships.slice(0, 3).map((job) => (
+            {(opportunityMatches.length > 0
+              ? opportunityMatches.slice(0, 3).map((m) => {
+                  const opp = m.opportunity || {}
+                  const companyName = opp.company?.company_name || 'Partner'
+                  return {
+                    id: m.id,
+                    company: companyName,
+                    role: opp.title,
+                    location: opp.location || 'Remote',
+                    duration: opp.duration || '6 Months',
+                    stipend: opp.stipend_salary || '₹25,000 / month',
+                    match: m.match_score || 75,
+                    skills: opp.skill_requirements ? opp.skill_requirements.map(r => r.skill?.name) : ['React', 'Python'],
+                    logo: companyName[0] || '🏢',
+                  }
+                })
+              : mockInternships.slice(0, 3)
+            ).map((job) => (
               <div key={job.id} className="p-4 sm:p-5">
                 <div className="flex items-start gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background border border-border text-lg shrink-0">{job.logo}</div>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 font-bold text-primary text-lg shrink-0">{job.logo}</div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="text-sm font-bold text-charcoal">{job.company}</p>
@@ -249,18 +278,16 @@ export default function Dashboard() {
                     </div>
                     <p className="mt-1 text-sm font-semibold text-charcoal">{job.role}</p>
                     <div className="mt-2 flex flex-wrap gap-1.5">
-                      {job.skills.map((s) => <span key={s} className="rounded-full bg-sage px-2 py-0.5 text-[11px] font-medium text-primary">{s} ✓</span>)}
-                      <span className="rounded-full bg-amber-50 border border-amber-200 px-2 py-0.5 text-[11px] font-medium text-amber-700">Docker ⚠ gap</span>
+                      {job.skills.map((s) => <span key={s} className="rounded-full bg-sage px-2 py-0.5 text-[11px] font-medium text-primary">{s}</span>)}
                     </div>
                     <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted">
                       <span className="inline-flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">location_on</span>{job.location}</span>
                       <span>•</span><span>{job.duration || '3 Months'}</span>
                       <span>•</span><span>{job.stipend || '₹25k/month'}</span>
-                      <span>•</span><span className="text-danger">Apply by Jan 15</span>
                     </div>
                     <div className="mt-3 flex gap-2">
-                      <Link to={`/student/internship/${job.id}`} className="flex-1"><Button size="sm" variant="outline" className="w-full">View Details</Button></Link>
-                      <Link to={`/student/internship/${job.id}`} className="flex-1"><Button size="sm" className="w-full">Apply</Button></Link>
+                      <Link to={`/student/internships`} className="flex-1"><Button size="sm" variant="outline" className="w-full">View Details</Button></Link>
+                      <Link to={`/student/internships`} className="flex-1"><Button size="sm" className="w-full">Apply</Button></Link>
                     </div>
                   </div>
                 </div>

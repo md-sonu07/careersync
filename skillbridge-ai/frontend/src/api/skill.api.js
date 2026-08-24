@@ -49,6 +49,18 @@ export const skillApi = {
     const { data } = await apiClient.get(ENDPOINTS.SKILLS.MY_SKILLS_HISTORY)
     return data
   },
+
+  // Calculate & get student's skill gaps
+  getSkillGaps: async (params = {}) => {
+    const { data } = await apiClient.get(ENDPOINTS.SKILLS.GAPS, { params })
+    return data
+  },
+
+  // Force recalculate student's skill gaps
+  recalculateSkillGaps: async (payload = {}) => {
+    const { data } = await apiClient.post(ENDPOINTS.SKILLS.GAPS_RECALCULATE, payload)
+    return data
+  },
 }
 
 export default skillApi

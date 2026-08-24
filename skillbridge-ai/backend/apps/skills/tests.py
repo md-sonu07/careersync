@@ -94,3 +94,30 @@ class SkillModelAndAPITest(TestCase):
         res_history = self.client.get('/api/students/my-skills/history/')
         self.assertEqual(res_history.status_code, status.HTTP_200_OK)
         self.assertGreaterEqual(len(res_history.data), 2)
+
+    def test_skill_gap_engine_flow(self):
+        self.client.force_authenticate(user=self.student_user)
+
+        # 1. Fetch skill gaps before having the skill (current_score=0, required=80 => gap=80, High severity)
+        res_gaps = self.client.get('/api/skills/gaps/')
+        self.assertEqual(res_gaps.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res_gaps.data), 1)
+        self.assertEqual(res_gaps.data[0]['gap_score'], 80)
+        self.assertEqual(res_gaps.data[0]['severity'], 'High')
+        self.assertEqual(res_gaps.data[0]['status'], 'open')
+
+        # 2. Add Python skill with score 70 => gap=10, Low severity, improving status
+        StudentSkill.objects.create(student=self.student_profile, skill=self.skill_python, score=70)
+        res_gaps_updated = self.client.get('/api/skills/gaps/')
+        self.assertEqual(res_gaps_updated.status_code, status.HTTP_200_OK)
+        self.assertEqual(res_gaps_updated.data[0]['gap_score'], 10)
+        self.assertEqual(res_gaps_updated.data[0]['severity'], 'Low')
+        self.assertEqual(res_gaps_updated.data[0]['status'], 'improving')
+
+        # 3. Increase Python skill score to 85 => gap=0, resolved status
+        StudentSkill.objects.filter(student=self.student_profile, skill=self.skill_python).update(score=85)
+        res_gaps_resolved = self.client.get('/api/skills/gaps/')
+        self.assertEqual(res_gaps_resolved.status_code, status.HTTP_200_OK)
+        self.assertEqual(res_gaps_resolved.data[0]['gap_score'], 0)
+        self.assertEqual(res_gaps_resolved.data[0]['status'], 'resolved')
+

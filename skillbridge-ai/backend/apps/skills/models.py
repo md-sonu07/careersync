@@ -134,6 +134,20 @@ class StudentSkill(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def calculate_level(self):
+        if self.score >= 80:
+            return 'Expert'
+        elif self.score >= 65:
+            return 'Advanced'
+        elif self.score >= 40:
+            return 'Intermediate'
+        return 'Beginner'
+
+    def save(self, *args, **kwargs):
+        if self.score is not None and not kwargs.get('update_fields') or 'score' in (kwargs.get('update_fields') or []):
+            self.level = self.calculate_level()
+        super().save(*args, **kwargs)
+
     class Meta:
         app_label = 'skills'
         ordering = ['-score']
@@ -177,3 +191,69 @@ class SkillScoreHistory(models.Model):
 
     def __str__(self):
         return f"{self.student.user.email} - {self.skill.name}: {self.score}% on {self.recorded_at.strftime('%Y-%m-%d')}"
+
+
+class SkillGapSeverity(models.TextChoices):
+    LOW = 'Low', 'Low'
+    MEDIUM = 'Medium', 'Medium'
+    HIGH = 'High', 'High'
+
+
+class SkillGapStatus(models.TextChoices):
+    OPEN = 'open', 'Open'
+    IMPROVING = 'improving', 'Improving'
+    RESOLVED = 'resolved', 'Resolved'
+
+
+class SkillGap(models.Model):
+    """
+    Skill gap analysis comparing student score against target career role benchmark.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    student = models.ForeignKey(
+        StudentProfile,
+        on_delete=models.CASCADE,
+        related_name='skill_gaps'
+    )
+    skill = models.ForeignKey(
+        Skill,
+        on_delete=models.CASCADE,
+        related_name='gaps'
+    )
+    career_role = models.ForeignKey(
+        CareerRole,
+        on_delete=models.CASCADE,
+        related_name='gaps',
+        null=True,
+        blank=True
+    )
+    current_score = models.PositiveIntegerField(default=0)
+    required_score = models.PositiveIntegerField(default=0)
+    gap_score = models.PositiveIntegerField(default=0)
+    severity = models.CharField(
+        max_length=50,
+        choices=SkillGapSeverity.choices,
+        default=SkillGapSeverity.LOW
+    )
+    status = models.CharField(
+        max_length=50,
+        choices=SkillGapStatus.choices,
+        default=SkillGapStatus.OPEN
+    )
+    calculated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        app_label = 'skills'
+        ordering = ['-gap_score']
+        verbose_name = 'Skill Gap'
+        verbose_name_plural = 'Skill Gaps'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['student', 'skill', 'career_role'],
+                name='unique_student_skill_gap'
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.student.user.email} - {self.skill.name} Gap: {self.gap_score}% [{self.severity}] ({self.status})"
+

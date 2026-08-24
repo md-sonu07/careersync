@@ -5,14 +5,16 @@ from django.db.models import Q
 
 from accounts.permissions import IsStudent
 from students.models import StudentProfile
-from skills.models import Skill, CareerRole, StudentSkill, SkillScoreHistory
+from skills.models import Skill, CareerRole, StudentSkill, SkillScoreHistory, SkillGap
 from skills.serializers import (
     SkillSerializer,
     CareerRoleSerializer,
     StudentSkillSerializer,
     StudentSkillCreateSerializer,
     SkillScoreHistorySerializer,
+    SkillGapSerializer,
 )
+from skills.services.gap_engine import calculate_student_skill_gaps
 
 
 class SkillListCreateView(generics.ListCreateAPIView):
@@ -86,19 +88,23 @@ class StudentSkillDetailView(APIView):
     def patch(self, request, pk):
         student_skill = self.get_object(request, pk)
         score = request.data.get('score', student_skill.score)
-        level = request.data.get('level', student_skill.level)
         source = request.data.get('source', student_skill.source)
+        is_verified = request.data.get('is_verified', student_skill.is_verified)
 
-        student_skill.score = score
-        student_skill.level = level
+        student_skill.score = int(score)
         student_skill.source = source
+        student_skill.is_verified = is_verified
+        if source in ['assessment', 'practice'] or 'score' in request.data:
+            from django.utils import timezone
+            student_skill.last_assessed_at = timezone.now()
+
         student_skill.save()
 
         # Log history
         SkillScoreHistory.objects.create(
             student=student_skill.student,
             skill=student_skill.skill,
-            score=score,
+            score=student_skill.score,
             source=source
         )
 
@@ -119,5 +125,35 @@ class StudentSkillHistoryView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated, IsStudent]
 
     def get_queryset(self):
-        profile, _ = StudentProfile.objects.get_or_create(user=self.request.user)
-        return SkillScoreHistory.objects.filter(student=profile)
+        student, _ = StudentProfile.objects.get_or_create(user=self.request.user)
+        return SkillScoreHistory.objects.filter(student=student)
+
+
+class StudentSkillGapView(APIView):
+    """
+    GET  /api/skills/gaps/ -> Calculates & returns authenticated student's skill gaps
+    POST /api/skills/gaps/recalculate/ -> Force recalculates skill gaps
+    """
+    permission_classes = [permissions.IsAuthenticated, IsStudent]
+
+    def get(self, request):
+        student, _ = StudentProfile.objects.get_or_create(user=request.user)
+        role_id = request.query_params.get('career_role_id')
+        career_role = None
+        if role_id:
+            career_role = generics.get_object_or_404(CareerRole, id=role_id)
+
+        gaps = calculate_student_skill_gaps(student, career_role)
+        serializer = SkillGapSerializer(gaps, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        student, _ = StudentProfile.objects.get_or_create(user=request.user)
+        role_id = request.data.get('career_role_id')
+        career_role = None
+        if role_id:
+            career_role = generics.get_object_or_404(CareerRole, id=role_id)
+
+        gaps = calculate_student_skill_gaps(student, career_role)
+        serializer = SkillGapSerializer(gaps, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

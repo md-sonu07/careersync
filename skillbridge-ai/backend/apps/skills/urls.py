@@ -5,11 +5,14 @@ from skills.views import (
     StudentSkillListCreateView,
     StudentSkillDetailView,
     StudentSkillHistoryView,
+    StudentSkillGapView,
 )
 
 urlpatterns = [
     path('', SkillListCreateView.as_view(), name='skill_list_create'),
     path('career-roles/', CareerRoleListView.as_view(), name='career_role_list'),
+    path('gaps/', StudentSkillGapView.as_view(), name='student_skill_gaps'),
+    path('gaps/recalculate/', StudentSkillGapView.as_view(), name='student_skill_gaps_recalculate'),
     path('my-skills/', StudentSkillListCreateView.as_view(), name='student_skill_list_create'),
     path('my-skills/history/', StudentSkillHistoryView.as_view(), name='student_skill_history'),
     path('my-skills/<uuid:pk>/', StudentSkillDetailView.as_view(), name='student_skill_detail'),
