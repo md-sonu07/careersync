@@ -21,11 +21,24 @@ npm run dev
 ```
 
 ### Backend
+
+**Mac / Linux**
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+
+**Windows**
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate
+venv\Scripts\activate
 pip install -r requirements.txt
+python manage.py migrate
 python manage.py runserver
 ```
 
