@@ -2,6 +2,8 @@ import IndustryLayout from '../components/layout/IndustryLayout'
 import ErrorBoundary from '../components/ui/ErrorBoundary'
 
 import IndustryDashboard from '../pages/Industry/Dashboard'
+import IndustryInternships from '../pages/Industry/IndustryInternships'
+import IndustryJobs from '../pages/Industry/IndustryJobs'
 import PostInternship from '../pages/Industry/PostInternship'
 import PostJob from '../pages/Industry/PostJob'
 import Candidates from '../pages/Industry/Candidates'
@@ -43,9 +45,9 @@ export const industryRoutes = {
         { path: 'verification', element: <IndustryVerification /> },
         { path: 'team', element: <Team /> },
         { path: 'skills', element: <SkillRequirements /> },
-        { path: 'internships', element: <IndustryApplications /> },
+        { path: 'internships', element: <IndustryInternships /> },
         { path: 'internship/new', element: <PostInternship /> },
-        { path: 'jobs', element: <IndustryApplications /> },
+        { path: 'jobs', element: <IndustryJobs /> },
         { path: 'job/new', element: <PostJob /> },
         { path: 'candidates', element: <Candidates /> },
         { path: 'candidate/:id', element: <CandidateDetail /> },

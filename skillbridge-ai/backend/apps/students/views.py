@@ -16,3 +16,14 @@ class StudentProfileView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         profile, created = StudentProfile.objects.get_or_create(user=self.request.user)
         return profile
+
+
+class CandidateListView(generics.ListAPIView):
+    """
+    GET /api/students/candidates/ -> List all student candidate profiles
+    """
+    serializer_class = StudentProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return StudentProfile.objects.all()

@@ -11,6 +11,14 @@ export const profileApi = {
     const { data } = await apiClient.patch(ENDPOINTS.STUDENTS.PROFILE, payload)
     return data
   },
+  getCandidates: async () => {
+    try {
+      const { data } = await apiClient.get('/students/candidates/')
+      return data || []
+    } catch {
+      return []
+    }
+  },
 
   // Company Profile
   getCompanyProfile: async () => {

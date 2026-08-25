@@ -63,7 +63,11 @@ class OpportunityListCreateView(APIView):
         return [permissions.AllowAny()]
 
     def get(self, request):
-        queryset = Opportunity.objects.filter(status='published')
+        if request.user.is_authenticated and request.query_params.get('my_posts') == 'true':
+            queryset = Opportunity.objects.filter(company__user=request.user)
+        else:
+            queryset = Opportunity.objects.filter(status='published')
+
         opp_type = request.query_params.get('type')
         work_mode = request.query_params.get('work_mode')
         search = request.query_params.get('search')
