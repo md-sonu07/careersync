@@ -1,13 +1,15 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import AppIcon from '../ui/AppIcon';
 import { useChatContext } from '../../context/ChatContext';
 
 export default function AdminHeader({ onMenuClick }) {
   const navigate = useNavigate()
+  const location = useLocation()
   const { user, logout } = useAuth()
   const { toggleChat } = useChatContext()
+  const isDashboard = location.pathname.endsWith('/dashboard') || location.pathname === '/'
   const [query, setQuery] = useState('')
   const [notifOpen, setNotifOpen] = useState(false)
   const displayName = user?.full_name || (user?.first_name ? `${user.first_name} ${user.last_name}` : 'Super Admin')
@@ -91,9 +93,11 @@ export default function AdminHeader({ onMenuClick }) {
           )}
         </div>
 
-        <button onClick={toggleChat} className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg border border-border bg-white text-charcoal hover:bg-background shadow-soft shrink-0" title="Chat with AI">
-          <img src="/logo.png" alt="Career AI" className="w-5 h-5 object-contain" />
-        </button>
+        {isDashboard && (
+          <button onClick={toggleChat} className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg border border-border bg-white text-charcoal hover:bg-background shadow-soft shrink-0" title="Chat with AI">
+            <img src="/logo.png" alt="Career AI" className="w-5 h-5 object-contain" />
+          </button>
+        )}
 
         <div className="flex items-center gap-1.5 sm:gap-2.5 rounded-lg border border-border bg-white p-1 sm:py-2 sm:px-2 shadow-soft shrink-0">
           <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-slate-900 text-white text-xs font-bold border border-slate-800 shrink-0">

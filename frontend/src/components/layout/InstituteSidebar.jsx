@@ -5,7 +5,7 @@ import AppIcon from '../ui/AppIcon';
 const navSections = [
   {
     label: 'Overview', items: [
-      { label: 'Dashboard', icon: 'dashboard', path: '/institute' },
+      { label: 'Dashboard', icon: 'dashboard', path: '/institute/dashboard' },
       { label: 'Chat with Career AI', icon: 'smart_toy', path: '/institute/ai-assistant' },
     ]
   },
