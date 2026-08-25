@@ -40,14 +40,17 @@ class IsAcademician(permissions.BasePermission):
 
 class IsAdminUserRole(permissions.BasePermission):
     """
-    Allows access only to authenticated users with 'admin' role or is_staff flag.
+    Allows access only to authenticated users with 'admin' role or is_staff/is_superuser flag.
     """
     def has_permission(self, request, view):
         return bool(
             request.user and 
             request.user.is_authenticated and 
-            (request.user.role == UserRole.ADMIN or request.user.is_staff)
+            (str(request.user.role).lower() == 'admin' or request.user.is_staff or request.user.is_superuser)
         )
+
+
+IsAdmin = IsAdminUserRole
 
 
 class IsCompanyOwner(permissions.BasePermission):

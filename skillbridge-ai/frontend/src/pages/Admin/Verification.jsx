@@ -1,62 +1,95 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
 import Modal from '../../components/ui/Modal'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/Tabs'
 import Textarea from '../../components/ui/Textarea'
-import AppIcon from '../../components/ui/AppIcon';
+import AppIcon from '../../components/ui/AppIcon'
+import apiClient from '../../api/axios'
+import { toast } from 'react-hot-toast'
 
-const data = {
-  Pending: [
-    { id: 1, name: 'TechNova Pvt Ltd', type: 'Company', docs: 'Incorporation.pdf, GST.pdf', date: '2026-02-10', reviewer: '—', reason: '—' },
-    { id: 2, name: 'Delhi Technological University', type: 'College', docs: 'Affiliation.pdf, UGC.pdf', date: '2026-02-11', reviewer: '—', reason: '—' },
-    { id: 3, name: 'CRED Technologies', type: 'Company', docs: 'Incorporation.pdf', date: '2026-02-12', reviewer: '—', reason: '—' },
-  ],
-  Verified: [
-    { id: 4, name: 'Flipkart Internet', type: 'Company', docs: 'Incorporation.pdf', date: '2026-01-20', reviewer: 'A. Singh', reason: '—' },
-    { id: 5, name: 'NSUT Delhi', type: 'College', docs: 'Affiliation.pdf', date: '2026-01-15', reviewer: 'P. Kumar', reason: '—' },
-  ],
-  Rejected: [
-    { id: 6, name: 'Fake Corp Ltd', type: 'Company', docs: 'Incorporation.pdf (invalid)', date: '2026-02-05', reviewer: 'A. Singh', reason: 'Documents not verifiable — incorrect GST' },
-  ],
-}
-
-export default function Verification() {
+export default function Verification({ defaultType = 'company' }) {
   const [tab, setTab] = useState('Pending')
   const [action, setAction] = useState(null)
   const [rejectReason, setRejectReason] = useState('')
-  const [lists, setLists] = useState(data)
+  const [loading, setLoading] = useState(true)
+  const [lists, setLists] = useState({
+    Pending: [],
+    Verified: [],
+    Rejected: [],
+  })
 
-  const handleVerify = () => {
-    if (!action) return
-    const item = lists.Pending.find((i) => i.id === action.id)
-    if (!item) return
-    setLists({
-      ...lists,
-      Pending: lists.Pending.filter((i) => i.id !== action.id),
-      Verified: [...lists.Verified, { ...item, reviewer: 'You', date: new Date().toISOString().slice(0, 10) }],
-    })
-    setAction(null)
+  const loadVerifications = async () => {
+    try {
+      setLoading(true)
+      const { data } = await apiClient.get('/companies/verifications/')
+      let items = Array.isArray(data) ? data : []
+
+      if (defaultType === 'company') {
+        items = items.filter((i) => i.type === 'Company' || i.entity_type === 'company')
+      } else if (defaultType === 'college') {
+        items = items.filter((i) => i.type === 'College' || i.entity_type === 'institution')
+      }
+
+      const pending = items.filter((i) => !i.is_verified && i.reason === '—')
+      const verified = items.filter((i) => i.is_verified)
+      const rejected = items.filter((i) => !i.is_verified && i.reason !== '—')
+
+      setLists({
+        Pending: pending,
+        Verified: verified,
+        Rejected: rejected,
+      })
+    } catch {
+      toast.error('Failed to load verification list.')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleReject = () => {
+  useEffect(() => {
+    loadVerifications()
+  }, [defaultType])
+
+  const handleVerify = async () => {
     if (!action) return
-    const item = lists.Pending.find((i) => i.id === action.id)
-    setLists({
-      ...lists,
-      Pending: lists.Pending.filter((i) => i.id !== action.id),
-      Rejected: [...lists.Rejected, { ...item, reviewer: 'You', reason: rejectReason || 'No reason provided' }],
-    })
-    setAction(null)
-    setRejectReason('')
+    try {
+      await apiClient.post(`/companies/verifications/${action.id}/action/`, { action: 'verify' })
+      toast.success(`${action.name} verified successfully ✓`)
+      setAction(null)
+      loadVerifications()
+    } catch {
+      toast.error('Failed to verify entity.')
+    }
   }
+
+  const handleReject = async () => {
+    if (!action) return
+    try {
+      await apiClient.post(`/companies/verifications/${action.id}/action/`, { action: 'reject', reason: rejectReason })
+      toast.success(`${action.name} verification rejected`)
+      setAction(null)
+      setRejectReason('')
+      loadVerifications()
+    } catch {
+      toast.error('Failed to reject entity.')
+    }
+  }
+
+  const pageTitle = defaultType === 'college' ? 'College Verification Console' : defaultType === 'company' ? 'Industry Verification Console' : 'Verification Console'
+  const pageSubtitle = defaultType === 'college' ? 'Approve & verify colleges & universities — verified institutions show ✓ badge across the platform' : 'Approve & verify industry partners — verified companies show ✓ badge across the platform'
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-charcoal">Verification</h1>
-        <p className="text-sm text-muted mt-1">Approve companies & colleges — verified entities show ✓ badge across the platform</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-charcoal">{pageTitle}</h1>
+          <p className="text-sm text-muted mt-1">{pageSubtitle}</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={loadVerifications} disabled={loading}>
+          <AppIcon name="refresh" className="text-[16px]" /> Refresh
+        </Button>
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
@@ -95,16 +128,16 @@ export default function Verification() {
                         <td className="px-4 py-3 text-sm text-muted">{row.date}</td>
                         <td className="px-4 py-3 text-sm text-muted">{row.reviewer}</td>
                         <td className="px-4 py-3 text-xs text-danger max-w-[200px] truncate">{row.reason}</td>
-                        <td className="px-6 py-3">
+                        <td className="px-6 py-3 whitespace-nowrap">
                           {t === 'Pending' ? (
-                            <div className="flex gap-1.5">
+                            <div className="flex gap-1.5 whitespace-nowrap">
                               <Button size="sm" className="bg-success hover:bg-success/90" onClick={() => setAction({ ...row, mode: 'verify' })}>Verify</Button>
                               <Button size="sm" variant="outline" className="!text-danger !border-danger/20" onClick={() => setAction({ ...row, mode: 'reject' })}>Reject</Button>
                             </div>
                           ) : t === 'Verified' ? (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-success/10 text-success px-2.5 py-1 text-xs font-bold">✓ Verified</span>
+                            <span className="inline-flex items-center gap-1 rounded-full bg-success/10 text-success px-3 py-1 text-xs font-bold whitespace-nowrap shrink-0">✓ Verified</span>
                           ) : (
-                            <span className="inline-flex rounded-full bg-danger/10 text-danger px-2.5 py-1 text-xs font-bold">Rejected</span>
+                            <span className="inline-flex rounded-full bg-danger/10 text-danger px-3 py-1 text-xs font-bold whitespace-nowrap shrink-0">Rejected</span>
                           )}
                         </td>
                       </tr>

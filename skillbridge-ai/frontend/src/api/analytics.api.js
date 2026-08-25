@@ -22,12 +22,8 @@ export const analyticsApi = {
 
   // System admin analytics
   getSystemAnalytics: async () => {
-    try {
-      const { data } = await apiClient.get('/api/analytics/system/')
-      return data
-    } catch {
-      return null
-    }
+    const { data } = await apiClient.get(ENDPOINTS.ANALYTICS.SYSTEM)
+    return data
   },
 }
 

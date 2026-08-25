@@ -86,3 +86,49 @@ class LogoutView(APIView):
                 {"error": "Invalid or expired token."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+from accounts.permissions import IsAdmin
+from django.contrib.auth import get_user_model
+from django.db.models import Q
+
+User = get_user_model()
+
+
+class UserListView(generics.ListAPIView):
+    """
+    GET /api/auth/users/ -> List all registered platform users for Admin
+    """
+    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+    serializer_class = UserResponseSerializer
+
+    def get_queryset(self):
+        qs = User.objects.all().order_by('-created_at')
+        role = self.request.query_params.get('role')
+        search = self.request.query_params.get('search')
+
+        if role and role.lower() != 'all':
+            qs = qs.filter(role__iexact=role.lower())
+        if search:
+            qs = qs.filter(
+                Q(first_name__icontains=search) |
+                Q(last_name__icontains=search) |
+                Q(email__icontains=search)
+            )
+        return qs
+
+
+class ToggleUserActiveView(APIView):
+    """
+    PATCH /api/auth/users/<uuid:pk>/toggle-active/ -> Block or unblock a user
+    """
+    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+
+    def patch(self, request, pk):
+        try:
+            user = User.objects.get(pk=pk)
+            user.is_active = not user.is_active
+            user.save(update_fields=['is_active'])
+            return Response(UserResponseSerializer(user).data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)

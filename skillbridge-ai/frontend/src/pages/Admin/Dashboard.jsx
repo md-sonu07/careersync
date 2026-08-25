@@ -4,29 +4,34 @@ import ChartCard from '../../components/common/ChartCard'
 import Card from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
 import { analyticsApi } from '../../api/analytics.api'
-import AppIcon from '../../components/ui/AppIcon';
+import Button from '../../components/ui/Button'
+import AppIcon from '../../components/ui/AppIcon'
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  const loadData = async () => {
+    try {
+      setLoading(true)
+      const data = await analyticsApi.getSystemAnalytics()
+      if (data) setStats(data)
+    } catch {
+      // Fallback
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    let isMounted = true
-    analyticsApi.getSystemAnalytics()
-      .then((data) => {
-        if (isMounted && data) setStats(data)
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (isMounted) setLoading(false)
-      })
-    return () => { isMounted = false }
+    loadData()
   }, [])
 
   const totalUsers = stats?.total_users ?? 0
   const studentsCount = stats?.students_count ?? 0
   const industryCount = stats?.industry_count ?? 0
   const instituteCount = stats?.institute_count ?? 0
+  const adminsCount = stats?.admins_count ?? 1
   const coursesCount = stats?.courses_count ?? 0
   const opportunitiesCount = stats?.opportunities_count ?? 0
   const applicationsCount = stats?.applications_count ?? 0
@@ -44,6 +49,9 @@ export default function AdminDashboard() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={loadData} disabled={loading}>
+            <AppIcon name="refresh" className="text-[16px]" /> Refresh
+          </Button>
           <Badge variant="default" className="!bg-slate-900 !text-white">Admin</Badge>
           <span className="hidden items-center gap-1 rounded-full bg-success/10 px-3 py-1 text-xs font-bold text-success sm:inline-flex">
             <span className="h-2 w-2 rounded-full bg-success animate-pulse" /> System healthy
@@ -51,43 +59,52 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Top stats */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 xl:grid-cols-5">
-        <StatCard label="Total Registered Users" value={totalUsers} icon="group" trend={100} trendLabel="verified" />
-        <StatCard label="Students" value={studentsCount} icon="school" trend={100} trendLabel="active" />
-        <StatCard label="Industry Partners" value={industryCount} icon="business" trend={100} trendLabel="companies" />
-        <StatCard label="Institute Institutions" value={instituteCount} icon="apartment" trend={100} trendLabel="colleges" />
-        <StatCard label="Active Courses" value={coursesCount} icon="menu_book" trend={100} trendLabel="published" className="col-span-2 xl:col-span-1" />
-      </div>
+      {loading ? (
+        <Card className="p-12 text-center text-muted">
+          <AppIcon name="sync" className="animate-spin text-3xl text-primary mx-auto mb-2" />
+          Loading live system metrics from Django database...
+        </Card>
+      ) : (
+        <>
+          {/* Top stats */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 xl:grid-cols-5">
+            <StatCard label="Total Registered Users" value={totalUsers} icon="group" trend={100} trendLabel="verified" />
+            <StatCard label="Students" value={studentsCount} icon="school" trend={100} trendLabel="active" />
+            <StatCard label="Industry Partners" value={industryCount} icon="business" trend={100} trendLabel="companies" />
+            <StatCard label="Institute Institutions" value={instituteCount} icon="apartment" trend={100} trendLabel="colleges" />
+            <StatCard label="Active Courses" value={coursesCount} icon="menu_book" trend={100} trendLabel="published" className="col-span-2 xl:col-span-1" />
+          </div>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-        <StatCard label="Posted Opportunities" value={opportunitiesCount} icon="work" trend={100} trendLabel="total" />
-        <StatCard label="Total Applications" value={applicationsCount} icon="assignment" trend={100} trendLabel="submitted" />
-        <StatCard label="AI System Health" value="100%" icon="smart_toy" trend={100} trendLabel="operational" />
-      </div>
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+            <StatCard label="Posted Opportunities" value={opportunitiesCount} icon="work" trend={100} trendLabel="total" />
+            <StatCard label="Total Applications" value={applicationsCount} icon="assignment" trend={100} trendLabel="submitted" />
+            <StatCard label="AI System Health" value="100%" icon="smart_toy" trend={100} trendLabel="operational" />
+          </div>
 
-      {/* Governance breakdown */}
-      <Card className="!p-0 overflow-hidden">
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h3 className="font-bold text-charcoal">Platform User Breakdown</h3>
-          <span className="text-xs text-muted">Live Django Database Metrics</span>
-        </div>
-        <div className="grid grid-cols-2 gap-0 divide-x divide-border lg:grid-cols-5">
-          {[
-            { k: 'Students', active: studentsCount, c: 'text-primary' },
-            { k: 'Industries', active: industryCount, c: 'text-accent' },
-            { k: 'Institute', active: instituteCount, c: 'text-success' },
-            { k: 'Admins', active: 1, c: 'text-charcoal' },
-            { k: 'Total', active: totalUsers, c: 'text-charcoal font-bold' },
-          ].map((r) => (
-            <div key={r.k} className="p-4 text-center">
-              <p className="text-xs font-bold uppercase tracking-widest text-muted">{r.k}</p>
-              <p className={`mt-1 text-lg font-bold ${r.c}`}>{r.active}</p>
-              <p className="text-xs text-muted">Verified account</p>
+          {/* Governance breakdown */}
+          <Card className="!p-0 overflow-hidden">
+            <div className="flex items-center justify-between border-b border-border px-6 py-4">
+              <h3 className="font-bold text-charcoal">Platform User Breakdown</h3>
+              <span className="text-xs text-muted">Live Django Database Metrics</span>
             </div>
-          ))}
-        </div>
-      </Card>
+            <div className="grid grid-cols-2 gap-0 divide-x divide-border lg:grid-cols-5">
+              {[
+                { k: 'Students', active: studentsCount, c: 'text-primary' },
+                { k: 'Industries', active: industryCount, c: 'text-accent' },
+                { k: 'Institute', active: instituteCount, c: 'text-success' },
+                { k: 'Admins', active: adminsCount, c: 'text-charcoal' },
+                { k: 'Total', active: totalUsers, c: 'text-charcoal font-bold' },
+              ].map((r) => (
+                <div key={r.k} className="p-4 text-center">
+                  <p className="text-xs font-bold uppercase tracking-widest text-muted">{r.k}</p>
+                  <p className={`mt-1 text-lg font-bold ${r.c}`}>{r.active}</p>
+                  <p className="text-xs text-muted">Verified account</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </>
+      )}
     </div>
   )
 }

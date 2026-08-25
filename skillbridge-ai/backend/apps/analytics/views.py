@@ -2,13 +2,14 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.permissions import IsStudent, IsIndustry, IsAcademician
+from accounts.permissions import IsStudent, IsIndustry, IsAcademician, IsAdmin
 from students.models import StudentProfile
 from companies.models import Company
 from analytics.services.analytics_engine import (
     get_student_analytics,
     get_company_analytics,
     get_academician_analytics,
+    get_admin_analytics,
 )
 
 
@@ -47,4 +48,15 @@ class AcademicianAnalyticsView(APIView):
 
     def get(self, request):
         data = get_academician_analytics()
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class SystemAnalyticsView(APIView):
+    """
+    GET /api/analytics/system/ -> Returns live Django platform system metrics for Admin Dashboard
+    """
+    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+
+    def get(self, request):
+        data = get_admin_analytics()
         return Response(data, status=status.HTTP_200_OK)

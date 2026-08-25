@@ -62,7 +62,8 @@ export const ENDPOINTS = {
   ANALYTICS: {
     STUDENT: '/analytics/student/',
     COMPANY: '/analytics/company/',
-    ACADEMICIAN: '/analytics/institute/',
+    ACADEMICIAN: '/analytics/academician/',
+    SYSTEM: '/analytics/system/',
   },
   AI: {
     CONVERSATIONS: '/ai/conversations/',

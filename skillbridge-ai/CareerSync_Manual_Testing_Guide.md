@@ -144,7 +144,8 @@ Institute / Academician ka main goal hai College ke sabhi Students ka Skill Leve
    - **Needs Focus** (Skills Score < 50%)
 3. **Top Institutional Skill Gaps** dekhein ki college ke sabse zyada bache kis skill me weak hain (e.g., Docker, Python).
 4. **Placement Statistics** dekhein (Total Applications, Shortlisted count, Selected count).
-5. **Expected Outcome**: Sabhi metrics live Django ORM database query se real-time compute honge without exposing individual student passwords or private data.
+5. **Expected Outcome**: Sabhi metrics live Django ORM database query se real-time compute honge without
+ exposing individual student passwords or private data.
 
 ---
 

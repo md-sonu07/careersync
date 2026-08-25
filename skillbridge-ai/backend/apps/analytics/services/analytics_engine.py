@@ -184,3 +184,55 @@ def get_academician_analytics():
             "selected_applications": selected_apps,
         }
     }
+
+
+def get_admin_analytics():
+    """
+    Phase 13 — Admin & System Platform Analytics via dynamic ORM queries:
+    - User Counts: Total Users, Students, Industry, Institutes, Admins
+    - Verified User Accounts
+    - Opportunities, Applications, and Active Courses
+    """
+    from accounts.models import User, UserRole
+    from courses.models import LearningResource
+
+    total_users = User.objects.count()
+    students_count = User.objects.filter(role=UserRole.STUDENT).count()
+    industry_count = User.objects.filter(role=UserRole.INDUSTRY).count()
+    institute_count = User.objects.filter(role=UserRole.ACADEMICIAN).count()
+    admins_count = User.objects.filter(role=UserRole.ADMIN).count()
+
+    verified_students = User.objects.filter(role=UserRole.STUDENT, is_verified=True).count()
+    verified_industry = User.objects.filter(role=UserRole.INDUSTRY, is_verified=True).count()
+    verified_institute = User.objects.filter(role=UserRole.ACADEMICIAN, is_verified=True).count()
+    verified_admins = User.objects.filter(role=UserRole.ADMIN, is_verified=True).count()
+
+    companies_count = Company.objects.count()
+    verified_companies = Company.objects.filter(is_verified=True).count()
+
+    opportunities_count = Opportunity.objects.count()
+    published_opportunities = Opportunity.objects.filter(status='published').count()
+    applications_count = Application.objects.count()
+
+    courses_count = LearningResource.objects.count()
+
+    return {
+        "total_users": total_users,
+        "students_count": students_count,
+        "industry_count": industry_count,
+        "institute_count": institute_count,
+        "admins_count": admins_count,
+        "companies_count": companies_count,
+        "verified_companies": verified_companies,
+        "courses_count": courses_count,
+        "opportunities_count": opportunities_count,
+        "published_opportunities": published_opportunities,
+        "applications_count": applications_count,
+        "user_breakdown": {
+            "students": {"total": students_count, "verified": verified_students},
+            "industry": {"total": industry_count, "verified": verified_industry},
+            "institute": {"total": institute_count, "verified": verified_institute},
+            "admins": {"total": admins_count, "verified": verified_admins},
+        },
+        "system_health": 100,
+    }

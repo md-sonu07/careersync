@@ -36,5 +36,15 @@ export const authApi = {
     const { data } = await apiClient.post(ENDPOINTS.AUTH.REFRESH, { refresh })
     return data
   },
+
+  getUsers: async (params = {}) => {
+    const { data } = await apiClient.get('/auth/users/', { params })
+    return data
+  },
+
+  toggleUserActive: async (userId) => {
+    const { data } = await apiClient.patch(`/auth/users/${userId}/toggle-active/`)
+    return data
+  },
 }
 

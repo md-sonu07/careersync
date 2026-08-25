@@ -5,6 +5,8 @@ from accounts.views import (
     CustomTokenObtainPairView,
     UserProfileView,
     LogoutView,
+    UserListView,
+    ToggleUserActiveView,
 )
 
 urlpatterns = [
@@ -13,4 +15,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('me/', UserProfileView.as_view(), name='auth_me'),
     path('logout/', LogoutView.as_view(), name='auth_logout'),
+    path('users/', UserListView.as_view(), name='admin_user_list'),
+    path('users/<uuid:pk>/toggle-active/', ToggleUserActiveView.as_view(), name='admin_toggle_user_active'),
 ]
