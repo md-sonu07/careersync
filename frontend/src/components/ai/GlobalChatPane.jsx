@@ -172,13 +172,17 @@ export default function GlobalChatPane() {
 
   const handleSend = async (textOverride = null) => {
     const textToSend = textOverride !== null ? textOverride : input
-    if (!textToSend.trim()) return
+    if (!textToSend.trim() && !selectedFile) return
+
+    const attachedFile = selectedFile
+    const messageContent = textToSend.trim() || (attachedFile ? `Please analyze this file: ${attachedFile.name}` : '')
 
     const userMsg = {
       id: Date.now().toString(),
       role: 'user',
-      content: textToSend,
+      content: messageContent,
       created_at: new Date().toISOString(),
+      attachment: attachedFile ? { name: attachedFile.name, size: attachedFile.size } : null,
     }
 
     setMessages((prev) => [...prev, userMsg])
@@ -187,7 +191,24 @@ export default function GlobalChatPane() {
     setIsSending(true)
 
     try {
-      const response = await aiAPI.sendMessage(textToSend, activeConversationId)
+      let docContextText = null
+      if (attachedFile) {
+        try {
+          const docRes = await aiAPI.uploadDocument(attachedFile)
+          if (docRes) {
+            let docText = docRes.extracted_text || ''
+            if (!docText && docRes.analysis_result?.summary) {
+              docText = `Summary: ${docRes.analysis_result.summary}`
+            }
+            docContextText = docText.slice(0, 3000)
+          }
+        } catch (fileErr) {
+          console.warn('Document extraction fallback in popup chat:', fileErr)
+        }
+      }
+
+      const attachmentPayload = attachedFile ? { name: attachedFile.name, size: attachedFile.size } : null
+      const response = await aiAPI.sendMessage(messageContent, activeConversationId, docContextText, attachmentPayload)
 
       const assistantMsg = {
         id: response.assistant_message_id || (Date.now() + 1).toString(),
@@ -270,8 +291,8 @@ export default function GlobalChatPane() {
                 setSidebarOpen(false)
               }}
               className={`group relative flex cursor-pointer flex-col rounded-lg p-3 transition-colors ${activeConversationId === c.id
-                  ? 'bg-primary/10 border border-primary/20'
-                  : 'hover:bg-background border border-transparent'
+                ? 'bg-primary/10 border border-primary/20'
+                : 'hover:bg-background border border-transparent'
                 }`}
             >
               <div className="flex items-center justify-between gap-2">
@@ -494,12 +515,27 @@ export default function GlobalChatPane() {
           <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div
               className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[13px] leading-relaxed shadow-xs ${m.role === 'user'
-                  ? 'bg-[#f4f4f4] text-charcoal rounded-tr-sm font-medium'
-                  : 'bg-white border border-border/60 text-charcoal rounded-tl-sm prose prose-sm max-w-none p-3.5 shadow-xs'
+                ? 'bg-[#f4f4f4] text-charcoal rounded-tr-sm font-medium'
+                : 'bg-white border border-border/60 text-charcoal rounded-tl-sm prose prose-sm max-w-none p-3.5 shadow-xs'
                 }`}
             >
               {m.role === 'user' ? (
-                <p className="whitespace-pre-wrap m-0">{m.content}</p>
+                <>
+                  {m.attachment && (
+                    <div
+                      title={typeof m.attachment === 'string' ? m.attachment : (m.attachment.name || 'Attached File')}
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold mb-2 w-fit border shadow-2xs bg-charcoal/10 text-charcoal border-charcoal/20"
+                    >
+                      <AppIcon name="description" className="text-[16px] shrink-0" />
+                      <span className="truncate max-w-[200px] leading-tight">
+                        {typeof m.attachment === 'string' ? m.attachment : (m.attachment.name || 'Attached File')}
+                      </span>
+                    </div>
+                  )}
+                  {m.content && m.content.split('\n\n[ATTACHED DOCUMENT')[0].trim() ? (
+                    <p className="whitespace-pre-wrap m-0">{m.content.split('\n\n[ATTACHED DOCUMENT')[0].trim()}</p>
+                  ) : null}
+                </>
               ) : (
                 <MarkdownRenderer content={m.content} />
               )}

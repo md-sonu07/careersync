@@ -6,7 +6,7 @@ from .models import AIConversation, AIMessage
 class AIMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = AIMessage
-        fields = ['id', 'role', 'content', 'suggestions', 'created_at']
+        fields = ['id', 'role', 'content', 'attachment', 'suggestions', 'created_at']
         read_only_fields = ['id', 'conversation', 'created_at']
 
 
@@ -58,14 +58,17 @@ class AIConversationDetailSerializer(AIConversationSerializer):
 
 class ChatRequestSerializer(serializers.Serializer):
     conversation_id = serializers.UUIDField(required=False, allow_null=True)
-    message = serializers.CharField(max_length=4000, min_length=1)
+    message = serializers.CharField(max_length=4000, required=False, allow_blank=True, default='')
+    attachment = serializers.JSONField(required=False, allow_null=True, default=dict)
+    doc_context = serializers.CharField(required=False, allow_blank=True, allow_null=True, default='')
 
-    def validate_message(self, value):
-        # Strip but reject empty after strip
-        value = value.strip()
-        if not value:
-            raise serializers.ValidationError("Message cannot be empty")
-        return value
+    def validate(self, attrs):
+        msg = attrs.get('message', '').strip()
+        doc = attrs.get('doc_context', '').strip()
+        if not msg and not doc:
+            raise serializers.ValidationError({"message": "Message or document attachment is required."})
+        attrs['message'] = msg or "Attached document analysis request."
+        return attrs
 
 
 class ChatResponseSerializer(serializers.Serializer):
@@ -76,3 +79,47 @@ class ChatResponseSerializer(serializers.Serializer):
     suggestions = serializers.ListField(child=serializers.CharField(), default=[])
     actions = serializers.ListField(child=serializers.CharField(), default=[])
     timestamp = serializers.DateTimeField(read_only=True)
+
+
+class AIDocumentUploadSerializer(serializers.Serializer):
+    file = serializers.FileField(required=True)
+
+    def validate_file(self, value):
+        allowed_extensions = ['pdf', 'docx', 'doc', 'txt']
+        ext = value.name.split('.')[-1].lower() if '.' in value.name else ''
+        if ext not in allowed_extensions:
+            raise serializers.ValidationError(
+                f"Invalid file type '.{ext}'. Supported formats: PDF, DOCX, TXT."
+            )
+        # Max file size 10MB
+        if value.size > 10 * 1024 * 1024:
+            raise serializers.ValidationError("File size exceeds 10MB limit.")
+        return value
+
+
+from .models import AIDocument, AIDocumentChatMessage
+
+
+class AIDocumentChatMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AIDocumentChatMessage
+        fields = ['id', 'role', 'content', 'created_at']
+        read_only_fields = ['id', 'document', 'created_at']
+
+
+class AIDocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AIDocument
+        fields = [
+            'id', 'filename', 'file_type', 'file_size',
+            'document_type', 'analysis_result', 'ai_provider',
+            'ocr_required', 'created_at', 'updated_at',
+        ]
+        read_only_fields = ['id', 'user', 'guest_id', 'created_at', 'updated_at']
+
+
+class AIDocumentDetailSerializer(AIDocumentSerializer):
+    chat_messages = AIDocumentChatMessageSerializer(many=True, read_only=True)
+
+    class Meta(AIDocumentSerializer.Meta):
+        fields = AIDocumentSerializer.Meta.fields + ['extracted_text', 'chat_messages']

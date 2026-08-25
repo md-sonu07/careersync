@@ -491,7 +491,20 @@ export default function AIAssistant() {
                     }`}
                 >
                   {m.role === 'user' ? (
-                    <p className="whitespace-pre-wrap m-0">{m.content}</p>
+                    <>
+                      {m.attachment && (
+                        <div
+                          title={typeof m.attachment === 'string' ? m.attachment : (m.attachment.name || 'Attached File')}
+                          className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold mb-2 w-fit border shadow-2xs bg-charcoal/10 text-charcoal border-charcoal/20"
+                        >
+                          <AppIcon name="description" className="text-[16px] shrink-0" />
+                          <span className="truncate max-w-[200px] leading-tight">
+                            {typeof m.attachment === 'string' ? m.attachment : (m.attachment.name || 'Attached File')}
+                          </span>
+                        </div>
+                      )}
+                      <p className="whitespace-pre-wrap m-0">{m.content}</p>
+                    </>
                   ) : (
                     <MarkdownRenderer content={m.content} />
                   )}

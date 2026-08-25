@@ -33,12 +33,40 @@ export const aiAPI = {
   },
 
   // Send a message
-  sendMessage: async (message, conversationId = null) => {
-    const payload = { message }
+  sendMessage: async (message, conversationId = null, docContext = null, attachment = null) => {
+    const payload = { message: message || '' }
     if (conversationId) {
       payload.conversation_id = conversationId
     }
+    if (docContext) {
+      payload.doc_context = docContext
+    }
+    if (attachment) {
+      payload.attachment = attachment
+    }
     const response = await api.post(ENDPOINTS.AI.CHAT, payload)
+    return response.data
+  },
+
+  // Document Analysis APIs
+  uploadDocument: async (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    const response = await api.post(ENDPOINTS.AI.DOCUMENT_UPLOAD, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    return response.data
+  },
+
+  getDocument: async (id) => {
+    const response = await api.get(ENDPOINTS.AI.DOCUMENT_DETAIL(id))
+    return response.data
+  },
+
+  sendDocumentMessage: async (documentId, message) => {
+    const response = await api.post(ENDPOINTS.AI.DOCUMENT_CHAT(documentId), { message })
     return response.data
   },
 }

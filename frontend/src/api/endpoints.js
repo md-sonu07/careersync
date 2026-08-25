@@ -69,6 +69,9 @@ export const ENDPOINTS = {
     CONVERSATIONS: '/ai/conversations/',
     CONVERSATION_DETAIL: (id) => `/ai/conversations/${id}/`,
     CHAT: '/ai/chat/',
+    DOCUMENT_UPLOAD: '/ai/documents/upload/',
+    DOCUMENT_DETAIL: (id) => `/ai/documents/${id}/`,
+    DOCUMENT_CHAT: (id) => `/ai/documents/${id}/chat/`,
   },
 }
 

@@ -27,7 +27,15 @@ def generate_response(conversation, user_message_content, user):
     base_system_prompt = settings.AI_SYSTEM_PROMPT or SYSTEM_PROMPT
     user_prompt_lower = user_message_content.lower()
 
-    if 'mcq' in user_prompt_lower:
+    if '[attached document' in user_prompt_lower:
+        base_system_prompt += (
+            "\n\n[INSTRUCTION FOR ATTACHED DOCUMENTS]: "
+            "The user has attached a document. Respond with a clear, engaging, human-friendly response or summary in clean Markdown. "
+            "Never output raw JSON schemas, raw database keys, or unformatted data dumps. "
+            "Do NOT generate multiple choice questions unless the user explicitly requests a quiz or MCQs in their message."
+        )
+
+    if re.search(r'\bmcqs?\b|\bmultiple choice\b|\bquiz\b', user_prompt_lower):
         base_system_prompt += (
             "\n\n[INSTRUCTION]: The user is requesting Multiple Choice Questions (MCQs). "
             "Format the response clearly with 3-4 structured questions, options (A, B, C, D), "

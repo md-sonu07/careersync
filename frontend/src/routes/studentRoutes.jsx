@@ -38,6 +38,7 @@ import AssessmentResult from '../pages/Student/AssessmentResult'
 import Portfolio from '../pages/Student/Portfolio'
 import Help from '../pages/Student/Help'
 import ProtectedRoute from './ProtectedRoute'
+import DocumentAnalyzer from '../pages/Student/DocumentAnalyzer'
 
 export const studentRoutes = {
   path: '/student',
@@ -67,6 +68,8 @@ export const studentRoutes = {
     { path: 'quizzes', element: <Quizzes /> },
     { path: 'ai-practice', element: <AIPractice /> },
     { path: 'ai-assistant', element: <AIAssistant /> },
+    { path: 'document-analyzer', element: <DocumentAnalyzer /> },
+    { path: 'document-analysis', element: <DocumentAnalyzer /> },
     { path: 'resume', element: <ResumeAnalyzer /> },
     { path: 'resume-analyzer', element: <ResumeAnalyzer /> },
     { path: 'pdf-analyzer', element: <PDFAnalyzer /> },
