@@ -668,7 +668,7 @@ export default function ChatFull({ isEmbedded = false, onOpenMobileMenu = null }
 
         {/* Content Container */}
         <div className="flex-1 overflow-y-auto w-full pb-36 pt-16 scroll-smooth">
-          {!activeConversationId && messages.length === 0 ? (
+          {!activeConversationId || activeConversationId === 'new' || messages.length === 0 ? (
             /* Empty State Hero */
             <div className="flex flex-col items-center justify-center min-h-[calc(100vh-220px)] max-w-3xl mx-auto px-6 text-center animate-in fade-in zoom-in-95 duration-500">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 via-primary/5 to-transparent border border-primary/20 shadow-md flex items-center justify-center mb-6 backdrop-blur-md">

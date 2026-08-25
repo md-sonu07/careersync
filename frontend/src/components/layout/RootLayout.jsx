@@ -64,7 +64,7 @@ export default function RootLayout() {
       {isChatOpen && (
         <div 
           className="h-full bg-white border-l border-border shadow-xl shrink-0 z-40"
-          style={{ width: `${chatWidth}px` }}
+          style={{ width: `${chatWidth}px`, minWidth: '400px', maxWidth: '70vw' }}
         >
           <GlobalChatPane />
         </div>

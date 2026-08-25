@@ -5,7 +5,7 @@ const StatCard = ({ icon, label, value, trend, trendLabel, className, ...props }
   const isPositive = trend !== undefined && trend !== null ? trend >= 0 : null
 
   return (
-    <div className={cn('rounded-2xl border border-border bg-white p-5 shadow-subtle flex flex-col justify-between min-w-[200px] overflow-hidden', className)} {...props}>
+    <div className={cn('rounded-2xl border border-border bg-white p-5 shadow-subtle flex flex-col justify-between overflow-hidden min-w-0', className)} {...props}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           {label && <p className="text-xs font-semibold uppercase tracking-wider text-muted leading-snug">{label}</p>}

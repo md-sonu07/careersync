@@ -463,7 +463,7 @@ export default function GlobalChatPane() {
 
       {/* Chat Messages / Empty State */}
       <div className="flex-1 overflow-y-auto bg-background/20 p-4 space-y-5">
-        {!activeConversationId && messages.length === 0 && (
+        {(!activeConversationId || activeConversationId === 'new') && messages.length === 0 && (
           <div className="flex flex-col items-center justify-center text-center py-6 px-2 max-w-lg mx-auto animate-in fade-in zoom-in-95 duration-500">
             {/* Logo Icon Ring */}
             <div className="relative mb-4">
