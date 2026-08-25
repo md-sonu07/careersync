@@ -32,6 +32,8 @@ const Placeholder = ({ title, subtitle }) => (
   </div>
 )
 
+import AIAssistant from '../pages/Student/AIAssistant'
+
 export const InstituteRoutes = {
   path: '/institute',
   element: <ProtectedRoute allowedRoles={['academician', 'Institute']} />,
@@ -42,6 +44,7 @@ export const InstituteRoutes = {
       children: [
         { index: true, element: <InstituteDashboard /> },
         { path: 'dashboard', element: <InstituteDashboard /> },
+        { path: 'ai-assistant', element: <AIAssistant /> },
         { path: 'students', element: <InstituteStudents /> },
         { path: 'student/:id', element: <Performance /> },
         { path: 'performance', element: <Performance /> },

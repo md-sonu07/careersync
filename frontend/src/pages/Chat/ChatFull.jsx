@@ -118,7 +118,7 @@ function MarkdownRenderer({ content, theme }) {
   )
 }
 
-export default function ChatFull() {
+export default function ChatFull({ isEmbedded = false, onOpenMobileMenu = null }) {
   const isAuthenticated = useSelector(selectIsAuthenticated)
   const user = useSelector(selectCurrentUser)
   const { logout } = useAuth()
@@ -149,7 +149,8 @@ export default function ChatFull() {
   const [editingId, setEditingId] = useState(null)
   const [editTitle, setEditTitle] = useState('')
   const [deleteConfirmId, setDeleteConfirmId] = useState(null)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(!isEmbedded)
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState(null)
   const fileInputRef = useRef(null)
   const bottomRef = useRef(null)
@@ -350,7 +351,7 @@ export default function ChatFull() {
 
   return (
     <div
-      className={`flex h-screen w-full font-sans overflow-hidden transition-colors ${theme === 'dark' ? 'bg-[#212121] text-[#ececec]' : 'bg-[#FCFCFC] text-charcoal'
+      className={`flex ${isEmbedded ? 'h-full' : 'h-screen'} w-full font-sans overflow-hidden transition-colors ${theme === 'dark' ? 'bg-[#212121] text-[#ececec]' : 'bg-[#FCFCFC] text-charcoal'
         }`}
     >
       {/* Sidebar */}
@@ -592,6 +593,18 @@ export default function ChatFull() {
         {/* Top Header Bar */}
         <div className="absolute top-0 left-0 w-full p-4 flex items-center justify-between z-10 pointer-events-none">
           <div className="pointer-events-auto flex items-center gap-2">
+            {onOpenMobileMenu && (
+              <button
+                onClick={onOpenMobileMenu}
+                className={`p-1.5 lg:hidden flex items-center justify-center cursor-pointer rounded-md backdrop-blur-sm border shadow-sm transition-colors ${theme === 'dark'
+                    ? 'bg-[#2f2f2f]/80 text-gray-300 border-[#383838] hover:text-white'
+                    : 'bg-white/80 text-muted border-border/50 hover:text-charcoal'
+                  }`}
+                title="Open Navigation"
+              >
+                <AppIcon name="menu" className="text-[18px]" />
+              </button>
+            )}
             {!sidebarOpen && (
               <button
                 onClick={() => setSidebarOpen(true)}
@@ -639,15 +652,17 @@ export default function ChatFull() {
               )}
             </button>
 
-            <Link
-              to="/"
-              className={`text-sm font-medium backdrop-blur-sm px-3 py-1.5 rounded-lg border shadow-sm flex items-center gap-1.5 transition-colors ${theme === 'dark'
-                  ? 'bg-[#2f2f2f] text-gray-300 border-[#3a3a3a] hover:text-white'
-                  : 'bg-white/80 text-charcoal/70 border-border/50 hover:text-charcoal'
-                }`}
-            >
-              Exit Chat <AppIcon name="arrow_outward" className="text-[16px]" />
-            </Link>
+            {!isEmbedded && (
+              <Link
+                to="/"
+                className={`text-sm font-medium backdrop-blur-sm px-3 py-1.5 rounded-lg border shadow-sm flex items-center gap-1.5 transition-colors ${theme === 'dark'
+                    ? 'bg-[#2f2f2f] text-gray-300 border-[#3a3a3a] hover:text-white'
+                    : 'bg-white/80 text-charcoal/70 border-border/50 hover:text-charcoal'
+                  }`}
+              >
+                Exit Chat <AppIcon name="arrow_outward" className="text-[16px]" />
+              </Link>
+            )}
           </div>
         </div>
 

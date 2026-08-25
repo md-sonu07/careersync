@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import Drawer from '../ui/Drawer'
 import StudentSidebar from './StudentSidebar'
 import StudentHeader from './StudentHeader'
@@ -7,6 +7,9 @@ import AppIcon from '../ui/AppIcon';
 
 export default function StudentLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const location = useLocation()
+  const isAIAssistant = location.pathname.endsWith('/ai-assistant')
+
   return (
     <div className="min-h-screen bg-background">
       <div className="flex">
@@ -18,11 +21,11 @@ export default function StudentLayout() {
             <StudentSidebar onNavigate={() => setDrawerOpen(false)} />
           </div>
         </Drawer>
-        <div className="flex flex-1 flex-col min-w-0">
-          <StudentHeader onMenuClick={() => setDrawerOpen(true)} />
-          <main className="flex-1 min-w-0">
-            <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8 pb-20 lg:pb-8">
-              <Outlet />
+        <div className={`flex flex-1 flex-col min-w-0 ${isAIAssistant ? 'h-screen overflow-hidden' : ''}`}>
+          {!isAIAssistant && <StudentHeader onMenuClick={() => setDrawerOpen(true)} />}
+          <main className={`flex-1 min-w-0 ${isAIAssistant ? 'h-full bg-[#212121] overflow-hidden' : ''}`}>
+            <div className={isAIAssistant ? 'h-full w-full' : 'mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8 pb-20 lg:pb-8'}>
+              <Outlet context={{ onMenuClick: () => setDrawerOpen(true) }} />
             </div>
             <nav className="fixed bottom-0 inset-x-0 z-30 flex items-center justify-around border-t border-border bg-white px-2 py-1.5 lg:hidden">
               {[
