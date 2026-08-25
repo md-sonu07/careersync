@@ -41,6 +41,10 @@ class OpportunitySkillRequirementSerializer(serializers.ModelSerializer):
 class OpportunitySerializer(serializers.ModelSerializer):
     company = CompanySerializer(read_only=True)
     skill_requirements = OpportunitySkillRequirementSerializer(many=True, read_only=True)
+    applicants_count = serializers.SerializerMethodField()
+
+    def get_applicants_count(self, obj):
+        return obj.applications.count()
 
     class Meta:
         model = Opportunity
@@ -57,6 +61,7 @@ class OpportunitySerializer(serializers.ModelSerializer):
             'deadline',
             'status',
             'skill_requirements',
+            'applicants_count',
             'created_at',
             'updated_at'
         ]
