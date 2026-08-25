@@ -32,6 +32,8 @@ class DocumentExtractor:
             text, ocr = cls._extract_from_docx(file_obj)
         elif file_ext in ['txt', 'text/plain']:
             text, ocr = cls._extract_from_txt(file_obj)
+        elif file_ext in ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp', 'svg']:
+            text, ocr = cls._extract_from_image(file_obj, filename, file_ext)
         else:
             raise DocumentExtractionError(f"Unsupported file format: '.{file_ext}'")
 
@@ -142,6 +144,32 @@ class DocumentExtractor:
         except Exception as e:
             logger.error(f"TXT extraction failed: {e}")
             raise DocumentExtractionError(f"Could not read text file: {str(e)}")
+
+    @classmethod
+    def _extract_from_image(cls, file_obj, filename, file_ext):
+        """Extract image metadata and base64 string for vision processing using PIL."""
+        try:
+            import base64
+            from PIL import Image
+            file_bytes = file_obj.read() if hasattr(file_obj, 'read') else file_obj
+            img = Image.open(io.BytesIO(file_bytes))
+            width, height = img.size
+            format_name = img.format or file_ext.upper()
+            mode = img.mode
+
+            b64_str = base64.b64encode(file_bytes).decode('utf-8')
+            clean_ext = 'jpeg' if file_ext in ['jpg', 'jpeg'] else file_ext
+
+            extracted_text = (
+                f"[ATTACHED IMAGE FILE: {filename}]\n"
+                f"Image Format: {format_name}\n"
+                f"Image Dimensions: {width}x{height} pixels ({mode})\n"
+                f"data:image/{clean_ext};base64,{b64_str}"
+            )
+            return extracted_text, False
+        except Exception as e:
+            logger.warning(f"PIL image inspection failed for {filename}: {e}")
+            return f"[Attached Image File: {filename}]", False
 
     @classmethod
     def _clean_text(cls, text):

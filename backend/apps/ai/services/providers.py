@@ -1,4 +1,5 @@
 import abc
+import re
 import json
 import logging
 import time
@@ -171,7 +172,22 @@ class GeminiProvider(AIProvider):
             if role == 'system':
                 system_instruction = content
             elif role == 'user':
-                contents.append({'role': 'user', 'parts': [{'text': content}]})
+                parts = []
+                b64_match = re.search(r'data:(image/[a-zA-Z0-9\+\-]+);base64,([A-Za-z0-9+/=]+)', content)
+                if b64_match:
+                    mime_type = b64_match.group(1)
+                    b64_data = b64_match.group(2)
+                    parts.append({
+                        'inline_data': {
+                            'mime_type': mime_type,
+                            'data': b64_data
+                        }
+                    })
+                    clean_text = re.sub(r'data:image/[a-zA-Z0-9\+\-]+;base64,[A-Za-z0-9+/=]+', '', content).strip()
+                    parts.append({'text': clean_text or 'Describe and analyze this image in detail.'})
+                else:
+                    parts.append({'text': content})
+                contents.append({'role': 'user', 'parts': parts})
             elif role == 'assistant':
                 contents.append({'role': 'model', 'parts': [{'text': content}]})
 
@@ -182,8 +198,14 @@ class GeminiProvider(AIProvider):
                 'temperature': 0.7,
                 'topP': 1,
                 'topK': 40,
-                'maxOutputTokens': 512,
-            }
+                'maxOutputTokens': 2048,
+            },
+            'safetySettings': [
+                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+            ]
         }
         
         if system_instruction:

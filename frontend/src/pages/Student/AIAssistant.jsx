@@ -9,6 +9,7 @@ import { aiAPI } from '../../api/ai.api'
 import AppIcon from '../../components/ui/AppIcon'
 import { toast } from 'react-hot-toast'
 import Modal from '../../components/ui/Modal'
+import MCQQuizWidget, { parseMCQsFromText } from '../../components/ai/MCQQuizWidget'
 
 const chips = [
   'Explain a topic',
@@ -20,6 +21,15 @@ const chips = [
 ]
 
 function MarkdownRenderer({ content }) {
+  const mcqs = parseMCQsFromText(content)
+
+  if (mcqs && mcqs.length > 0) {
+    return (
+      <div className="space-y-3">
+        <MCQQuizWidget questions={mcqs} theme="light" />
+      </div>
+    )
+  }
   return (
     <ReactMarkdown
       components={{

@@ -37,9 +37,11 @@ def generate_response(conversation, user_message_content, user):
 
     if re.search(r'\bmcqs?\b|\bmultiple choice\b|\bquiz\b', user_prompt_lower):
         base_system_prompt += (
-            "\n\n[INSTRUCTION]: The user is requesting Multiple Choice Questions (MCQs). "
-            "Format the response clearly with 3-4 structured questions, options (A, B, C, D), "
-            "and provide the correct answers with concise explanations at the end."
+            "\n\n[ROLE & TASK FOR MCQs]: You are an expert computer science tutor and career educator. "
+            "The user wants educational Multiple Choice Questions (MCQs) for learning and self-assessment. "
+            "Always generate and provide 4 distinct, high-quality practice questions on the requested topic. "
+            "Never refuse or state that you cannot generate MCQs. "
+            "For each question, list 4 options (A, B, C, D), followed by 'Answer: <Key>' and 'Explanation: <Text>'."
         )
     elif 'internship' in user_prompt_lower:
         base_system_prompt += (

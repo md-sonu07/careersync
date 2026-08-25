@@ -85,11 +85,11 @@ class AIDocumentUploadSerializer(serializers.Serializer):
     file = serializers.FileField(required=True)
 
     def validate_file(self, value):
-        allowed_extensions = ['pdf', 'docx', 'doc', 'txt']
+        allowed_extensions = ['pdf', 'docx', 'doc', 'txt', 'png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp', 'svg']
         ext = value.name.split('.')[-1].lower() if '.' in value.name else ''
         if ext not in allowed_extensions:
             raise serializers.ValidationError(
-                f"Invalid file type '.{ext}'. Supported formats: PDF, DOCX, TXT."
+                f"Invalid file type '.{ext}'. Supported formats: PDF, DOCX, TXT, Images (PNG, JPG, WEBP)."
             )
         # Max file size 10MB
         if value.size > 10 * 1024 * 1024:

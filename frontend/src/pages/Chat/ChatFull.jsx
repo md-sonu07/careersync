@@ -10,6 +10,7 @@ import { toast } from 'react-hot-toast'
 import AppIcon from '../../components/ui/AppIcon'
 import Modal from '../../components/ui/Modal'
 import Button from '../../components/ui/Button'
+import MCQQuizWidget, { parseMCQsFromText } from '../../components/ai/MCQQuizWidget'
 
 const chips = [
   'Course Recommendations',
@@ -19,6 +20,15 @@ const chips = [
 ]
 
 function MarkdownRenderer({ content, theme }) {
+  const mcqs = parseMCQsFromText(content)
+
+  if (mcqs && mcqs.length > 0) {
+    return (
+      <div className="space-y-3">
+        <MCQQuizWidget questions={mcqs} theme={theme} />
+      </div>
+    )
+  }
   return (
     <ReactMarkdown
       components={{
@@ -290,6 +300,16 @@ export default function ChatFull() {
       setIsSending(false)
     }
   }
+
+  useEffect(() => {
+    const handleCustomSend = (e) => {
+      if (e.detail?.text) {
+        handleSend(e.detail.text)
+      }
+    }
+    window.addEventListener('careersync:chat:send', handleCustomSend)
+    return () => window.removeEventListener('careersync:chat:send', handleCustomSend)
+  }, [activeConversationId, input, selectedFile])
 
   const handleNewChat = () => {
     localStorage.setItem('public_chat_conversation_id', 'new')

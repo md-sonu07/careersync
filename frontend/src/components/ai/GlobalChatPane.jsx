@@ -10,6 +10,7 @@ import { selectIsAuthenticated } from '../../features/auth/authSlice'
 import { toast } from 'react-hot-toast'
 import AppIcon from '../ui/AppIcon';
 import Modal from '../ui/Modal'
+import MCQQuizWidget, { parseMCQsFromText } from './MCQQuizWidget'
 
 const chips = [
   'Explain a topic',
@@ -19,6 +20,15 @@ const chips = [
 ]
 
 function MarkdownRenderer({ content }) {
+  const mcqs = parseMCQsFromText(content)
+
+  if (mcqs && mcqs.length > 0) {
+    return (
+      <div className="space-y-3">
+        <MCQQuizWidget questions={mcqs} theme="light" />
+      </div>
+    )
+  }
   return (
     <ReactMarkdown
       components={{
@@ -237,6 +247,16 @@ export default function GlobalChatPane() {
       setIsSending(false)
     }
   }
+
+  useEffect(() => {
+    const handleCustomSend = (e) => {
+      if (e.detail?.text) {
+        handleSend(e.detail.text)
+      }
+    }
+    window.addEventListener('careersync:chat:send', handleCustomSend)
+    return () => window.removeEventListener('careersync:chat:send', handleCustomSend)
+  }, [activeConversationId, input, selectedFile])
 
   const handleNewChat = () => {
     setActiveConversationId(null)
@@ -606,6 +626,7 @@ export default function GlobalChatPane() {
             type="file"
             ref={fileInputRef}
             className="hidden"
+            accept=".pdf,.docx,.doc,.txt,.png,.jpg,.jpeg,.webp,.gif,.bmp"
             onChange={(e) => {
               if (e.target.files && e.target.files[0]) {
                 setSelectedFile(e.target.files[0])
