@@ -49,7 +49,7 @@ class Company(models.Model):
         default=CompanySize.SMALL
     )
     description = models.TextField(blank=True)
-    logo = models.ImageField(upload_to='company_logos/', null=True, blank=True)
+    logo = models.TextField(null=True, blank=True)
     is_verified = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)

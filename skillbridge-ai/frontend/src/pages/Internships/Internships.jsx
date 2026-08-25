@@ -11,7 +11,7 @@ import AppIcon from '../../components/ui/AppIcon'
 import { opportunityApi } from '../../api/opportunity.api'
 import { applicationApi } from '../../api/application.api'
 import { useAuth } from '../../hooks/useAuth'
-import { timeSince } from '../../utils/helpers'
+import { timeSince, getCompanyLogo } from '../../utils/helpers'
 import { toast } from 'react-hot-toast'
 
 export default function Internships() {
@@ -50,12 +50,14 @@ export default function Internships() {
             .filter((m) => !m.opportunity?.opportunity_type || m.opportunity?.opportunity_type === 'internship')
             .map((m) => {
               const opp = m.opportunity || {}
+              const companyName = opp.company?.company_name || 'Hiring Partner'
+              const companyLogo = getCompanyLogo(opp.company)
               return {
                 id: opp.id || m.id,
                 oppId: opp.id,
                 role: opp.title || 'Internship',
-                company: opp.company?.company_name || 'Hiring Partner',
-                logo: (opp.company?.company_name || 'C')[0].toUpperCase(),
+                company: companyName,
+                logo: companyLogo,
                 location: opp.location || 'Remote',
                 duration: opp.duration || '3 months',
                 stipend: opp.stipend_salary || '₹20,000/month',
@@ -76,25 +78,29 @@ export default function Internships() {
       if (liveData.length === 0) {
         const opps = await opportunityApi.getOpportunities({ type: 'internship' }).catch(() => [])
         if (opps && Array.isArray(opps)) {
-          liveData = opps.map((opp) => ({
-            id: opp.id,
-            oppId: opp.id,
-            role: opp.title || 'Internship',
-            company: opp.company?.company_name || 'Hiring Partner',
-            logo: (opp.company?.company_name || 'C')[0].toUpperCase(),
-            location: opp.location || 'Remote',
-            duration: opp.duration || '3 months',
-            stipend: opp.stipend_salary || '₹20,000/month',
-            skills: opp.skill_requirements && opp.skill_requirements.length > 0
-              ? opp.skill_requirements.map((r) => r.skill?.name || r.skill_name || 'Skill')
-              : ['Python', 'Django'],
-            match: 80,
-            deadline: opp.deadline || '30 Sep 2026',
-            type: opp.work_mode ? opp.work_mode.charAt(0).toUpperCase() + opp.work_mode.slice(1) : 'Remote',
-            applicants: typeof opp.applicants_count === 'number' ? opp.applicants_count : 1,
-            publishedDate: opp.created_at ? timeSince(opp.created_at) : '1 day ago',
-            raw: opp,
-          }))
+          liveData = opps.map((opp) => {
+            const companyName = opp.company?.company_name || 'Hiring Partner'
+            const companyLogo = getCompanyLogo(opp.company)
+            return {
+              id: opp.id,
+              oppId: opp.id,
+              role: opp.title || 'Internship',
+              company: companyName,
+              logo: companyLogo,
+              location: opp.location || 'Remote',
+              duration: opp.duration || '3 months',
+              stipend: opp.stipend_salary || '₹20,000/month',
+              skills: opp.skill_requirements && opp.skill_requirements.length > 0
+                ? opp.skill_requirements.map((r) => r.skill?.name || r.skill_name || 'Skill')
+                : ['Python', 'Django'],
+              match: 80,
+              deadline: opp.deadline || '30 Sep 2026',
+              type: opp.work_mode ? opp.work_mode.charAt(0).toUpperCase() + opp.work_mode.slice(1) : 'Remote',
+              applicants: typeof opp.applicants_count === 'number' ? opp.applicants_count : 1,
+              publishedDate: opp.created_at ? timeSince(opp.created_at) : '1 day ago',
+              raw: opp,
+            }
+          })
         }
       }
 
@@ -207,9 +213,15 @@ export default function Internships() {
                   <div>
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex gap-3">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 font-bold text-primary text-sm">
-                          {item.logo}
-                        </div>
+                        <img
+                          src={item.logo}
+                          alt={item.company}
+                          className="h-12 w-12 rounded-xl object-cover border border-primary/20 shadow-sm shrink-0"
+                          onError={(e) => {
+                            e.target.onerror = null
+                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(item.company)}&background=0D9488&color=ffffff&bold=true`
+                          }}
+                        />
                         <div>
                           <h3 className="font-bold leading-tight text-charcoal">{item.role}</h3>
                           <p className="text-xs text-muted mt-0.5">{item.company} • {item.location} • {item.type}</p>
@@ -283,9 +295,15 @@ export default function Internships() {
           <div className="space-y-4">
             <div className="rounded-xl border border-border bg-background p-4 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-white text-xl font-bold">
-                  {selectedItem.logo}
-                </div>
+                <img
+                  src={selectedItem.logo}
+                  alt={selectedItem.company}
+                  className="h-12 w-12 rounded-xl object-cover border border-primary/20 shrink-0"
+                  onError={(e) => {
+                    e.target.onerror = null
+                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedItem.company)}&background=0D9488&color=ffffff&bold=true`
+                  }}
+                />
                 <div>
                   <h3 className="font-bold text-charcoal">{selectedItem.role}</h3>
                   <p className="text-xs text-muted">

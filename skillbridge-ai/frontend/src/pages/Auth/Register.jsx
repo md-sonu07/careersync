@@ -30,9 +30,9 @@ export default function Register() {
   // Student: name, email, phone, password
   // Industry: companyName, companyEmail, password
   // Institute: name, email, password
-  const [studentForm, setStudentForm] = useState({ name: "", email: "", phone: "", password: "" });
-  const [industryForm, setIndustryForm] = useState({ companyName: "", companyEmail: "", password: "" });
-  const [InstituteForm, setInstituteForm] = useState({ name: "", email: "", password: "" });
+  const [studentForm, setStudentForm] = useState({ name: "", email: "", phone: "", password: "", profilePicture: "" });
+  const [industryForm, setIndustryForm] = useState({ companyName: "", companyEmail: "", password: "", profilePicture: "" });
+  const [InstituteForm, setInstituteForm] = useState({ name: "", email: "", password: "", profilePicture: "" });
 
   const splitName = (fullName) => {
     const parts = (fullName || "").trim().split(/\s+/);
@@ -97,6 +97,7 @@ export default function Register() {
         role: "student",
         password: studentForm.password,
         confirm_password: studentForm.password,
+        profile_picture: studentForm.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(studentForm.name)}&background=0D9488&color=ffffff&bold=true`,
       };
     } else if (activeRole === "industry") {
       const { first_name, last_name } = splitName(industryForm.companyName);
@@ -107,6 +108,7 @@ export default function Register() {
         role: "industry",
         password: industryForm.password,
         confirm_password: industryForm.password,
+        profile_picture: industryForm.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(industryForm.companyName)}&background=0D9488&color=ffffff&bold=true`,
       };
     } else {
       const { first_name, last_name } = splitName(InstituteForm.name);
@@ -117,6 +119,7 @@ export default function Register() {
         role: "Institute",
         password: InstituteForm.password,
         confirm_password: InstituteForm.password,
+        profile_picture: InstituteForm.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(InstituteForm.name)}&background=0D9488&color=ffffff&bold=true`,
       };
     }
 
@@ -323,6 +326,7 @@ export default function Register() {
                   <Input label="Full name" placeholder="Ananya Sharma" autoComplete="name" required value={studentForm.name} onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })} error={errors.name} />
                   <Input label="Email address" type="email" placeholder="you@college.edu" autoComplete="email" required value={studentForm.email} onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })} error={errors.email} />
                   <Input label="Phone number" placeholder="+91 98765 43210" autoComplete="tel" required value={studentForm.phone} onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })} error={errors.phone} />
+                  <Input label="Profile Picture URL (Optional)" placeholder="https://example.com/avatar.jpg" value={studentForm.profilePicture} onChange={(e) => setStudentForm({ ...studentForm, profilePicture: e.target.value })} />
                   <div>
                     <label htmlFor="student-password" className="text-sm font-medium text-charcoal">Password <span className="text-danger ml-1">*</span></label>
                     <div className="relative mt-1.5">
@@ -340,6 +344,7 @@ export default function Register() {
                 <>
                   <Input label="Company name" placeholder="TechNova Pvt Ltd" required value={industryForm.companyName} onChange={(e) => setIndustryForm({ ...industryForm, companyName: e.target.value })} error={errors.companyName} />
                   <Input label="Company email" type="email" placeholder="hr@technova.com" autoComplete="email" required value={industryForm.companyEmail} onChange={(e) => setIndustryForm({ ...industryForm, companyEmail: e.target.value })} error={errors.companyEmail} />
+                  <Input label="Company Logo / Profile Picture URL (Optional)" placeholder="https://example.com/logo.png" value={industryForm.profilePicture} onChange={(e) => setIndustryForm({ ...industryForm, profilePicture: e.target.value })} />
                   <div>
                     <label htmlFor="industry-password" className="text-sm font-medium text-charcoal">Password <span className="text-danger ml-1">*</span></label>
                     <div className="relative mt-1.5">
@@ -357,6 +362,7 @@ export default function Register() {
                 <>
                   <Input label="Full name" placeholder="Dr. Priya Singh" autoComplete="name" required value={InstituteForm.name} onChange={(e) => setInstituteForm({ ...InstituteForm, name: e.target.value })} error={errors.name} />
                   <Input label="Email address" type="email" placeholder="priya@college.edu" autoComplete="email" required value={InstituteForm.email} onChange={(e) => setInstituteForm({ ...InstituteForm, email: e.target.value })} error={errors.email} />
+                  <Input label="Institution Logo / Profile Picture URL (Optional)" placeholder="https://example.com/college.png" value={InstituteForm.profilePicture} onChange={(e) => setInstituteForm({ ...InstituteForm, profilePicture: e.target.value })} />
                   <div>
                     <label htmlFor="Institute-password" className="text-sm font-medium text-charcoal">Password <span className="text-danger ml-1">*</span></label>
                     <div className="relative mt-1.5">

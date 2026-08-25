@@ -23,6 +23,7 @@ export default function CompanyProfile() {
     industry_type: 'Software & Technology',
     company_size: '11-50',
     description: '',
+    profile_picture: '',
     is_verified: false,
   })
 
@@ -43,6 +44,7 @@ export default function CompanyProfile() {
           industry_type: profileData.industry_type || 'Software & Technology',
           company_size: profileData.company_size || '11-50',
           description: profileData.description || '',
+          profile_picture: profileData.profile_picture || profileData.logo || '',
           is_verified: profileData.is_verified || false,
         })
       }
@@ -62,14 +64,33 @@ export default function CompanyProfile() {
     loadCompanyData()
   }, [])
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size must be less than 5MB.')
+        return
+      }
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setForm((prev) => ({ ...prev, profile_picture: reader.result }))
+        toast.success('Image loaded for profile logo!')
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
   const handleSave = async (e) => {
     e?.preventDefault()
     try {
       setSaving(true)
-      const updated = await profileApi.updateCompanyProfile(form)
-      toast.success('Company profile updated successfully in Django database!')
+      const updated = await profileApi.updateCompanyProfile({
+        ...form,
+        logo: form.profile_picture,
+      })
+      toast.success('Company profile & logo updated successfully in Django database!')
       if (updated) {
-        setForm((prev) => ({ ...prev, ...updated }))
+        setForm((prev) => ({ ...prev, ...updated, profile_picture: updated.profile_picture || updated.logo || prev.profile_picture }))
       }
     } catch (err) {
       toast.error('Failed to update company profile: ' + (err.response?.data?.detail || err.message))
@@ -78,7 +99,7 @@ export default function CompanyProfile() {
     }
   }
 
-  const logoAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(form.company_name || 'Company')}&background=0D9488&color=ffffff&bold=true&font-size=0.4`
+  const logoAvatarUrl = form.profile_picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(form.company_name || 'Company')}&background=0D9488&color=ffffff&bold=true&font-size=0.4`
 
   return (
     <div className="space-y-6 min-h-screen">
@@ -86,7 +107,7 @@ export default function CompanyProfile() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-charcoal">Company Profile</h1>
-          <p className="text-sm text-muted">Manage your organization details, industry sector, website, and verification status.</p>
+          <p className="text-sm text-muted">Manage your organization logo, details, industry sector, website, and verification status.</p>
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" size="sm" onClick={loadCompanyData} disabled={loading}>
@@ -105,14 +126,18 @@ export default function CompanyProfile() {
         </Card>
       ) : (
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Left Column: Quick Profile Card & Stats */}
+          {/* Left Column: Quick Profile Card & Logo Preview */}
           <div className="space-y-6 lg:col-span-1">
             <Card className="p-6 text-center space-y-4">
-              <div className="relative inline-block">
+              <div className="relative inline-block group">
                 <img
                   src={logoAvatarUrl}
                   alt={form.company_name}
-                  className="h-24 w-24 rounded-3xl mx-auto object-cover border-2 border-primary/20 shadow-md"
+                  className="h-28 w-28 rounded-3xl mx-auto object-cover border-2 border-primary/20 shadow-md bg-white"
+                  onError={(e) => {
+                    e.target.onerror = null
+                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(form.company_name || 'Company')}&background=0D9488&color=ffffff&bold=true`
+                  }}
                 />
                 {form.is_verified && (
                   <span className="absolute bottom-0 right-0 bg-success text-white p-1 rounded-full shadow" title="Verified Employer">
@@ -126,7 +151,14 @@ export default function CompanyProfile() {
                 <p className="text-xs text-muted mt-0.5">{form.industry_type} • {form.company_size} employees</p>
               </div>
 
-              <div className="flex justify-center gap-2">
+              <div className="pt-2">
+                <label className="cursor-pointer inline-flex items-center gap-1.5 rounded-xl border border-primary text-primary px-3 py-1.5 text-xs font-bold hover:bg-sage transition-colors">
+                  <AppIcon name="upload" className="text-[16px]" /> Upload Logo File
+                  <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
+                </label>
+              </div>
+
+              <div className="flex justify-center gap-2 pt-1">
                 <Badge variant={form.is_verified ? 'success' : 'warning'} className="whitespace-nowrap">
                   {form.is_verified ? 'Verified Employer ✓' : 'Pending Verification'}
                 </Badge>
@@ -197,6 +229,21 @@ export default function CompanyProfile() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
+                    label="Company Logo / Profile Image URL"
+                    value={form.profile_picture}
+                    onChange={(e) => setForm({ ...form, profile_picture: e.target.value })}
+                    placeholder="https://example.com/logo.png or upload above"
+                  />
+                  <Input
+                    label="Official Website URL"
+                    value={form.website}
+                    onChange={(e) => setForm({ ...form, website: e.target.value })}
+                    placeholder="e.g. https://company.com"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Input
                     label="Industry Sector"
                     value={form.industry_type}
                     onChange={(e) => setForm({ ...form, industry_type: e.target.value })}
@@ -215,13 +262,6 @@ export default function CompanyProfile() {
                     ]}
                   />
                 </div>
-
-                <Input
-                  label="Official Website URL"
-                  value={form.website}
-                  onChange={(e) => setForm({ ...form, website: e.target.value })}
-                  placeholder="e.g. https://company.com"
-                />
 
                 <Textarea
                   label="Company Bio & Overview"

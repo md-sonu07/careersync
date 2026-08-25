@@ -9,6 +9,7 @@ import PageHeader from '../../components/common/PageHeader'
 import AppIcon from '../../components/ui/AppIcon'
 import { opportunityApi } from '../../api/opportunity.api'
 import { applicationApi } from '../../api/application.api'
+import { getCompanyLogo } from '../../utils/helpers'
 import { toast } from 'react-hot-toast'
 
 export default function Recommended() {
@@ -112,6 +113,7 @@ export default function Recommended() {
           {matches.map((m) => {
             const opp = m.opportunity || {}
             const companyName = opp.company?.company_name || 'Hiring Partner'
+            const companyLogo = getCompanyLogo(opp.company)
             const score = m.match_score || 75
             const isApplied = appliedMap[opp.id]
 
@@ -119,9 +121,15 @@ export default function Recommended() {
               <Card key={m.id || opp.id} hover className="!p-6">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-xl font-bold text-primary shrink-0">
-                      {companyName[0].toUpperCase()}
-                    </div>
+                    <img
+                      src={companyLogo}
+                      alt={companyName}
+                      className="h-12 w-12 rounded-xl object-cover border border-primary/20 shadow-sm shrink-0"
+                      onError={(e) => {
+                        e.target.onerror = null
+                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(companyName)}&background=0D9488&color=ffffff&bold=true`
+                      }}
+                    />
                     <div>
                       <h3 className="text-sm font-bold text-charcoal">{opp.title}</h3>
                       <p className="text-xs text-muted">
@@ -177,9 +185,15 @@ export default function Recommended() {
           <div className="space-y-4">
             <div className="rounded-xl border border-border bg-background p-4 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-white text-xl font-bold">
-                  {(selectedOpp.company?.company_name || 'C')[0]}
-                </div>
+                <img
+                  src={getCompanyLogo(selectedOpp.company)}
+                  alt={selectedOpp.company?.company_name}
+                  className="h-12 w-12 rounded-xl object-cover border border-primary/20 shrink-0"
+                  onError={(e) => {
+                    e.target.onerror = null
+                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedOpp.company?.company_name || 'C')}&background=0D9488&color=ffffff&bold=true`
+                  }}
+                />
                 <div>
                   <h3 className="font-bold text-charcoal">{selectedOpp.title}</h3>
                   <p className="text-xs text-muted">

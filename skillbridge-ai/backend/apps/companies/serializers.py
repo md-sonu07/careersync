@@ -13,6 +13,9 @@ from companies.models import (
 
 
 class CompanySerializer(serializers.ModelSerializer):
+    logo = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    profile_picture = serializers.CharField(source='user.profile_picture', read_only=True, required=False, allow_null=True)
+
     class Meta:
         model = Company
         fields = [
@@ -24,6 +27,7 @@ class CompanySerializer(serializers.ModelSerializer):
             'company_size',
             'description',
             'logo',
+            'profile_picture',
             'is_verified',
             'created_at'
         ]

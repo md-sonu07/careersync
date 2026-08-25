@@ -167,8 +167,8 @@ const Navbar = () => {
                   {/* User Profile Section */}
                   <div className="flex items-center gap-3 pl-3 border-l border-border/80">
                     <div className="flex items-center gap-3">
-                      {user?.avatar_url || user?.profile_image ? (
-                        <img src={user.avatar_url || user.profile_image} alt="Profile" className="w-9 h-9 rounded-full object-cover border-2 border-primary/20 shadow-sm" />
+                      {user?.profile_picture || user?.avatar_url || user?.profile_image ? (
+                        <img src={user.profile_picture || user.avatar_url || user.profile_image} alt="Profile" className="w-9 h-9 rounded-full object-cover border-2 border-primary/20 shadow-sm" />
                       ) : (
                         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/20 to-emerald-500/20 text-primary flex items-center justify-center font-bold text-sm border border-primary/30 shadow-sm">
                           {(user?.full_name || user?.name || user?.email || '?').charAt(0).toUpperCase()}

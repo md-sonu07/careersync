@@ -11,6 +11,7 @@ class UserResponseSerializer(serializers.ModelSerializer):
     Serializer for exposing User profile details.
     """
     full_name = serializers.CharField(read_only=True)
+    profile_picture = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
     class Meta:
         model = User
@@ -43,6 +44,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         write_only=True,
         style={'input_type': 'password'}
     )
+    profile_picture = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
     class Meta:
         model = User
@@ -53,6 +55,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'role',
             'password',
             'confirm_password',
+            'profile_picture',
         ]
 
     def validate_role(self, value):
@@ -61,7 +64,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         if val not in allowed_roles:
             raise serializers.ValidationError("Invalid role for self-registration.")
         return val
-
 
     def validate_email(self, value):
         normalized_email = value.lower()
@@ -77,7 +79,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('confirm_password')
         password = validated_data.pop('password')
+        profile_pic = validated_data.pop('profile_picture', None)
         user = User.objects.create_user(password=password, **validated_data)
+        if profile_pic:
+            user.profile_picture = profile_pic
+            user.save(update_fields=['profile_picture'])
         return user
 
 

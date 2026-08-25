@@ -17,7 +17,7 @@ export default function Candidates() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [skillFilter, setSkillFilter] = useState('All')
-  const [view, setView] = useState('cards')
+  const [viewMode, setViewMode] = useState('grid')
   const [selectedCandidate, setSelectedCandidate] = useState(null)
   const [shortlistedMap, setShortlistedMap] = useState({})
 
@@ -46,12 +46,16 @@ export default function Candidates() {
 
         const strongItems = skillNames.slice(0, 3).map((s) => `${s} Verified (Strong Fit)`)
         const improveItems = skillNames.length > 3 ? [`Advanced ${skillNames[3]} — recommended practice`] : ['Docker & Cloud Infrastructure — recommended practice']
+        const userPic = studentUser?.profile_picture || c.user?.profile_picture
+        const avatarUrl = (userPic && typeof userPic === 'string' && userPic.length > 5)
+          ? userPic
+          : `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName || 'Candidate')}&background=0D9488&color=ffffff&bold=true`
 
         return {
           id: c.id,
           name: fullName || 'Rahul Verma',
           email: studentUser.email || '',
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${c.id || index}`,
+          avatar: avatarUrl,
           match: matchScore,
           branch: c.course || c.specialization ? `${c.course || 'Degree'} ${c.specialization ? `(${c.specialization})` : ''}` : 'Computer Science & Engineering',
           college: c.institution_detail?.name || c.institution_name || 'Institute of Technology',
@@ -110,48 +114,61 @@ export default function Candidates() {
           <Button variant="outline" size="sm" onClick={loadData} disabled={loading}>
             <AppIcon name="refresh" className="text-[16px]" /> Refresh
           </Button>
-          <Button variant={view === 'cards' ? 'primary' : 'outline'} size="sm" onClick={() => setView('cards')}>
-            Cards
-          </Button>
-          <Button variant={view === 'table' ? 'primary' : 'outline'} size="sm" onClick={() => setView('table')}>
-            Table
-          </Button>
+          <div className="flex items-center rounded-xl bg-surface border border-border p-1">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                viewMode === 'grid' ? 'bg-primary text-white shadow-xs' : 'text-muted hover:text-charcoal'
+              }`}
+            >
+              <AppIcon name="grid_view" className="text-[16px]" /> Cards
+            </button>
+            <button
+              onClick={() => setViewMode('table')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                viewMode === 'table' ? 'bg-primary text-white shadow-xs' : 'text-muted hover:text-charcoal'
+              }`}
+            >
+              <AppIcon name="view_list" className="text-[16px]" /> Table
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Filters */}
-      <Card className="!p-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="flex-1">
-            <SearchInput placeholder="Search candidates by name, college, skill..." value={search} onChange={(e) => setSearch(e.target.value)} />
-          </div>
-          <Select value={skillFilter} onChange={(e) => setSkillFilter(e.target.value)} className="w-full sm:w-48">
-            <option value="All">All skills</option>
-            {['React', 'Node.js', 'Python', 'Django', 'SQL', 'JavaScript', 'Tailwind'].map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </Select>
-          <Badge variant="default" className="shrink-0 whitespace-nowrap">{filtered.length} candidates</Badge>
+      {/* Filter Bar */}
+      <Card className="p-4">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <SearchInput value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search candidates by name, college or skill..." />
+          <Select value={skillFilter} onChange={(e) => setSkillFilter(e.target.value)} placeholder="Filter by skill" options={['All', 'Python', 'Django', 'React', 'Docker', 'PostgreSQL']} />
+          <Button variant="outline" size="sm" onClick={() => { setSearch(''); setSkillFilter('All') }} className="w-full sm:w-auto">
+            Clear Filters
+          </Button>
         </div>
       </Card>
 
-      {/* Loading state */}
+      {/* Candidates List View */}
       {loading ? (
         <Card className="p-12 text-center text-muted">
           <AppIcon name="sync" className="animate-spin text-3xl text-primary mx-auto mb-2" />
           Loading candidate profiles from database...
         </Card>
       ) : filtered.length > 0 ? (
-        view === 'cards' ? (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            {filtered.map((c) => {
+        viewMode === 'grid' ? (
+          <div className="grid gap-6 md:grid-cols-2">
+            {filtered.map((c, idx) => {
               const isShortlisted = shortlistedMap[c.id]
               return (
-                <Card key={c.id} hover className="p-5 flex flex-col justify-between">
+                <Card key={`${c.id}-${idx}`} hover className="p-5 flex flex-col justify-between">
                   <div className="flex gap-4">
-                    <div className="h-14 w-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-xl shrink-0">
-                      {c.name[0]?.toUpperCase() || 'S'}
-                    </div>
+                    <img
+                      src={c.avatar}
+                      alt={c.name}
+                      className="h-14 w-14 rounded-2xl object-cover border border-primary/20 shadow-xs shrink-0"
+                      onError={(e) => {
+                        e.target.onerror = null
+                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=0D9488&color=ffffff&bold=true`
+                      }}
+                    />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <div>
@@ -164,8 +181,8 @@ export default function Candidates() {
                       </div>
 
                       <div className="mt-3 flex flex-wrap gap-1.5">
-                        {c.skills.map((s) => (
-                          <span key={s} className="rounded-full bg-sage border border-sage px-2.5 py-0.5 text-xs font-semibold text-primary">
+                        {c.skills.map((s, sidx) => (
+                          <span key={`${s}-${sidx}`} className="rounded-full bg-sage border border-sage px-2.5 py-0.5 text-xs font-semibold text-primary">
                             {s}
                           </span>
                         ))}
@@ -191,8 +208,8 @@ export default function Candidates() {
                           <AppIcon name="check_circle" className="text-[16px]" /> Why candidate matches
                         </p>
                         <ul className="mt-1 space-y-0.5">
-                          {c.strong.map((s) => (
-                            <li key={s} className="text-xs text-charcoal flex gap-1.5 items-center">
+                          {c.strong.map((s, stidx) => (
+                            <li key={`${s}-${stidx}`} className="text-xs text-charcoal flex gap-1.5 items-center">
                               <span className="text-success text-[10px]">●</span> {s}
                             </li>
                           ))}
@@ -203,8 +220,8 @@ export default function Candidates() {
                               <AppIcon name="warning" className="text-[16px]" /> Recommendations
                             </p>
                             <ul className="mt-0.5 space-y-0.5">
-                              {c.improve.map((s) => (
-                                <li key={s} className="text-xs text-muted flex gap-1.5 items-center">
+                              {c.improve.map((s, impidx) => (
+                                <li key={`${s}-${impidx}`} className="text-xs text-muted flex gap-1.5 items-center">
                                   <span className="text-amber-500 text-[10px]">●</span> {s}
                                 </li>
                               ))}
@@ -250,12 +267,18 @@ export default function Candidates() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((c) => (
-                    <tr key={c.id} className="border-b border-border last:border-0 hover:bg-background/40">
+                  {filtered.map((c, idx) => (
+                    <tr key={`${c.id}-${idx}`} className="border-b border-border last:border-0 hover:bg-background/40">
                       <td className="px-6 py-3 flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-sm border border-primary/20">
-                          {c.name[0]?.toUpperCase() || 'S'}
-                        </div>
+                        <img
+                          src={c.avatar}
+                          alt={c.name}
+                          className="h-9 w-9 rounded-full object-cover border border-primary/20 shrink-0"
+                          onError={(e) => {
+                            e.target.onerror = null
+                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=0D9488&color=ffffff&bold=true`
+                          }}
+                        />
                         <div>
                           <p className="text-sm font-semibold text-charcoal">{c.name}</p>
                           <p className="text-xs text-muted">{c.college}</p>
@@ -292,9 +315,15 @@ export default function Candidates() {
         {selectedCandidate && (
           <div className="space-y-4 text-sm">
             <div className="flex items-center gap-4 border-b border-border pb-4">
-              <div className="h-16 w-16 rounded-2xl bg-primary text-white text-2xl font-bold flex items-center justify-center">
-                {selectedCandidate.name[0]?.toUpperCase() || 'S'}
-              </div>
+              <img
+                src={selectedCandidate.avatar}
+                alt={selectedCandidate.name}
+                className="h-16 w-16 rounded-2xl object-cover border border-primary/20 shrink-0"
+                onError={(e) => {
+                  e.target.onerror = null
+                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedCandidate.name)}&background=0D9488&color=ffffff&bold=true`
+                }}
+              />
               <div>
                 <p className="text-lg font-bold text-charcoal">{selectedCandidate.name} — <span className="text-success font-bold">{selectedCandidate.match}% Match</span></p>
                 <p className="text-xs text-muted">{selectedCandidate.branch} • {selectedCandidate.college}</p>

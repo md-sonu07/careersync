@@ -9,6 +9,7 @@ import AppIcon from '../ui/AppIcon'
 import { opportunityApi } from '../../api/opportunity.api'
 import { applicationApi } from '../../api/application.api'
 import { useAuth } from '../../hooks/useAuth'
+import { getCompanyLogo } from '../../utils/helpers'
 import { toast } from 'react-hot-toast'
 
 const Jobs = () => {
@@ -41,11 +42,12 @@ const Jobs = () => {
             const formattedMatches = matches.slice(0, 6).map((m) => {
               const opp = m.opportunity || {}
               const companyName = opp.company?.company_name || 'Hiring Partner'
+              const companyLogo = getCompanyLogo(opp.company)
               const score = Math.round(m.match_score || 75)
               return {
                 id: opp.id || m.id,
                 oppId: opp.id,
-                logo: companyName[0]?.toUpperCase() || 'C',
+                logo: companyLogo,
                 logoBg: score >= 80 ? 'bg-primary/10' : 'bg-amber-100',
                 logoColor: score >= 80 ? 'text-primary' : 'text-amber-700',
                 match: `${score}% Match`,
@@ -81,10 +83,11 @@ const Jobs = () => {
           if (isMounted && Array.isArray(liveOpps) && liveOpps.length > 0) {
             const formattedOpps = liveOpps.slice(0, 6).map((opp) => {
               const companyName = opp.company?.company_name || 'Hiring Partner'
+              const companyLogo = getCompanyLogo(opp.company)
               return {
                 id: opp.id,
                 oppId: opp.id,
-                logo: companyName[0]?.toUpperCase() || 'C',
+                logo: companyLogo,
                 logoBg: 'bg-primary/10',
                 logoColor: 'text-primary',
                 match: 'Featured',
@@ -113,44 +116,49 @@ const Jobs = () => {
     }
 
     fetchFeaturedOpportunities()
-    return () => { isMounted = false }
-  }, [isAuthenticated, user?.role])
 
-  const handleApply = async (oppItem) => {
-    if (!oppItem?.oppId) return
+    return () => {
+      isMounted = false
+    }
+  }, [isAuthenticated, user])
+
+  const handleApplySubmit = async () => {
+    if (!selectedOpp) return
     try {
       setSubmitting(true)
-      await applicationApi.applyForOpportunity(oppItem.oppId, {
-        cover_letter: coverLetter || 'I am highly interested in applying for this opportunity via CareerSync.',
-      })
-      setAppliedMap((prev) => ({ ...prev, [oppItem.oppId]: true }))
-      toast.success(`Application for "${oppItem.title}" submitted successfully!`)
+      await applicationApi.applyForOpportunity(selectedOpp.oppId, { cover_letter: coverLetter })
+      toast.success(`Application submitted for ${selectedOpp.title}!`)
+      setAppliedMap((prev) => ({ ...prev, [selectedOpp.oppId]: true }))
       setSelectedOpp(null)
       setCoverLetter('')
     } catch (err) {
-      toast.error('Application failed: ' + (err.response?.data?.detail || 'Already applied or error occurred.'))
+      toast.error('Failed to submit application: ' + (err.response?.data?.detail || err.message))
     } finally {
       setSubmitting(false)
     }
   }
 
   return (
-    <section id="jobs" className="py-24 bg-surface">
-      <div className="max-w-7xl mx-auto px-6 @3xl:px-8">
-        <div className="flex flex-wrap justify-between items-end gap-4 mb-10 @3xl:mb-12">
-          <div className="max-w-2xl w-full @3xl:w-auto">
-            <h2 className="text-3xl @3xl:text-4xl font-bold text-charcoal mb-3 @3xl:mb-4">
+    <section className="py-16 bg-surface border-t border-border">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sage text-primary text-xs font-bold uppercase tracking-wider mb-3">
+              <AppIcon name="stars" className="text-[16px]" /> Live Recommendations
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-charcoal tracking-tight">
               Featured Opportunities
             </h2>
-            <p className="text-base @3xl:text-lg text-charcoal/70">
-              {isAuthenticated && user?.role === 'student'
-                ? `Personalized AI opportunity recommendations tailored for ${user?.first_name || 'your profile'}.`
-                : 'Top internships and entry-level roles connected live to hiring partners.'}
+            <p className="mt-2 text-muted max-w-xl text-sm">
+              Discover verified internships & job roles matched directly with your skill profile.
             </p>
           </div>
-          <Link to={isAuthenticated && user?.role === 'student' ? '/student/recommended' : '/jobs'}>
-            <Button variant="secondary" className="hidden @3xl:flex">
-              View All Opportunities
+          <Link
+            to={isAuthenticated && user?.role === 'student' ? '/student/recommended' : '/jobs'}
+            className="hidden @3xl:inline-flex"
+          >
+            <Button variant="outline" className="font-bold flex items-center gap-1">
+              View All Opportunities <AppIcon name="arrow_forward" className="text-[18px]" />
             </Button>
           </Link>
         </div>
@@ -173,9 +181,15 @@ const Jobs = () => {
                   <Card hover className="flex flex-col gap-4 h-full !p-6 justify-between">
                     <div>
                       <div className="flex justify-between items-start">
-                        <div className={`w-12 h-12 ${j.logoBg} rounded-xl flex items-center justify-center font-bold text-lg ${j.logoColor}`}>
-                          {j.logo}
-                        </div>
+                        <img
+                          src={j.logo}
+                          alt={j.company}
+                          className="w-12 h-12 rounded-xl object-cover border border-primary/20 shadow-sm shrink-0"
+                          onError={(e) => {
+                            e.target.onerror = null
+                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(j.company)}&background=0D9488&color=ffffff&bold=true`
+                          }}
+                        />
                         <Badge variant={isApplied ? 'success' : 'success'} icon="bolt" className="whitespace-nowrap shrink-0">
                           {isApplied ? 'Applied ✓' : j.match}
                         </Badge>
@@ -221,9 +235,15 @@ const Jobs = () => {
           <div className="space-y-4">
             <div className="rounded-xl border border-border bg-background p-4 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-white text-xl font-bold">
-                  {selectedOpp.logo}
-                </div>
+                <img
+                  src={selectedOpp.logo}
+                  alt={selectedOpp.company}
+                  className="h-12 w-12 rounded-xl object-cover border border-primary/20 shrink-0"
+                  onError={(e) => {
+                    e.target.onerror = null
+                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedOpp.company)}&background=0D9488&color=ffffff&bold=true`
+                  }}
+                />
                 <div>
                   <h3 className="font-bold text-charcoal">{selectedOpp.title}</h3>
                   <p className="text-xs text-muted">

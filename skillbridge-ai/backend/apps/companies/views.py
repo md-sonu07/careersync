@@ -46,10 +46,17 @@ class CompanyProfileView(APIView):
             user=request.user,
             defaults={'company_name': request.user.first_name or request.user.email.split('@')[0]}
         )
+        logo_input = request.data.get('logo') or request.data.get('profile_picture')
+        if logo_input:
+            request.user.profile_picture = logo_input
+            request.user.save(update_fields=['profile_picture'])
+            company.logo = logo_input
+            company.save(update_fields=['logo'])
+
         serializer = CompanySerializer(company, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data)
+        return Response(CompanySerializer(company).data)
 
 
 class OpportunityListCreateView(APIView):

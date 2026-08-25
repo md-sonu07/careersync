@@ -139,8 +139,16 @@ export default function Profile() {
   const handlePicSelect = (e) => {
     const file = e.target.files?.[0]
     if (file) {
-      setProfilePicFile(file)
-      setProfilePicPreview(URL.createObjectURL(file))
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size must be less than 5MB.')
+        return
+      }
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setProfilePicFile(reader.result)
+        setProfilePicPreview(reader.result)
+      }
+      reader.readAsDataURL(file)
     }
   }
 
@@ -149,12 +157,15 @@ export default function Profile() {
     try {
       let updatedUser = currentUser
       if (editForm.first_name || editForm.last_name || profilePicFile) {
-        const userFormData = new FormData()
-        if (editForm.first_name) userFormData.append('first_name', editForm.first_name)
-        if (editForm.last_name) userFormData.append('last_name', editForm.last_name)
-        if (profilePicFile) userFormData.append('profile_picture', profilePicFile)
+        const userPayload = {
+          first_name: editForm.first_name,
+          last_name: editForm.last_name,
+        }
+        if (profilePicFile) {
+          userPayload.profile_picture = profilePicFile
+        }
 
-        updatedUser = await authApi.updateMe(userFormData)
+        updatedUser = await authApi.updateMe(userPayload)
         const token = localStorage.getItem('token')
         dispatch(setCredentials({ user: updatedUser, token }))
       }
@@ -173,7 +184,7 @@ export default function Profile() {
       const updatedProfile = await profileApi.updateStudentProfile(profilePayload)
       setStudentProfile(updatedProfile)
 
-      toast.success('Profile and picture updated successfully!')
+      toast.success('Profile and picture updated successfully in Django database!')
       setIsEditOpen(false)
     } catch (err) {
       toast.error('Failed to update profile: ' + (err.response?.data?.detail || err.message))
