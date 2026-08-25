@@ -1,79 +1,71 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Button from '../ui/Button'
 import Badge from '../ui/Badge'
-import AppIcon from '../ui/AppIcon';
-
-const courses = [
-  {
-    tag: 'Engineering',
-    duration: '12 Weeks',
-    title: 'Full Stack Development',
-    desc: 'Master modern web technologies from front-end frameworks to scalable back-end architectures.',
-    img: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop&q=80',
-  },
-  {
-    tag: 'Data Science',
-    duration: '10 Weeks',
-    title: 'Data Analytics',
-    desc: 'Learn to extract meaningful insights from complex datasets using industry-standard tools.',
-    img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80',
-  },
-  {
-    tag: 'Programming',
-    duration: '8 Weeks',
-    title: 'Python Programming',
-    desc: 'Build a strong foundation in Python, covering core concepts, libraries, and practical applications.',
-    img: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
-  },
-]
-
-const CourseCard = ({ tag, duration, title, desc, img }) => (
-  <Link to="/courses" className="group cursor-pointer rounded-2xl border border-border-light overflow-hidden bg-white shadow-subtle hover:shadow-card transition-all duration-300 block">
-    <div className="aspect-video relative overflow-hidden bg-surface">
-      <img className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={title} src={img} />
-    </div>
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-3">
-        <Badge>{tag}</Badge>
-        <span className="flex items-center gap-1 text-sm font-medium text-charcoal/60">
-          <AppIcon name="schedule" className="text-[16px]" /> {duration}
-        </span>
-      </div>
-      <h3 className="text-xl font-bold text-charcoal mb-2 group-hover:text-primary transition-colors">{title}</h3>
-      <p className="text-sm text-charcoal/70 mb-6 line-clamp-2">{desc}</p>
-      <div className="flex items-center text-primary font-semibold text-sm gap-1 group-hover:gap-2 transition-all">
-        View Course <AppIcon name="arrow_forward" className="text-[18px]" />
-      </div>
-    </div>
-  </Link>
-)
+import AppIcon from '../ui/AppIcon'
+import { courseApi } from '../../api/course.api'
+import { ModernCourseCard } from '../../pages/Courses/Courses'
 
 const Courses = () => {
+  const [courses, setCourses] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let isMounted = true
+    courseApi.getResources({ limit: 3 })
+      .then((data) => {
+        if (isMounted) {
+          const list = Array.isArray(data) ? data : data?.results || []
+          setCourses(list)
+        }
+      })
+      .catch(() => {
+        if (isMounted) setCourses([])
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false)
+      })
+    return () => { isMounted = false }
+  }, [])
+
   return (
-    <section id="courses" className="py-24 bg-card-bg border-y border-border-light">
-      <div className="max-w-7xl mx-auto px-6 @3xl:px-8">
-        <div className="flex flex-wrap justify-between items-end gap-4 mb-10 @3xl:mb-12">
-          <div className="max-w-2xl w-full @3xl:w-auto">
-            <h2 className="text-3xl @3xl:text-4xl font-bold text-charcoal mb-3 @3xl:mb-4">Premium Courses</h2>
-            <p className="text-base @3xl:text-lg text-charcoal/70">Industry-aligned curriculum designed to close your skill gaps.</p>
+    <section id="courses" className="py-20 bg-background border-y border-border">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="flex flex-wrap justify-between items-end gap-4 mb-10">
+          <div className="max-w-2xl w-full">
+            <Badge variant="default" className="mb-2">Institutional Learning</Badge>
+            <h2 className="text-3xl lg:text-4xl font-bold text-charcoal mb-2">Featured Institutional Courses</h2>
+            <p className="text-base text-muted">Curated curriculum designed by top colleges and universities to close skill gaps.</p>
           </div>
           <Link to="/courses">
-            <Button variant="secondary" className="hidden @3xl:flex">
-              View All Courses
+            <Button variant="secondary" className="hidden sm:flex">
+              View All Courses →
             </Button>
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 @3xl:grid-cols-2 @5xl:grid-cols-3 gap-8">
-          {courses.map((c) => (
-            <CourseCard key={c.title} {...c} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="py-16 text-center text-sm text-muted">Loading featured courses…</div>
+        ) : courses.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {courses.map((c) => (
+              <ModernCourseCard key={c.id} course={c} />
+            ))}
+          </div>
+        ) : (
+          <div className="py-16 text-center rounded-2xl bg-white border border-border p-8">
+            <AppIcon name="menu_book" className="text-4xl text-primary mb-2 mx-auto" />
+            <h3 className="text-base font-bold text-charcoal">No Courses Published Yet</h3>
+            <p className="text-xs text-muted max-w-sm mx-auto mt-1">
+              Institutions can publish courses from their dashboard to feature them here.
+            </p>
+          </div>
+        )}
 
-        <div className="mt-8 text-center @3xl:hidden">
+        <div className="mt-8 text-center sm:hidden">
           <Link to="/courses">
             <Button variant="secondary" className="w-full">
-              View All Courses
+              View All Courses →
             </Button>
           </Link>
         </div>

@@ -5,51 +5,30 @@ import AppIcon from '../ui/AppIcon';
 const navSections = [
   { label: 'Overview', items: [{ label: 'Dashboard', icon: 'dashboard', path: '/institute' }] },
   {
-    label: 'Students', items: [
-      { label: 'Student Overview', icon: 'group', path: '/institute/students' },
-      { label: 'Performance', icon: 'trending_up', path: '/institute/performance' },
-      { label: 'Skill Distribution', icon: 'pie_chart', path: '/institute/skill-distribution' },
+    label: 'Student Intelligence', items: [
+      { label: 'Students Directory', icon: 'group', path: '/institute/students' },
+      { label: 'Skill Gaps Analysis', icon: 'compare', path: '/institute/skill-gaps' },
     ]
   },
   {
-    label: 'Learning', items: [
-      { label: 'Courses', icon: 'menu_book', path: '/institute/courses' },
-      { label: 'Progress', icon: 'timeline', path: '/institute/progress' },
-      { label: 'Assessments', icon: 'quiz', path: '/institute/assessments' },
+    label: 'Learning & Curriculum', items: [
+      { label: 'Courses & Curriculum', icon: 'menu_book', path: '/institute/courses' },
     ]
   },
   {
-    label: 'Industry Intelligence', items: [
+    label: 'Market & Placements', items: [
       { label: 'Industry Demand', icon: 'show_chart', path: '/institute/industry-demand' },
-      { label: 'Skill Gaps', icon: 'compare', path: '/institute/skill-gaps' },
-      { label: 'Trending Skills', icon: 'trending_up', path: '/institute/trending-skills' },
-      { label: 'Industry Partners', icon: 'handshake', path: '/institute/industry-partners' },
-    ]
-  },
-  {
-    label: 'Career', items: [
-      { label: 'Internships', icon: 'work', path: '/institute/internships' },
-      { label: 'Jobs', icon: 'business_center', path: '/institute/jobs' },
-      { label: 'Placements', icon: 'workspace_premium', path: '/institute/placements' },
-    ]
-  },
-  {
-    label: 'Training', items: [
-      { label: 'Skill Recommendations', icon: 'lightbulb', path: '/institute/training-recommendations' },
-      { label: 'Workshops', icon: 'event', path: '/institute/workshops' },
-      { label: 'Training Programs', icon: 'school', path: '/institute/training-programs' },
+      { label: 'Placements & Hiring', icon: 'workspace_premium', path: '/institute/placements' },
     ]
   },
   {
     label: 'Reports', items: [
-      { label: 'Reports', icon: 'description', path: '/institute/reports' },
-      { label: 'Analytics', icon: 'analytics', path: '/institute/analytics' },
+      { label: 'Institutional Analytics', icon: 'analytics', path: '/institute/analytics' },
     ]
   },
   {
-    label: 'Account', items: [
-      { label: 'Notifications', icon: 'notifications', path: '/institute/notifications' },
-      { label: 'Settings', icon: 'settings', path: '/institute/settings' },
+    label: 'Settings', items: [
+      { label: 'Institute Profile', icon: 'settings', path: '/institute/profile' },
     ]
   },
 ]
@@ -68,8 +47,9 @@ export default function InstituteSidebar({ onNavigate }) {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
   const isActive = (p) => pathname === p || (p !== '/institute' && pathname.startsWith(p))
-  const displayName = user?.full_name || (user?.first_name ? `${user.first_name} ${user.last_name}` : 'Institute Admin')
-  const email = user?.email || 'prof.singh@iitb.ac.in'
+  const displayName = user?.full_name || (user?.first_name ? `${user.first_name} ${user.last_name}`.trim() : 'Institute Admin')
+  const email = user?.email || 'admin@institute.edu'
+  const initials = displayName.slice(0, 2).toUpperCase()
   const handleLogout = async () => { await logout(); if (onNavigate) onNavigate(); navigate('/login') }
   return (
     <div className="flex h-full flex-col">
@@ -78,7 +58,7 @@ export default function InstituteSidebar({ onNavigate }) {
           <AppIcon name="menu" />
         </button>
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-slate-900 font-bold text-xs">SB</div>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-slate-900 font-bold text-xs">{initials}</div>
           <span className="text-sm font-bold text-white truncate max-w-[130px]">{displayName}</span>
         </div>
         <button onClick={handleLogout} className="p-2 rounded-xl border border-white/20 text-rose-400 hover:bg-rose-500/10">

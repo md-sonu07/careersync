@@ -25,6 +25,12 @@ export const analyticsApi = {
     const { data } = await apiClient.get(ENDPOINTS.ANALYTICS.SYSTEM)
     return data
   },
+
+  // Industry demand analytics (top demanded skills & hiring partner drives)
+  getIndustryDemandAnalytics: async () => {
+    const { data } = await apiClient.get(ENDPOINTS.ANALYTICS.INDUSTRY_DEMAND)
+    return data
+  },
 }
 
 export default analyticsApi

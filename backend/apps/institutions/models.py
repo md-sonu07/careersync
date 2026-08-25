@@ -2,25 +2,12 @@ import uuid
 from django.db import models
 
 
-class InstitutionType(models.TextChoices):
-    UNIVERSITY = 'university', 'University'
-    COLLEGE = 'college', 'College'
-    INSTITUTE = 'institute', 'Institute'
-    SCHOOL = 'school', 'School'
-    OTHER = 'other', 'Other'
-
-
 class Institution(models.Model):
     """
-    Model representing an educational institution or university.
+    Model representing an educational institution.
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255, unique=True, db_index=True)
-    institution_type = models.CharField(
-        max_length=50,
-        choices=InstitutionType.choices,
-        default=InstitutionType.UNIVERSITY
-    )
     website = models.URLField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=100, blank=True)
     state = models.CharField(max_length=100, blank=True)
@@ -35,6 +22,16 @@ class Institution(models.Model):
         ordering = ['name']
         verbose_name = 'Institution'
         verbose_name_plural = 'Institutions'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        try:
+            for ap in self.academicians.select_related('user').all():
+                if ap.user and ap.user.is_verified != self.is_verified:
+                    ap.user.is_verified = self.is_verified
+                    ap.user.save(update_fields=['is_verified'])
+        except Exception:
+            pass
 
     def __str__(self):
         return f"{self.name} ({self.city})"

@@ -15,7 +15,10 @@ export const ENDPOINTS = {
     PROFILE: '/companies/profile/',
   },
   INSTITUTES: {
-    PROFILE: '/institutes/profile/',
+    PROFILE: '/academicians/profile/',
+  },
+  ACADEMICIANS: {
+    PROFILE: '/academicians/profile/',
   },
   INSTITUTIONS: {
     LIST: '/institutions/',
@@ -29,6 +32,11 @@ export const ENDPOINTS = {
   },
   COURSES: {
     RESOURCES: '/courses/resources/',
+    RESOURCE_DETAIL: (id) => `/courses/resources/${id}/`,
+    ENROLL: (id) => `/courses/resources/${id}/enroll/`,
+    MY_ENROLLMENTS: '/courses/my-enrollments/',
+    ENROLLMENT_DETAIL: (id) => `/courses/enrollments/${id}/`,
+    PROGRESS: (id) => `/courses/enrollments/${id}/progress/`,
     RECOMMENDATIONS: '/courses/recommendations/',
     RECOMMENDATION_DETAIL: (id) => `/courses/recommendations/${id}/`,
   },
@@ -64,6 +72,7 @@ export const ENDPOINTS = {
     COMPANY: '/analytics/company/',
     ACADEMICIAN: '/analytics/academician/',
     SYSTEM: '/analytics/system/',
+    INDUSTRY_DEMAND: '/analytics/industry-demand/',
   },
   AI: {
     CONVERSATIONS: '/ai/conversations/',

@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 
 from accounts.models import UserRole
-from institutions.models import Institution, InstitutionType
+from institutions.models import Institution
 from students.models import StudentProfile
 from companies.models import Company, CompanySize
 from academicians.models import AcademicianProfile
@@ -41,7 +41,6 @@ class Command(BaseCommand):
         iitb, _ = Institution.objects.get_or_create(
             name="IIT Bombay",
             defaults={
-                "institution_type": InstitutionType.UNIVERSITY,
                 "website": "https://iitb.ac.in",
                 "city": "Mumbai",
                 "state": "Maharashtra",
@@ -52,7 +51,6 @@ class Command(BaseCommand):
         dtu, _ = Institution.objects.get_or_create(
             name="Delhi Technological University (DTU)",
             defaults={
-                "institution_type": InstitutionType.UNIVERSITY,
                 "website": "https://dtu.ac.in",
                 "city": "New Delhi",
                 "state": "Delhi",
@@ -63,7 +61,6 @@ class Command(BaseCommand):
         bits, _ = Institution.objects.get_or_create(
             name="BITS Pilani",
             defaults={
-                "institution_type": InstitutionType.INSTITUTE,
                 "website": "https://bits-pilani.ac.in",
                 "city": "Pilani",
                 "state": "Rajasthan",

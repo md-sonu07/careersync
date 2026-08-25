@@ -77,24 +77,23 @@ export default function Profile() {
         if (isMounted) {
           if (profileData) setStudentProfile(profileData)
           const activeUser = userData || currentUser
-          const currentInstName = profileData?.institution_detail?.name || 'Delhi Technological University (DTU)'
+          const currentInstName = profileData?.institution_detail?.name || ''
           setEditForm({
             first_name: activeUser?.first_name || '',
             last_name: activeUser?.last_name || '',
             institution_name: currentInstName,
-            course: profileData?.course || 'B.Tech Computer Science',
-            specialization: profileData?.specialization || 'Full Stack Web Development',
-            graduation_year: profileData?.graduation_year || 2026,
-            enrollment_number: profileData?.enrollment_number || 'EN2023CS091',
-            semester: profileData?.semester || 6,
-            bio: profileData?.bio || 'Passionate student eager to build scalable web software and solve real-world problems.',
+            course: profileData?.course || '',
+            specialization: profileData?.specialization || '',
+            graduation_year: profileData?.graduation_year || new Date().getFullYear(),
+            enrollment_number: profileData?.enrollment_number || '',
+            semester: profileData?.semester || 1,
+            bio: profileData?.bio || '',
             linkedin_url: profileData?.linkedin_url || '',
             github_url: profileData?.github_url || '',
           })
 
           const fetchedList = Array.isArray(instData) ? instData.map((i) => i.name) : instData?.results ? instData.results.map((i) => i.name) : []
-          const combined = Array.from(new Set([...fetchedList, ...DEFAULT_COLLEGES]))
-          setInstitutionsList(combined)
+          setInstitutionsList(fetchedList)
 
           if (activeUser?.profile_picture) {
             setProfilePicPreview(activeUser.profile_picture)
@@ -104,13 +103,13 @@ export default function Profile() {
         setEditForm({
           first_name: currentUser?.first_name || '',
           last_name: currentUser?.last_name || '',
-          institution_name: 'Delhi Technological University (DTU)',
-          course: 'B.Tech Computer Science',
-          specialization: 'Full Stack Web Development',
-          graduation_year: 2026,
-          enrollment_number: 'EN2023CS091',
-          semester: 6,
-          bio: 'Passionate student eager to build scalable web software and solve real-world problems.',
+          institution_name: '',
+          course: '',
+          specialization: '',
+          graduation_year: new Date().getFullYear(),
+          enrollment_number: '',
+          semester: 1,
+          bio: '',
           linkedin_url: '',
           github_url: '',
         })
@@ -125,7 +124,7 @@ export default function Profile() {
   const name = currentUser?.full_name || (currentUser?.first_name ? `${currentUser.first_name} ${currentUser.last_name}` : 'Student')
   const email = currentUser?.email || 'student@careersync.ai'
   const role = currentUser?.role || 'Student'
-  const college = studentProfile?.institution_detail?.name || editForm.institution_name || 'Academic Institution'
+  const college = studentProfile?.institution_detail?.name || editForm.institution_name || 'Not linked to any college'
   const degree = studentProfile?.course || editForm.course || 'Not specified'
   const specialization = studentProfile?.specialization || editForm.specialization || 'General'
   const enrollmentNo = studentProfile?.enrollment_number || editForm.enrollment_number || 'N/A'

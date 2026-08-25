@@ -47,7 +47,7 @@ class AcademicianAnalyticsView(APIView):
     permission_classes = [permissions.IsAuthenticated, IsAcademician]
 
     def get(self, request):
-        data = get_academician_analytics()
+        data = get_academician_analytics(user=request.user)
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -59,4 +59,16 @@ class SystemAnalyticsView(APIView):
 
     def get(self, request):
         data = get_admin_analytics()
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class IndustryDemandAnalyticsView(APIView):
+    """
+    GET /api/analytics/industry-demand/ -> Live industry skill demand and hiring partner trends
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from analytics.services.analytics_engine import get_industry_demand_analytics
+        data = get_industry_demand_analytics()
         return Response(data, status=status.HTTP_200_OK)

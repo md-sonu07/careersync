@@ -18,11 +18,17 @@ export default function Learning() {
 
   useEffect(() => {
     let isMounted = true
+    setLoading(true)
     courseApi.getResources()
       .then((data) => {
-        if (isMounted && data && data.length > 0) setResources(data)
+        if (isMounted) {
+          const list = Array.isArray(data) ? data : data?.results || []
+          setResources(list)
+        }
       })
-      .catch(() => {})
+      .catch(() => {
+        if (isMounted) setResources([])
+      })
       .finally(() => {
         if (isMounted) setLoading(false)
       })
@@ -30,17 +36,10 @@ export default function Learning() {
   }, [])
 
   const filtered = useMemo(() => {
-    if (resources.length > 0) {
-      return resources.filter((res) => {
-        if (query && !res.title.toLowerCase().includes(query.toLowerCase()) && !res.description.toLowerCase().includes(query.toLowerCase())) return false
-        if (difficulty && res.level !== difficulty) return false
-        if (typeFilter && res.resource_type !== typeFilter) return false
-        return true
-      })
-    }
-    return mockCourses.filter((c) => {
-      if (query && !c.title.toLowerCase().includes(query.toLowerCase())) return false
-      if (difficulty && c.difficulty !== difficulty) return false
+    return resources.filter((res) => {
+      if (query && !res.title?.toLowerCase().includes(query.toLowerCase()) && !res.description?.toLowerCase().includes(query.toLowerCase())) return false
+      if (difficulty && res.level?.toLowerCase() !== difficulty.toLowerCase()) return false
+      if (typeFilter && res.resource_type?.toLowerCase() !== typeFilter.toLowerCase()) return false
       return true
     })
   }, [query, difficulty, typeFilter, resources])

@@ -326,6 +326,10 @@ class AdminVerificationActionView(APIView):
             inst = Institution.objects.get(pk=pk)
             inst.is_verified = (action_type == 'verify')
             inst.save(update_fields=['is_verified'])
+            for ap in inst.academicians.all():
+                if ap.user:
+                    ap.user.is_verified = (action_type == 'verify')
+                    ap.user.save(update_fields=['is_verified'])
             return Response({"message": f"Institution {action_type}ed successfully.", "is_verified": inst.is_verified})
         except Institution.DoesNotExist:
             pass

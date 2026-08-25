@@ -47,6 +47,15 @@ const Navbar = () => {
     navigate('/login')
   }
 
+  const getDashboardPath = (role) => {
+    const normalizedRole = (role || '').toLowerCase()
+    if (normalizedRole === 'student') return '/student/dashboard'
+    if (normalizedRole === 'industry') return '/industry/dashboard'
+    if (['academician', 'institute'].includes(normalizedRole)) return '/institute/dashboard'
+    if (normalizedRole === 'admin') return '/admin/dashboard'
+    return '/student/dashboard'
+  }
+
   const exploreItems = [
     {
       to: '/courses',
@@ -164,7 +173,7 @@ const Navbar = () => {
             <div className="hidden @2xl:flex items-center gap-3">
               {isAuthenticated ? (
                 <>
-                  <Link to="/student/dashboard" className="hidden @3xl:inline text-sm font-medium text-charcoal hover:text-primary px-3">
+                  <Link to={getDashboardPath(user?.role)} className="hidden @3xl:inline text-sm font-medium text-charcoal hover:text-primary px-3">
                     Dashboard
                   </Link>
 
@@ -307,7 +316,7 @@ const Navbar = () => {
           {isAuthenticated ? (
             <div className="space-y-2">
               <Link
-                to="/student/dashboard"
+                to={getDashboardPath(user?.role)}
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold bg-primary text-white"
               >

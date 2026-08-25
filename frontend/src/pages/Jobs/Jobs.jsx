@@ -201,81 +201,112 @@ export default function Jobs() {
             Loading live job recommendations...
           </Card>
         ) : filtered.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filtered.map((item) => {
-              const isApplied = appliedMap[item.oppId]
+              const isApplied = !!appliedMap[item.oppId]
+
               return (
-                <Card key={item.id} hover className="p-5 flex flex-col justify-between h-full">
+                <div
+                  key={item.id}
+                  className="group relative flex flex-col justify-between rounded-2xl border border-border bg-white p-6 shadow-soft hover:shadow-card hover:-translate-y-1 transition-all duration-300"
+                >
                   <div>
+                    {/* Top Header: Company Logo & Mode Badge */}
                     <div className="flex items-start justify-between gap-3">
-                      <div className="flex gap-3">
+                      <div className="flex items-center gap-3">
                         <img
                           src={item.logo}
                           alt={item.company}
-                          className="h-12 w-12 rounded-xl object-cover border border-primary/20 shadow-sm shrink-0"
+                          className="h-12 w-12 rounded-xl object-contain border border-border bg-background p-1 shadow-xs shrink-0"
                           onError={(e) => {
                             e.target.onerror = null
                             e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(item.company)}&background=0D9488&color=ffffff&bold=true`
                           }}
                         />
-                        <div>
-                          <h3 className="font-bold leading-tight text-charcoal">{item.role}</h3>
-                          <p className="text-xs text-muted mt-0.5">{item.company} • {item.location} • {item.mode}</p>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-muted uppercase tracking-wider truncate">
+                            {item.company}
+                          </p>
+                          <p className="text-xs text-charcoal/70 flex items-center gap-1 mt-0.5">
+                            <AppIcon name="location_on" className="text-[13px] text-muted shrink-0" />
+                            <span className="truncate">{item.location}</span>
+                          </p>
                         </div>
                       </div>
-                      <Badge variant={isApplied ? 'success' : item.match >= 90 ? 'success' : 'default'} className="shrink-0 whitespace-nowrap">
-                        {isApplied ? 'Applied ✓' : `${item.match}% Match`}
-                      </Badge>
+
+                      <div className="flex flex-col items-end gap-1.5 shrink-0">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                          {item.mode}
+                        </span>
+                        {isAuthenticated && item.match && item.match > 0 && (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            {item.match}% Match
+                          </span>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-                      <div className="rounded-xl bg-background border border-border px-3 py-2 flex items-center gap-2 font-semibold">
-                        <AppIcon name="payments" className="text-[16px] text-muted" /> {item.salary}
+                    {/* Role Title */}
+                    <h3 className="mt-4 text-base font-bold text-charcoal group-hover:text-primary transition-colors line-clamp-1">
+                      {item.role}
+                    </h3>
+
+                    {/* Salary & Experience Metrics */}
+                    <div className="mt-3 grid grid-cols-2 gap-2 bg-background/60 p-3 rounded-xl border border-border/60">
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Package (CTC)</p>
+                        <p className="text-xs font-bold text-primary truncate mt-0.5">{item.salary}</p>
                       </div>
-                      <div className="rounded-xl bg-background border border-border px-3 py-2 flex items-center gap-2">
-                        <AppIcon name="work_history" className="text-[16px] text-muted" /> {item.exp}
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted">Experience</p>
+                        <p className="text-xs font-bold text-charcoal truncate mt-0.5">{item.exp}</p>
                       </div>
                     </div>
 
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      <span className="rounded-full bg-sage border border-sage px-2.5 py-0.5 text-xs font-semibold text-primary">{item.type}</span>
-                      <span className="rounded-full bg-white border border-border px-2.5 py-0.5 text-xs text-charcoal">{item.mode}</span>
+                    {/* Skills required */}
+                    <div className="mt-3.5 flex flex-wrap gap-1.5">
+                      <span className="rounded-md bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-800">
+                        {item.type}
+                      </span>
                       {item.skills.map((s) => (
-                        <span key={s} className="rounded-full bg-white border border-border px-2.5 py-0.5 text-xs text-charcoal/70">
+                        <span key={s} className="rounded-md bg-slate-50 border border-slate-200/80 px-2.5 py-0.5 text-[11px] font-semibold text-slate-700">
                           {s}
                         </span>
                       ))}
                     </div>
                   </div>
 
-                  <div className="mt-5 border-t border-border pt-3.5 space-y-2">
-                    <div className="flex items-center justify-between text-[11px] text-muted">
-                      <span>Posted: <strong className="text-charcoal font-semibold">{item.posted}</strong></span>
-                      <span><strong className="text-primary font-bold">{item.applicants}</strong> {item.applicants === 1 ? 'applicant' : 'applicants'}</span>
+                  {/* Card Footer */}
+                  <div className="mt-5 pt-3.5 border-t border-border flex items-center justify-between">
+                    <div>
+                      <p className="text-[11px] text-muted">
+                        Deadline: <span className="font-semibold text-charcoal">{item.deadline}</span>
+                      </p>
+                      <p className="text-[10px] text-muted mt-0.5">
+                        {item.applicants} {item.applicants === 1 ? 'applicant' : 'applicants'}
+                      </p>
                     </div>
 
-                    <div className="flex items-center justify-between text-xs pt-1">
-                      <span className="text-muted">Deadline: <strong className="font-semibold text-charcoal">{item.deadline}</strong></span>
-                      {isAuthenticated ? (
-                        <Button
-                          size="sm"
-                          variant={isApplied ? 'secondary' : 'primary'}
-                          disabled={isApplied}
-                          onClick={() => { setSelectedJob(item); setCoverLetter('') }}
-                          className="shrink-0 font-bold"
-                        >
-                          {isApplied ? 'Applied ✓' : 'Apply Job →'}
+                    {isAuthenticated ? (
+                      <Button
+                        size="sm"
+                        variant={isApplied ? 'secondary' : 'primary'}
+                        disabled={isApplied}
+                        onClick={() => { setSelectedJob(item); setCoverLetter('') }}
+                        className="text-xs font-bold shadow-soft"
+                      >
+                        {isApplied ? 'Applied ✓' : 'Apply Now →'}
+                      </Button>
+                    ) : (
+                      <Link to="/login">
+                        <Button size="sm" variant="primary" className="text-xs font-bold shadow-soft">
+                          Apply Now →
                         </Button>
-                      ) : (
-                        <Link to="/login" className="shrink-0">
-                          <Button size="sm" variant="primary" className="font-bold">
-                            Apply Job →
-                          </Button>
-                        </Link>
-                      )}
-                    </div>
+                      </Link>
+                    )}
                   </div>
-                </Card>
+                </div>
               )
             })}
           </div>

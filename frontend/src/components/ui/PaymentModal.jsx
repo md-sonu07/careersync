@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Modal from './Modal'
 import Button from './Button'
+import { courseApi } from '../../api/course.api'
+import { toast } from 'react-hot-toast'
 
-const PaymentModal = ({ open, onClose, course }) => {
+const PaymentModal = ({ open, onClose, course, onPaymentSuccess }) => {
   const navigate = useNavigate()
   const [paymentMethod, setPaymentMethod] = useState('razorpay')
   const [coupon, setCoupon] = useState('')
@@ -26,6 +28,7 @@ const PaymentModal = ({ open, onClose, course }) => {
   // Payment process state: 'idle' | 'processing' | 'success'
   const [step, setStep] = useState('idle')
   const [transactionId, setTransactionId] = useState('')
+  const [enrollmentId, setEnrollmentId] = useState(null)
 
   if (!course) return null
 
@@ -34,6 +37,24 @@ const PaymentModal = ({ open, onClose, course }) => {
   const totalPayable = Math.max(1, basePrice + gst - discountAmount)
 
   const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_SgNPgO51icjN28'
+
+  const recordBackendEnrollment = async (txId, method) => {
+    try {
+      const res = await courseApi.enrollCourse(course.id, {
+        payment_method: method || paymentMethod.toUpperCase(),
+        amount: totalPayable,
+        transaction_id: txId,
+      })
+      const enrId = res.enrollment?.id
+      setEnrollmentId(enrId)
+      if (onPaymentSuccess) {
+        onPaymentSuccess(enrId)
+      }
+    } catch (err) {
+      console.error('Enrollment recording failed:', err)
+      toast.error('Payment verified, but enrollment sync issue. Please visit My Learning.')
+    }
+  }
 
   const handleApplyCoupon = (e) => {
     e.preventDefault()
@@ -50,6 +71,9 @@ const PaymentModal = ({ open, onClose, course }) => {
   }
 
   const handleLaunchRazorpay = () => {
+    const txId = 'PAY_RZP_' + Math.floor(10000000 + Math.random() * 90000000)
+    setStep('processing')
+
     if (window.Razorpay) {
       const options = {
         key: razorpayKey,
@@ -58,13 +82,15 @@ const PaymentModal = ({ open, onClose, course }) => {
         name: 'CareerSync',
         description: `Enrollment for ${course.title}`,
         image: 'https://ik.imagekit.io/crms/logo.png',
-        handler: function (response) {
-          setTransactionId(response.razorpay_payment_id || 'PAY_' + Math.floor(10000000 + Math.random() * 90000000))
+        handler: async function (response) {
+          const liveTx = response.razorpay_payment_id || txId
+          setTransactionId(liveTx)
+          await recordBackendEnrollment(liveTx, 'RAZORPAY_GATEWAY')
           setStep('success')
         },
         prefill: {
-          name: 'Rahul Sharma',
-          email: 'rahul.sharma@example.com',
+          name: 'Student User',
+          email: 'student@example.com',
           contact: '9876543210',
         },
         notes: {
@@ -80,21 +106,21 @@ const PaymentModal = ({ open, onClose, course }) => {
         const rzp = new window.Razorpay(options)
         rzp.on('payment.failed', function (response) {
           alert('Payment Failed: ' + (response.error?.description || 'Transaction failed'))
+          setStep('idle')
         })
         rzp.open()
         return
       } catch (err) {
-        console.warn('Razorpay SDK error, falling back to simulated checkout:', err)
+        console.warn('Razorpay SDK error, falling back to instant checkout:', err)
       }
     }
 
-    // Fallback simulation if script isn't loaded
-    setStep('processing')
-    setTimeout(() => {
-      const txId = 'PAY_RZP_' + Math.floor(10000000 + Math.random() * 90000000)
+    // Direct simulated checkout flow
+    setTimeout(async () => {
       setTransactionId(txId)
+      await recordBackendEnrollment(txId, paymentMethod.toUpperCase())
       setStep('success')
-    }, 2000)
+    }, 1500)
   }
 
   const handleResetAndClose = () => {
@@ -107,7 +133,11 @@ const PaymentModal = ({ open, onClose, course }) => {
 
   const handleStartLearning = () => {
     handleResetAndClose()
-    navigate('/student/learning')
+    if (enrollmentId) {
+      navigate(`/student/learning/${enrollmentId}`)
+    } else {
+      navigate('/student/my-learning')
+    }
   }
 
   return (

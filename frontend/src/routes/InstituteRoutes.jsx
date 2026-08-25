@@ -18,6 +18,7 @@ import InstituteCourses from '../pages/Institute/Courses'
 import InstituteProgress from '../pages/Institute/Progress'
 import InstituteAssessments from '../pages/Institute/Assessments'
 import IndustryPartners from '../pages/Institute/IndustryPartners'
+import InstituteProfile from '../pages/Institute/InstituteProfile'
 
 import ProtectedRoute from './ProtectedRoute'
 import AppIcon from '../components/ui/AppIcon';
@@ -63,7 +64,8 @@ export const InstituteRoutes = {
         { path: 'reports', element: <InstituteReports /> },
         { path: 'analytics', element: <InstituteAnalytics /> },
         { path: 'notifications', element: <Placeholder title="Notifications" /> },
-        { path: 'settings', element: <Placeholder title="Institute Settings" /> },
+        { path: 'settings', element: <InstituteProfile /> },
+        { path: 'profile', element: <InstituteProfile /> },
       ],
     },
   ],

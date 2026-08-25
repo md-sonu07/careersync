@@ -1,7 +1,7 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
-from institutions.models import Institution, InstitutionType
+from institutions.models import Institution
 
 
 class InstitutionAPITests(TestCase):
@@ -9,7 +9,6 @@ class InstitutionAPITests(TestCase):
         self.client = APIClient()
         self.institution = Institution.objects.create(
             name="Delhi Technological University",
-            institution_type=InstitutionType.UNIVERSITY,
             city="Delhi",
             state="Delhi",
             country="India"

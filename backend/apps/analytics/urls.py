@@ -4,6 +4,7 @@ from analytics.views import (
     CompanyAnalyticsView,
     AcademicianAnalyticsView,
     SystemAnalyticsView,
+    IndustryDemandAnalyticsView,
 )
 
 urlpatterns = [
@@ -12,4 +13,5 @@ urlpatterns = [
     path('academician/', AcademicianAnalyticsView.as_view(), name='academician_analytics'),
     path('system/', SystemAnalyticsView.as_view(), name='system_analytics'),
     path('admin/', SystemAnalyticsView.as_view(), name='admin_analytics'),
+    path('industry-demand/', IndustryDemandAnalyticsView.as_view(), name='industry_demand_analytics'),
 ]

@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { registerUser } from "../../features/auth/authSlice";
+import { registerUser, logout } from "../../features/auth/authSlice";
 import { profileApi } from "../../api/profile.api";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
@@ -16,6 +16,8 @@ const ROLE_TABS = [
 export default function Register() {
   const navigate = useNavigate();
   const { role: paramRole } = useParams();
+  const [searchParams] = useSearchParams();
+  const redirectParam = searchParams.get("redirect") || searchParams.get("returnUrl");
   const dispatch = useDispatch();
 
   const initialRole = paramRole && ["student", "industry", "Institute"].includes(paramRole) ? paramRole : "student";
@@ -24,20 +26,31 @@ export default function Register() {
   const [errors, setErrors] = useState({});
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   const [pending, setPending] = useState(null);
+  const [institutions, setInstitutions] = useState([]);
+
+  useEffect(() => {
+    profileApi.getInstitutions()
+      .then((data) => {
+        const list = Array.isArray(data) ? data : data?.results || [];
+        setInstitutions(list);
+      })
+      .catch(() => setInstitutions([]));
+  }, []);
 
   // Short forms as requested:
-  // Student: name, email, phone, password
+  // Student: name, email, phone, password, institutionId
   // Industry: companyName, companyEmail, password
   // Institute: name, email, password
-  const [studentForm, setStudentForm] = useState({ name: "", email: "", phone: "", password: "", profilePicture: "" });
+  const [studentForm, setStudentForm] = useState({ name: "", email: "", phone: "", password: "", institutionId: "", profilePicture: "" });
   const [industryForm, setIndustryForm] = useState({ companyName: "", companyEmail: "", password: "", profilePicture: "" });
   const [InstituteForm, setInstituteForm] = useState({ name: "", email: "", password: "", profilePicture: "" });
 
   const splitName = (fullName) => {
     const parts = (fullName || "").trim().split(/\s+/);
-    const first_name = parts[0] || "User";
-    const last_name = parts.slice(1).join(" ") || "User";
+    const first_name = parts[0] || "";
+    const last_name = parts.slice(1).join(" ") || "";
     return { first_name, last_name };
   };
 
@@ -64,8 +77,8 @@ export default function Register() {
 
   const validateInstitute = () => {
     const e = {};
-    if (!InstituteForm.name.trim()) e.name = "Full name required";
-    if (!InstituteForm.email.trim()) e.email = "Email required";
+    if (!InstituteForm.name.trim()) e.name = "Institute name required";
+    if (!InstituteForm.email.trim()) e.email = "Institute email required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(InstituteForm.email)) e.email = "Invalid email";
     if (!InstituteForm.password) e.password = "Password required";
     else if (InstituteForm.password.length < 6) e.password = "At least 6 chars";
@@ -78,6 +91,10 @@ export default function Register() {
     if (activeRole === "student") errs = validateStudent();
     else if (activeRole === "industry") errs = validateIndustry();
     else errs = validateInstitute();
+
+    if (!agreed) {
+      errs.agreed = "Please agree to the Terms and Privacy Policy to continue.";
+    }
 
     if (Object.keys(errs).length) {
       setErrors(errs);
@@ -97,6 +114,8 @@ export default function Register() {
         role: "student",
         password: studentForm.password,
         confirm_password: studentForm.password,
+        institution_id: studentForm.institutionId || null,
+        phone: studentForm.phone || "",
         profile_picture: studentForm.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(studentForm.name)}&background=0D9488&color=ffffff&bold=true`,
       };
     } else if (activeRole === "industry") {
@@ -116,7 +135,7 @@ export default function Register() {
         email: InstituteForm.email,
         first_name,
         last_name,
-        role: "Institute",
+        role: "academician",
         password: InstituteForm.password,
         confirm_password: InstituteForm.password,
         profile_picture: InstituteForm.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(InstituteForm.name)}&background=0D9488&color=ffffff&bold=true`,
@@ -128,36 +147,45 @@ export default function Register() {
       if (registerUser.fulfilled.match(resultAction)) {
         if (activeRole === "student") {
           try {
-            await profileApi.updateStudentProfile({ phone: studentForm.phone });
+            await profileApi.updateStudentProfile({
+              phone: studentForm.phone,
+              institution: studentForm.institutionId || null,
+            });
           } catch {
             // Profile fallback
           }
-          setToast({ type: "success", message: "Account created! Redirecting to Student dashboard…" });
-          setTimeout(() => navigate("/student/dashboard"), 700);
+          setToast({ type: "success", message: "Student account created! Redirecting…" });
+          const target = redirectParam || "/student/dashboard";
+          setTimeout(() => navigate(target), 600);
         } else if (activeRole === "industry") {
-          try {
-            await profileApi.updateCompanyProfile({ company_name: industryForm.companyName });
-          } catch {
-            // Profile fallback
-          }
+          // Clear session since approval is needed
+          await dispatch(logout());
           setPending({
-            role: "industry",
-            title: "Verification Pending",
-            desc: "Your company account has been created. You can complete remaining company profile details in your dashboard.",
+            role: "Company / Industry Partner",
+            name: industryForm.companyName,
+            email: industryForm.companyEmail,
           });
         } else {
+          // Clear session since approval is needed
+          await dispatch(logout());
           setPending({
-            role: "Institute",
-            title: "Account Created",
-            desc: "Your Institute account has been created. You can complete your institution profile details in your dashboard.",
+            role: "Educational Institute",
+            name: InstituteForm.name,
+            email: InstituteForm.email,
           });
         }
       } else {
-        const errorMsg = resultAction.payload || "Registration failed. Please check your details.";
-        setToast({ type: "danger", message: errorMsg });
+        const errorData = resultAction.payload;
+        if (typeof errorData === "object" && errorData !== null) {
+          setErrors(errorData);
+          const firstErr = Object.values(errorData).flat()[0];
+          setToast({ type: "error", message: firstErr || "Registration failed. Please check inputs." });
+        } else {
+          setToast({ type: "error", message: String(errorData || "Registration failed.") });
+        }
       }
     } catch (err) {
-      setToast({ type: "danger", message: err.message || "An unexpected error occurred during registration." });
+      setToast({ type: "error", message: "Network error occurred. Please try again." });
     } finally {
       setLoading(false);
     }
@@ -165,23 +193,42 @@ export default function Register() {
 
   if (pending) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
-        <div className="w-full max-w-md bg-surface rounded-2xl border border-border shadow-card p-8 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-600">
-            <AppIcon name="hourglass_top" className="text-3xl" />
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6">
+        <div className="w-full max-w-lg bg-surface rounded-3xl border border-border shadow-2xl p-8 sm:p-10 text-center relative overflow-hidden">
+          <div className="absolute -top-16 -right-16 w-36 h-36 bg-amber-400/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-600 border border-amber-500/20 mb-5">
+            <AppIcon name="hourglass_top" className="text-3xl animate-pulse" />
           </div>
-          <h2 className="mt-4 text-xl font-bold text-charcoal">{pending.title}</h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted">{pending.desc}</p>
-          <div className="mt-6 flex flex-col gap-2">
-            <Button onClick={() => navigate("/login")} className="w-full">Go to Login</Button>
-            <Button variant="outline" onClick={() => navigate("/")} className="w-full">Back to Home</Button>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 border border-amber-500/20 mb-3">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
+            Verification Required
+          </span>
+          <h2 className="text-2xl font-bold text-charcoal">{pending.title}</h2>
+          {pending.name && (
+            <p className="mt-1 text-sm font-semibold text-primary">{pending.name}</p>
+          )}
+          <p className="mt-3 text-sm leading-relaxed text-charcoal/70">{pending.desc}</p>
+
+          <div className="mt-6 p-4 rounded-2xl bg-background/80 border border-border text-left space-y-2">
+            <div className="flex items-center gap-2 text-xs font-semibold text-charcoal">
+              <AppIcon name="shield" className="text-primary text-[16px]" />
+              <span>What happens next?</span>
+            </div>
+            <p className="text-xs text-charcoal/60 leading-relaxed">
+              1. Platform administrator reviews your {pending.role} registration.<br />
+              2. You will receive access once the approval is completed.<br />
+              3. You can then sign in with your email &amp; password.
+            </p>
           </div>
-          <p className="mt-4 text-xs text-muted">
-            Demo: also saved locally as {pending.role} — you can still{" "}
-            <Link to={pending.role === "industry" ? "/industry/dashboard" : "/Institute/dashboard"} className="text-primary underline">
-              view dashboard
-            </Link>.
-          </p>
+
+          <div className="mt-8 flex flex-col sm:flex-row gap-3">
+            <Button onClick={() => navigate("/login")} variant="primary" className="flex-1 rounded-xl">
+              Go to Sign In
+            </Button>
+            <Button onClick={() => navigate("/")} variant="outline" className="flex-1 rounded-xl">
+              Back to Home
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -206,7 +253,7 @@ export default function Register() {
           </div>
 
           {/* Middle Rich Content (Fixed Top Gap) */}
-          <div className="relative z-10 mt-8 mb-auto space-y-6">
+          <div className="relative z-10 mt-8 space-y-6">
             <div>
               <h1 className="text-[2.25rem] font-extrabold leading-tight">Create your<br />future with us.</h1>
               <p className="mt-3 text-white/80 leading-relaxed text-sm max-w-md">
@@ -253,7 +300,7 @@ export default function Register() {
             </div>
           </div>
 
-          <div className="relative z-10 text-xs text-white/70 flex items-center justify-between">
+          <div className="relative z-10 text-xs text-white/70 flex items-center justify-between mt-6">
             <span>CareerSync Platform &copy; 2026</span>
             <span className="flex items-center gap-1.5 font-medium">
               <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />
@@ -326,7 +373,26 @@ export default function Register() {
                   <Input label="Full name" placeholder="Ananya Sharma" autoComplete="name" required value={studentForm.name} onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })} error={errors.name} />
                   <Input label="Email address" type="email" placeholder="you@college.edu" autoComplete="email" required value={studentForm.email} onChange={(e) => setStudentForm({ ...studentForm, email: e.target.value })} error={errors.email} />
                   <Input label="Phone number" placeholder="+91 98765 43210" autoComplete="tel" required value={studentForm.phone} onChange={(e) => setStudentForm({ ...studentForm, phone: e.target.value })} error={errors.phone} />
-                  <Input label="Profile Picture URL (Optional)" placeholder="https://example.com/avatar.jpg" value={studentForm.profilePicture} onChange={(e) => setStudentForm({ ...studentForm, profilePicture: e.target.value })} />
+
+                  <div>
+                    <label className="text-sm font-medium text-charcoal block mb-1">
+                      College / Institution <span className="text-xs text-muted font-normal">(Optional)</span>
+                    </label>
+                    <select
+                      value={studentForm.institutionId}
+                      onChange={(e) => setStudentForm({ ...studentForm, institutionId: e.target.value })}
+                      className="w-full rounded-xl border border-border bg-white px-3.5 py-2.5 text-sm text-charcoal shadow-soft focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                    >
+                      <option value="">-- Select your College / University (Optional) --</option>
+                      {institutions.map((inst) => (
+                        <option key={inst.id} value={inst.id}>
+                          {inst.name} {inst.city ? `(${inst.city})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-[11px] text-muted mt-1">You can also link or change your college later in profile settings.</p>
+                  </div>
+
                   <div>
                     <label htmlFor="student-password" className="text-sm font-medium text-charcoal">Password <span className="text-danger ml-1">*</span></label>
                     <div className="relative mt-1.5">
@@ -344,7 +410,7 @@ export default function Register() {
                 <>
                   <Input label="Company name" placeholder="TechNova Pvt Ltd" required value={industryForm.companyName} onChange={(e) => setIndustryForm({ ...industryForm, companyName: e.target.value })} error={errors.companyName} />
                   <Input label="Company email" type="email" placeholder="hr@technova.com" autoComplete="email" required value={industryForm.companyEmail} onChange={(e) => setIndustryForm({ ...industryForm, companyEmail: e.target.value })} error={errors.companyEmail} />
-                  <Input label="Company Logo / Profile Picture URL (Optional)" placeholder="https://example.com/logo.png" value={industryForm.profilePicture} onChange={(e) => setIndustryForm({ ...industryForm, profilePicture: e.target.value })} />
+
                   <div>
                     <label htmlFor="industry-password" className="text-sm font-medium text-charcoal">Password <span className="text-danger ml-1">*</span></label>
                     <div className="relative mt-1.5">
@@ -360,9 +426,8 @@ export default function Register() {
 
               {activeRole === "Institute" && (
                 <>
-                  <Input label="Full name" placeholder="Dr. Priya Singh" autoComplete="name" required value={InstituteForm.name} onChange={(e) => setInstituteForm({ ...InstituteForm, name: e.target.value })} error={errors.name} />
-                  <Input label="Email address" type="email" placeholder="priya@college.edu" autoComplete="email" required value={InstituteForm.email} onChange={(e) => setInstituteForm({ ...InstituteForm, email: e.target.value })} error={errors.email} />
-                  <Input label="Institution Logo / Profile Picture URL (Optional)" placeholder="https://example.com/college.png" value={InstituteForm.profilePicture} onChange={(e) => setInstituteForm({ ...InstituteForm, profilePicture: e.target.value })} />
+                  <Input label="Institute Name" placeholder="Vidya Vihar Institute Of Technology" autoComplete="name" required value={InstituteForm.name} onChange={(e) => setInstituteForm({ ...InstituteForm, name: e.target.value })} error={errors.name} />
+                  <Input label="Institute Email" type="email" placeholder="vvit@college.edu" autoComplete="email" required value={InstituteForm.email} onChange={(e) => setInstituteForm({ ...InstituteForm, email: e.target.value })} error={errors.email} />
                   <div>
                     <label htmlFor="Institute-password" className="text-sm font-medium text-charcoal">Password <span className="text-danger ml-1">*</span></label>
                     <div className="relative mt-1.5">
@@ -376,16 +441,37 @@ export default function Register() {
                 </>
               )}
 
-              <label className="flex items-start gap-2.5 text-sm leading-relaxed mt-2">
-                <input type="checkbox" required className="mt-1 w-4 h-4 rounded border-border text-primary accent-primary" />
-                <span className="text-muted">I agree to the <a href="#" className="font-medium text-primary hover:underline">Terms</a> and <a href="#" className="font-medium text-primary hover:underline">Privacy Policy</a></span>
-              </label>
+              <div>
+                <label className="flex items-start gap-2.5 text-sm leading-relaxed mt-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={agreed}
+                    onChange={(e) => {
+                      setAgreed(e.target.checked);
+                      if (errors.agreed) {
+                        setErrors((prev) => {
+                          const copy = { ...prev };
+                          delete copy.agreed;
+                          return copy;
+                        });
+                      }
+                    }}
+                    className="mt-1 w-4 h-4 rounded border-border text-primary accent-primary cursor-pointer"
+                  />
+                  <span className="text-muted">
+                    I agree to the <a href="#" className="font-medium text-primary hover:underline">Terms</a> and <a href="#" className="font-medium text-primary hover:underline">Privacy Policy</a>
+                  </span>
+                </label>
+                {errors.agreed && (
+                  <p role="alert" className="mt-1 text-xs font-medium text-danger">{errors.agreed}</p>
+                )}
+              </div>
 
               <Button type="submit" variant="primary" size="lg" className="w-full rounded-xl mt-2" disabled={loading}>
                 {loading ? "Creating account…" : `Create ${activeRole === "student" ? "Student" : activeRole === "industry" ? "Industry" : "Institute"} account`}
               </Button>
-              <p className="text-center text-xs text-charcoal/60 mt-4">
-                Already have an account? <Link to="/login" className="font-semibold text-primary hover:underline">Sign in</Link> • Admin? <Link to="/admin/login" className="font-medium text-charcoal hover:text-primary underline decoration-border">Admin login</Link>
+              <p className="text-center text-sm text-charcoal/60 mt-4">
+                Already have an account? <Link to={redirectParam ? `/login?redirect=${encodeURIComponent(redirectParam)}` : "/login"} className="font-semibold text-primary hover:underline">Sign in</Link>
               </p>
             </form>
           </div>

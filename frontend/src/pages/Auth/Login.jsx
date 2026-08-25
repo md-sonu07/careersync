@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setCredentials, loginUser } from "../../features/auth/authSlice";
+import { setCredentials, loginUser, logout } from "../../features/auth/authSlice";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import Select from "../../components/ui/Select";
@@ -18,6 +18,8 @@ const ROLE_ROUTES = {
 export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const redirectParam = searchParams.get("redirect") || searchParams.get("returnUrl");
 
   const [form, setForm] = useState({
     email: "",
@@ -65,6 +67,16 @@ export default function Login() {
         const user = payload.user;
         const userRole = (user?.role || "student").toLowerCase();
 
+        // Check for admin approval if user is Institute or Industry
+        if ((userRole === "academician" || userRole === "institute" || userRole === "industry") && !user?.is_verified) {
+          await dispatch(logout());
+          setToast({
+            type: "danger",
+            message: "Your account is pending Admin Approval. Please wait for an administrator to verify your account before signing in.",
+          });
+          return;
+        }
+
         if (form.rememberMe) localStorage.setItem("rememberMe", "true");
 
         setToast({
@@ -72,7 +84,7 @@ export default function Login() {
           message: `Welcome back${user?.first_name ? `, ${user.first_name}` : ""}! Redirecting...`,
         });
 
-        const target = ROLE_ROUTES[userRole] || ROLE_ROUTES.student;
+        const target = redirectParam || ROLE_ROUTES[userRole] || ROLE_ROUTES.student;
         setTimeout(() => navigate(target), 600);
       } else {
         const errorMsg = resultAction.payload || "Login failed. Please check your credentials.";
@@ -353,20 +365,10 @@ export default function Login() {
             <p className="mt-6 text-center text-sm text-charcoal/70">
               Don&apos;t have an account?{" "}
               <Link
-                to="/register"
+                to={redirectParam ? `/register?redirect=${encodeURIComponent(redirectParam)}` : "/register"}
                 className="font-semibold text-primary hover:underline underline-offset-4"
               >
                 Register now
-              </Link>
-            </p>
-
-            <p className="mt-4 text-center text-xs text-charcoal/60">
-              Admin?{" "}
-              <Link
-                to="/admin/login"
-                className="font-medium text-charcoal hover:text-primary underline underline-offset-4 decoration-border"
-              >
-                Secure admin login
               </Link>
             </p>
           </div>

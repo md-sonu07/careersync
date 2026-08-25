@@ -43,8 +43,7 @@ class StudentProfileSerializer(serializers.ModelSerializer):
         institution_name = validated_data.pop('institution_name', None)
         if institution_name:
             inst, _ = Institution.objects.get_or_create(
-                name=institution_name.strip(),
-                defaults={'institution_type': 'college'}
+                name=institution_name.strip()
             )
             instance.institution = inst
 

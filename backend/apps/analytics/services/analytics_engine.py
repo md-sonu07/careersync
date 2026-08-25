@@ -131,43 +131,52 @@ def get_company_analytics(company: Company):
     }
 
 
-def get_academician_analytics():
+def get_academician_analytics(user=None):
     """
     Phase 13 — Academician / Institution Analytics via dynamic ORM queries:
+    - Scoped to the specific institution of the authenticated user
     - Average Student Skill Scores
-    - Top Skill Gaps across student body
-    - Industry Demand
+    - Top Skill Gaps across enrolled students
     - Student Readiness distribution
     - Placement Statistics
     """
-    total_students = StudentProfile.objects.count()
-    avg_score = StudentSkill.objects.aggregate(avg=Avg('score'))['avg'] or 0.0
+    students_qs = StudentProfile.objects.all()
+    if user and getattr(user, 'role', None) == 'academician' and hasattr(user, 'academician_profile'):
+        inst = getattr(user.academician_profile, 'institution', None)
+        if inst:
+            students_qs = students_qs.filter(institution=inst)
+        else:
+            students_qs = StudentProfile.objects.none()
 
-    # Top skill gaps aggregate count
-    gaps_qs = SkillGap.objects.values('skill__name').annotate(gap_count=Count('id')).order_by('-gap_count')
+    total_students = students_qs.count()
+    avg_score = StudentSkill.objects.filter(student__in=students_qs).aggregate(avg=Avg('score'))['avg'] or 0.0
+
+    # Top skill gaps aggregate count for this cohort
+    gaps_qs = SkillGap.objects.filter(student__in=students_qs).values('skill__name').annotate(gap_count=Count('id')).order_by('-gap_count')
     top_gaps_aggregate = [
         {"skill_name": item['skill__name'], "total_students_with_gap": item['gap_count']}
         for item in gaps_qs[:5]
     ]
 
     # Student Readiness distribution
-    job_ready_students = StudentProfile.objects.annotate(
+    job_ready_students = students_qs.annotate(
         avg_s=Avg('skills__score')
     ).filter(avg_s__gte=75).count()
 
-    improving_students = StudentProfile.objects.annotate(
+    improving_students = students_qs.annotate(
         avg_s=Avg('skills__score')
     ).filter(avg_s__gte=50, avg_s__lt=75).count()
 
-    needs_focus_students = total_students - (job_ready_students + improving_students)
+    needs_focus_students = max(0, total_students - (job_ready_students + improving_students))
 
     # Placement statistics
-    total_apps = Application.objects.count()
-    shortlisted_apps = Application.objects.filter(
+    apps_qs = Application.objects.filter(student__in=students_qs)
+    total_apps = apps_qs.count()
+    shortlisted_apps = apps_qs.filter(
         status__in=[ApplicationStatus.SHORTLISTED, ApplicationStatus.INTERVIEW, ApplicationStatus.SELECTED]
     ).count()
 
-    selected_apps = Application.objects.filter(status=ApplicationStatus.SELECTED).count()
+    selected_apps = apps_qs.filter(status=ApplicationStatus.SELECTED).count()
 
     return {
         "total_students": total_students,
@@ -176,7 +185,7 @@ def get_academician_analytics():
         "student_readiness": {
             "job_ready_count": job_ready_students,
             "improving_count": improving_students,
-            "needs_focus_count": max(0, needs_focus_students),
+            "needs_focus_count": needs_focus_students,
         },
         "placement_statistics": {
             "total_applications": total_apps,
@@ -235,4 +244,74 @@ def get_admin_analytics():
             "admins": {"total": admins_count, "verified": verified_admins},
         },
         "system_health": 100,
+    }
+
+
+def get_industry_demand_analytics():
+    """
+    Computes real live industry skill demand and hiring trends directly from active Opportunity postings.
+    """
+    from companies.models import Opportunity, OpportunitySkillRequirement, Company, WorkMode, OpportunityType
+    from django.db.models import Count, Avg, Q
+
+    published_opps = Opportunity.objects.filter(status='published')
+    total_drives = published_opps.count()
+
+    # Skill Demand Query from live published requirements
+    skills_qs = OpportunitySkillRequirement.objects.filter(
+        opportunity__status='published'
+    ).values('skill__name', 'skill__category').annotate(
+        postings_count=Count('id'),
+        avg_min_score=Avg('minimum_score')
+    ).order_by('-postings_count')
+
+    top_skills = [
+        {
+            "name": item['skill__name'],
+            "category": item['skill__category'] or "Technical",
+            "postings_count": item['postings_count'],
+            "demand_percentage": round((item['postings_count'] / max(1, total_drives)) * 100) if total_drives > 0 else 0,
+            "avg_benchmark": round(float(item['avg_min_score'] or 70))
+        }
+        for item in skills_qs[:10]
+    ]
+
+    # Top Hiring Companies
+    companies_qs = Company.objects.filter(
+        opportunities__status='published'
+    ).annotate(
+        active_drives=Count('opportunities', filter=Q(opportunities__status='published'))
+    ).filter(active_drives__gt=0).order_by('-active_drives')[:8]
+
+    top_companies = [
+        {
+            "id": str(c.id),
+            "name": c.company_name,
+            "logo": c.logo,
+            "industry_type": c.industry_type or "Technology",
+            "website": c.website,
+            "active_posts": c.active_drives
+        }
+        for c in companies_qs
+    ]
+
+    # Work Mode breakdown
+    remote_count = published_opps.filter(work_mode=WorkMode.REMOTE).count()
+    hybrid_count = published_opps.filter(work_mode=WorkMode.HYBRID).count()
+    onsite_count = published_opps.filter(work_mode=WorkMode.ONSITE).count()
+
+    internships_count = published_opps.filter(opportunity_type=OpportunityType.INTERNSHIP).count()
+    jobs_count = published_opps.filter(opportunity_type=OpportunityType.JOB).count()
+
+    return {
+        "total_active_drives": total_drives,
+        "internships_count": internships_count,
+        "jobs_count": jobs_count,
+        "top_demanded_skills": top_skills,
+        "top_hiring_companies": top_companies,
+        "work_mode_distribution": {
+            "remote": remote_count,
+            "hybrid": hybrid_count,
+            "onsite": onsite_count
+        }
     }

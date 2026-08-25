@@ -27,6 +27,11 @@ const ProtectedRoute = ({ allowedRoles = [] }) => {
       const redirectPath = getRoleDashboard(userRole)
       return <Navigate to={redirectPath} replace />
     }
+
+    // Guard against unapproved institute / industry accounts
+    if ((userRole === 'academician' || userRole === 'institute' || userRole === 'industry') && !user?.is_verified) {
+      return <Navigate to="/login" replace />
+    }
   }
 
   return <Outlet />
