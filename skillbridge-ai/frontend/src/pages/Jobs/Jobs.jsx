@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import Card from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
@@ -7,6 +7,7 @@ import Select from '../../components/ui/Select'
 import Button from '../../components/ui/Button'
 import JobApplicationModal from '../../components/ui/JobApplicationModal'
 import AppIcon from '../../components/ui/AppIcon';
+import { opportunityApi } from '../../api/opportunity.api'
 
 const mockJobs = [
   { id: 1, role: 'Frontend Engineer', company: 'TechNova', logo: 'TN', location: 'Bengaluru', salary: '₹8–12 LPA', exp: '0–2 years', type: 'Full-time', mode: 'Remote', skills: ['React', 'TypeScript', 'Testing'], match: 93, posted: '2 days ago', applicants: 312 },
@@ -57,6 +58,7 @@ const JobCard = ({ item, onApply }) => (
 )
 
 const Jobs = () => {
+  const [liveJobs, setLiveJobs] = useState([])
   const [q, setQ] = useState('')
   const [exp, setExp] = useState('All')
   const [type, setType] = useState('All')
@@ -66,8 +68,41 @@ const Jobs = () => {
   const [match, setMatch] = useState('All')
   const [selectedJobForApply, setSelectedJobForApply] = useState(null)
 
+  useEffect(() => {
+    let isMounted = true
+    opportunityApi.getOpportunities({ type: 'job' })
+      .then((data) => {
+        if (isMounted && Array.isArray(data) && data.length > 0) {
+          const formatted = data.map((item) => ({
+            id: item.id,
+            role: item.title,
+            company: item.company?.company_name || 'Hiring Partner',
+            logo: (item.company?.company_name || 'CS')[0].toUpperCase(),
+            location: item.location || 'Hybrid',
+            salary: item.stipend_salary || '₹8–12 LPA',
+            exp: '0–2 years',
+            type: 'Full-time',
+            mode: item.work_mode ? item.work_mode.charAt(0).toUpperCase() + item.work_mode.slice(1) : 'Hybrid',
+            skills: item.skill_requirements && item.skill_requirements.length > 0
+              ? item.skill_requirements.map((r) => r.skill?.name || 'Skill')
+              : ['React', 'Node.js', 'SQL'],
+            match: 95,
+            posted: 'Just now',
+            applicants: 1,
+          }))
+          setLiveJobs(formatted)
+        }
+      })
+      .catch(() => {})
+    return () => { isMounted = false }
+  }, [])
+
+  const allListings = useMemo(() => {
+    return [...liveJobs, ...mockJobs]
+  }, [liveJobs])
+
   const filtered = useMemo(() => {
-    return mockJobs.filter((j) => {
+    return allListings.filter((j) => {
       if (q && !(`${j.role} ${j.company} ${j.skills.join(' ')}`.toLowerCase().includes(q.toLowerCase()))) return false
       if (exp !== 'All' && j.exp !== exp) return false
       if (type !== 'All' && j.type !== type) return false
@@ -86,7 +121,7 @@ const Jobs = () => {
       }
       return true
     })
-  }, [q, exp, type, mode, location, salary, match])
+  }, [allListings, q, exp, type, mode, location, salary, match])
 
   return (
     <div className="bg-background min-h-screen">

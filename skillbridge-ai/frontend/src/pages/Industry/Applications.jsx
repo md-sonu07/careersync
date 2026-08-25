@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
@@ -7,19 +8,9 @@ import Badge from '../../components/ui/Badge'
 import Modal from '../../components/ui/Modal'
 import Textarea from '../../components/ui/Textarea'
 import AppIcon from '../../components/ui/AppIcon';
+import { applicationApi } from '../../api/application.api'
 
 const STATUSES = ['Applied', 'Screening', 'Shortlisted', 'Interview', 'Selected', 'Rejected']
-
-const initialApps = [
-  { id: 'A1', name: 'Rahul Sharma', role: 'Frontend Intern', avatar: 'https://i.pravatar.cc/150?img=12', match: 94, status: 'Applied', date: '2026-02-12', skills: ['React', 'JS'], notes: '' },
-  { id: 'A2', name: 'Aman Verma', role: 'Frontend Intern', avatar: 'https://i.pravatar.cc/150?img=15', match: 89, status: 'Screening', date: '2026-02-11', skills: ['React', 'TS'], notes: 'Good comms' },
-  { id: 'A3', name: 'Priya Nair', role: 'Backend Intern', avatar: 'https://i.pravatar.cc/150?img=32', match: 86, status: 'Shortlisted', date: '2026-02-10', skills: ['Python', 'SQL'], notes: '' },
-  { id: 'A4', name: 'Sara Khan', role: 'Full Stack', avatar: 'https://i.pravatar.cc/150?img=25', match: 78, status: 'Interview', date: '2026-02-09', skills: ['Java', 'SQL'], notes: 'Interview on 15th' },
-  { id: 'A5', name: 'Dev Patel', role: 'Frontend Intern', avatar: 'https://i.pravatar.cc/150?img=33', match: 72, status: 'Applied', date: '2026-02-12', skills: ['JS', 'CSS'], notes: '' },
-  { id: 'A6', name: 'Neha Gupta', role: 'Backend Intern', avatar: 'https://i.pravatar.cc/150?img=26', match: 91, status: 'Selected', date: '2026-02-08', skills: ['Node', 'Mongo'], notes: 'Offer sent' },
-  { id: 'A7', name: 'Arjun Mehta', role: 'Full Stack', avatar: 'https://i.pravatar.cc/150?img=14', match: 65, status: 'Rejected', date: '2026-02-07', skills: ['React'], notes: 'Skill gap' },
-  { id: 'A8', name: 'Kiran Rao', role: 'Frontend Intern', avatar: 'https://i.pravatar.cc/150?img=20', match: 88, status: 'Shortlisted', date: '2026-02-10', skills: ['React', 'Tailwind'], notes: '' },
-]
 
 const statusColor = {
   Applied: 'bg-slate-100 text-slate-700 border-slate-200',
@@ -34,19 +25,21 @@ function AppCard({ app, onStatusChange, onNotes, onCompare }) {
   return (
     <div className="rounded-xl border border-border bg-white p-3 shadow-subtle space-y-2 hover:shadow-soft transition-shadow">
       <div className="flex gap-2.5">
-        <img src={app.avatar} alt="" className="h-9 w-9 rounded-full border border-border shrink-0" />
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-sm shrink-0">
+          {app.name?.[0] || 'S'}
+        </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold text-charcoal truncate">{app.name}</p>
           <p className="text-xs text-muted truncate">{app.role} • {app.date}</p>
         </div>
         <span className="rounded-full bg-sage px-2 py-0.5 text-xs font-bold text-primary shrink-0 h-fit">{app.match}%</span>
       </div>
-      <div className="flex flex-wrap gap-1">{app.skills.map((s) => <span key={s} className="rounded-full bg-background border border-border px-2 py-0.5 text-[11px] font-medium text-charcoal">{s}</span>)}</div>
+      <div className="flex flex-wrap gap-1">{app.skills?.map((s) => <span key={s} className="rounded-full bg-background border border-border px-2 py-0.5 text-[11px] font-medium text-charcoal">{s}</span>)}</div>
       <div className="flex items-center gap-2">
         <select
           value={app.status}
           onChange={(e) => onStatusChange(app.id, e.target.value)}
-          className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-bold ${statusColor[app.status]}`}
+          className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-bold ${statusColor[app.status] || 'bg-white'}`}
         >
           {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
@@ -59,7 +52,8 @@ function AppCard({ app, onStatusChange, onNotes, onCompare }) {
 }
 
 export default function Applications() {
-  const [apps, setApps] = useState(initialApps)
+  const [apps, setApps] = useState([])
+  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [roleFilter, setRoleFilter] = useState('All')
@@ -67,6 +61,32 @@ export default function Applications() {
   const [noteTarget, setNoteTarget] = useState(null)
   const [noteText, setNoteText] = useState('')
   const [compareList, setCompareList] = useState([])
+
+  useEffect(() => {
+    let isMounted = true
+    applicationApi.getCompanyApplications()
+      .then((data) => {
+        if (isMounted) {
+          const formatted = (Array.isArray(data) ? data : data?.results || []).map((a) => ({
+            id: a.id,
+            name: a.student_name || 'Candidate',
+            role: a.opportunity_title || 'Opportunity',
+            avatar: '',
+            match: a.match_score || 85,
+            status: a.status ? a.status.charAt(0).toUpperCase() + a.status.slice(1) : 'Applied',
+            date: a.applied_at ? a.applied_at.split('T')[0] : 'Recent',
+            skills: a.verified_skills || ['React', 'Python'],
+            notes: a.remarks || ''
+          }))
+          setApps(formatted)
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (isMounted) setLoading(false)
+      })
+    return () => { isMounted = false }
+  }, [])
 
   const filtered = apps.filter((a) => {
     if (search && !a.name.toLowerCase().includes(search.toLowerCase()) && !a.role.toLowerCase().includes(search.toLowerCase())) return false
@@ -90,10 +110,14 @@ export default function Applications() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-charcoal">Applications</h1>
-          <p className="text-sm text-muted mt-1">Kanban pipeline — drag-free status change, notes, resume compare</p>
+          <h1 className="text-2xl font-bold text-charcoal">Applications Pipeline</h1>
+          <p className="text-sm text-muted mt-1">Review candidates, drag-free status change, interview notes, resume compare</p>
         </div>
-        <Badge variant="default">{filtered.length} applications</Badge>
+        <div className="flex items-center gap-2">
+          <Link to="/industry/internship/new"><Button variant="outline" size="sm" icon="work">Post Internship</Button></Link>
+          <Link to="/industry/job/new"><Button variant="primary" size="sm" icon="business_center">Post Job</Button></Link>
+          <Badge variant="default">{filtered.length} applications</Badge>
+        </div>
       </div>
 
       <Card className="!p-4">

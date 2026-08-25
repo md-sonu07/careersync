@@ -8,7 +8,7 @@ import {
   Mail, Menu, Medal, Activity, MoreHorizontal, Bell, ExternalLink, Banknote, UserSearch,
   Play, PlayCircle, BrainCircuit, FileQuestion, Clock, GraduationCap, Search, Send,
   Shield, Bot, Star, Timer, TrendingUp, BadgeCheck, UserCheck, Eye, AlertTriangle, Hand,
-  Briefcase, Award
+  Briefcase, Award, Zap, Share2, Users, AtSign, Monitor, Infinity, Video, UserPlus
 } from 'lucide-react';
 
 // Custom Brand SVGs
@@ -47,7 +47,9 @@ const ChatIcon = ({ className, size="1em" }) => (
 const iconMap = {
   add: Plus,
   add_circle: PlusCircle,
+  all_inclusive: Infinity,
   alt_route: Route,
+  alternate_email: AtSign,
   apartment: Building2,
   arrow_back: ArrowLeft,
   arrow_forward: ArrowRight,
@@ -58,7 +60,9 @@ const iconMap = {
   auto_awesome: Sparkles,
   auto_stories: BookOpen,
   bar_chart: BarChart3,
+  bolt: Zap,
   business: Building,
+  business_center: Briefcase,
   chat_bubble: MessageCircle,
   check_circle: CheckCircle2,
   chevron_right: ChevronRight,
@@ -70,9 +74,11 @@ const iconMap = {
   construction: Wrench,
   delete: Trash2,
   description: FileText,
+  devices: Monitor,
   download: Download,
   error: AlertCircle,
   flag: Flag,
+  group: Users,
   history: History,
   home: Home,
   hourglass_top: Hourglass,
@@ -92,26 +98,32 @@ const iconMap = {
   logout: LogOut,
   mail: Mail,
   menu: Menu,
+  menu_book: BookOpen,
   military_tech: Medal,
   monitoring: Activity,
   more_horiz: MoreHorizontal,
   notifications: Bell,
   open_in_new: ExternalLink,
   payments: Banknote,
+  person_add: UserPlus,
   person_search: UserSearch,
   play_arrow: Play,
   play_circle: PlayCircle,
+  play_lesson: Video,
   psychology: BrainCircuit,
+  public: Globe,
   quiz: FileQuestion,
   schedule: Clock,
   school: GraduationCap,
   search: Search,
   send: Send,
+  share: Share2,
   shield: Shield,
   smart_toy: ChatIcon,
   star: Star,
   timer: Timer,
   trending_up: TrendingUp,
+  troubleshoot: Wrench,
   verified: BadgeCheck,
   verified_user: UserCheck,
   visibility: Eye,
@@ -132,9 +144,7 @@ const AppIcon = ({ name, className = '', ...props }) => {
   const IconComponent = iconMap[name];
   
   if (!IconComponent) {
-    console.warn(`Icon '${name}' not found in AppIcons.`);
-    // Fallback to avoid breaking layout
-    return <span className={`inline-block w-5 h-5 bg-gray-200 rounded-md ${className}`} />;
+    return <span className={`material-symbols-outlined select-none inline-flex items-center justify-center leading-none ${className}`} {...props}>{name}</span>;
   }
 
   // Determine if it's a lucide icon (needs size mapped from w-h classes ideally, 

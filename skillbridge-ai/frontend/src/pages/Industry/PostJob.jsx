@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
@@ -7,6 +8,8 @@ import Select from '../../components/ui/Select'
 import Badge from '../../components/ui/Badge'
 import Modal from '../../components/ui/Modal'
 import AppIcon from '../../components/ui/AppIcon';
+import { opportunityApi } from '../../api/opportunity.api'
+import { skillApi } from '../../api/skill.api'
 
 const ALL_SKILLS = ['React', 'Node.js', 'Python', 'JavaScript', 'TypeScript', 'SQL', 'MongoDB', 'AWS', 'Docker', 'Git', 'Java', 'Figma', 'Express.js', 'Next.js', 'Tailwind CSS', 'System Design', 'REST APIs']
 
@@ -125,8 +128,11 @@ function AIJobDescriptionAssistant({ onExtract }) {
 }
 
 export default function PostJob() {
+  const navigate = useNavigate()
   const [step, setStep] = useState(1)
   const [showPublish, setShowPublish] = useState(false)
+  const [publishing, setPublishing] = useState(false)
+  const [dbSkills, setDbSkills] = useState([])
   const [skills, setSkills] = useState([{ name: 'React', level: 'Required' }, { name: 'Node.js', level: 'Required' }, { name: 'SQL', level: 'Preferred' }])
   const [form, setForm] = useState({
     title: 'Junior Full Stack Developer',
@@ -142,9 +148,52 @@ export default function PostJob() {
     deadline: '',
     screening: 'Resume + Tech Interview',
   })
+
+  useEffect(() => {
+    skillApi.getSkills().then((res) => {
+      setDbSkills(Array.isArray(res) ? res : res?.results || [])
+    }).catch(() => {})
+  }, [])
+
   const handleAIExtract = (data) => { setForm((f) => ({ ...f, title: data.role, experience: data.experience })); setSkills(data.skills.map((s) => ({ name: s, level: 'Required' }))) }
   const next = () => setStep((s) => Math.min(6, s + 1))
   const back = () => setStep((s) => Math.max(1, s - 1))
+
+  const handlePublish = async () => {
+    setPublishing(true)
+    try {
+      const modeMap = { Remote: 'remote', 'On-site': 'onsite', Hybrid: 'hybrid' }
+      const reqs = skills.map((s) => {
+        const found = dbSkills.find((d) => d.name.toLowerCase() === s.name.toLowerCase())
+        return found ? {
+          skill_id: found.id,
+          minimum_score: 70,
+          weight: 1.0,
+          is_required: s.level === 'Required'
+        } : null
+      }).filter(Boolean)
+
+      const payload = {
+        title: form.title || 'Junior Full Stack Developer',
+        opportunity_type: 'job',
+        description: form.description || `${form.title}. Eligibility: ${form.eligibility || 'All graduates'}`,
+        location: form.city ? `${form.city} (${form.location})` : form.location || 'Hybrid',
+        work_mode: modeMap[form.location] || 'hybrid',
+        duration: 'Full-time',
+        stipend_salary: form.ctc || '₹8-12 LPA',
+        deadline: form.deadline || null,
+        status: 'published',
+        skill_requirements: reqs,
+      }
+      await opportunityApi.createOpportunity(payload)
+      setShowPublish(true)
+    } catch (err) {
+      const errorMsg = err.response?.data ? JSON.stringify(err.response.data) : err.message
+      alert('Failed to publish job: ' + errorMsg)
+    } finally {
+      setPublishing(false)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -254,17 +303,23 @@ export default function PostJob() {
 
         <div className="mt-6 flex items-center justify-between border-t border-border pt-4">
           <Button variant="outline" onClick={back} disabled={step === 1}>Back</Button>
-          {step < 6 ? <Button onClick={next}>Continue →</Button> : <Button onClick={() => setShowPublish(true)} className="bg-success hover:bg-success/90">🚀 Publish Job</Button>}
+          {step < 6 ? (
+            <Button onClick={next}>Continue →</Button>
+          ) : (
+            <Button onClick={handlePublish} disabled={publishing} className="bg-success hover:bg-success/90">
+              {publishing ? 'Publishing...' : '🚀 Publish Job'}
+            </Button>
+          )}
         </div>
       </Card>
 
-      <Modal open={showPublish} onClose={() => setShowPublish(false)} title="Job Published!" description="Your job is now live.">
+      <Modal open={showPublish} onClose={() => { setShowPublish(false); navigate('/industry/dashboard'); }} title="Job Published!" description="Your job is now live on Django database.">
         <div className="space-y-4 text-sm text-charcoal">
           <div className="flex items-center justify-center h-16 w-16 rounded-full bg-success/10 text-success mx-auto"><AppIcon name="check_circle" className="text-[32px]" /></div>
           <p className="text-center text-muted"><strong>{form.title}</strong> is live. Matching candidates notified.</p>
           <div className="flex gap-2 justify-center">
-            <Button onClick={() => setShowPublish(false)}>Go to Applications</Button>
-            <Button variant="outline" onClick={() => setShowPublish(false)}>View Posting</Button>
+            <Button onClick={() => { setShowPublish(false); navigate('/industry/dashboard'); }}>Go to Dashboard</Button>
+            <Button variant="outline" onClick={() => { setShowPublish(false); navigate('/industry/internships'); }}>View Applications</Button>
           </div>
         </div>
       </Modal>

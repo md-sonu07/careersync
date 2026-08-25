@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import Card from '../../components/ui/Card'
 import Badge from '../../components/ui/Badge'
@@ -6,6 +6,7 @@ import SearchInput from '../../components/ui/SearchInput'
 import Select from '../../components/ui/Select'
 import Button from '../../components/ui/Button'
 import AppIcon from '../../components/ui/AppIcon';
+import { opportunityApi } from '../../api/opportunity.api'
 
 const mockInternships = [
   { id: 1, role: 'Frontend Developer Intern', company: 'TechNova', logo: 'TN', location: 'Bengaluru', duration: '3 months', stipend: '₹15,000/month', skills: ['React', 'TypeScript', 'Tailwind'], match: 91, deadline: '15 Sep 2026', type: 'Remote', applicants: 124 },
@@ -40,12 +41,13 @@ const InternshipCard = ({ item }) => (
 
     <div className="mt-4 flex items-center justify-between border-t border-border pt-4 text-xs">
       <span className="text-muted">Deadline: <span className="font-semibold text-charcoal">{item.deadline}</span> • {item.applicants} applicants</span>
-      <Link to="#" className="font-semibold text-primary hover:underline">View & Apply →</Link>
+      <Link to="/login" className="font-semibold text-primary hover:underline">View & Apply →</Link>
     </div>
   </Card>
 )
 
 const Internships = () => {
+  const [liveInternships, setLiveInternships] = useState([])
   const [q, setQ] = useState('')
   const [role, setRole] = useState('All')
   const [skill, setSkill] = useState('All')
@@ -55,8 +57,40 @@ const Internships = () => {
   const [stipend, setStipend] = useState('All')
   const [match, setMatch] = useState('All')
 
+  useEffect(() => {
+    let isMounted = true
+    opportunityApi.getOpportunities({ type: 'internship' })
+      .then((data) => {
+        if (isMounted && Array.isArray(data) && data.length > 0) {
+          const formatted = data.map((item) => ({
+            id: item.id,
+            role: item.title,
+            company: item.company?.company_name || 'Hiring Partner',
+            logo: (item.company?.company_name || 'CS')[0].toUpperCase(),
+            location: item.location || 'Remote',
+            duration: item.duration || '3 months',
+            stipend: item.stipend_salary || '₹15,000/month',
+            skills: item.skill_requirements && item.skill_requirements.length > 0
+              ? item.skill_requirements.map((r) => r.skill?.name || 'Skill')
+              : ['Python', 'Django', 'REST'],
+            match: 95,
+            deadline: item.deadline || '30 Sep 2026',
+            type: item.work_mode ? item.work_mode.charAt(0).toUpperCase() + item.work_mode.slice(1) : 'Remote',
+            applicants: 1,
+          }))
+          setLiveInternships(formatted)
+        }
+      })
+      .catch(() => {})
+    return () => { isMounted = false }
+  }, [])
+
+  const allListings = useMemo(() => {
+    return [...liveInternships, ...mockInternships]
+  }, [liveInternships])
+
   const filtered = useMemo(() => {
-    return mockInternships.filter((it) => {
+    return allListings.filter((it) => {
       if (q && !(`${it.role} ${it.company} ${it.skills.join(' ')}`.toLowerCase().includes(q.toLowerCase()))) return false
       if (role !== 'All' && !it.role.toLowerCase().includes(role.toLowerCase())) return false
       if (skill !== 'All' && !it.skills.includes(skill)) return false
@@ -76,7 +110,7 @@ const Internships = () => {
       }
       return true
     })
-  }, [q, role, skill, location, mode, duration, stipend, match])
+  }, [allListings, q, role, skill, location, mode, duration, stipend, match])
 
   return (
     <div className="bg-background">

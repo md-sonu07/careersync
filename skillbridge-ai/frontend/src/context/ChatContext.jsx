@@ -48,6 +48,17 @@ export function ChatProvider({ children }) {
   );
 }
 
+const defaultChatContext = {
+  isChatOpen: false,
+  toggleChat: () => {},
+  closeChat: () => {},
+  openChat: () => {},
+  activeConversationId: null,
+  setActiveConversationId: () => {},
+  guestId: '',
+  isGuest: true,
+}
+
 export function useChatContext() {
-  return useContext(ChatContext);
+  return useContext(ChatContext) || defaultChatContext;
 }

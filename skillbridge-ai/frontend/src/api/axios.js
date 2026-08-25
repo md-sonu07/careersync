@@ -24,25 +24,59 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
-// Response interceptor - global error handling
+// Response interceptor - global error handling & auto JWT refresh
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config
     const status = error.response?.status
+    const isTokenError = status === 401 || error.response?.data?.code === 'token_not_valid'
+
+    if (isTokenError && originalRequest && !originalRequest._retry) {
+      originalRequest._retry = true
+      const refreshToken = localStorage.getItem('refresh_token')
+
+      if (refreshToken) {
+        try {
+          const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api'
+          const refreshRes = await axios.post(`${baseURL}/auth/token/refresh/`, {
+            refresh: refreshToken,
+          })
+
+          if (refreshRes.data?.access) {
+            const newAccess = refreshRes.data.access
+            localStorage.setItem('token', newAccess)
+            if (refreshRes.data.refresh) {
+              localStorage.setItem('refresh_token', refreshRes.data.refresh)
+            }
+            originalRequest.headers.Authorization = `Bearer ${newAccess}`
+            return apiClient(originalRequest)
+          }
+        } catch {
+          // Token refresh failed - session genuinely expired
+          localStorage.removeItem('token')
+          localStorage.removeItem('refresh_token')
+          localStorage.removeItem('user')
+          localStorage.removeItem('auth')
+          if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+            alert('Your session has expired. Please log in again.')
+            window.location.href = '/login'
+          }
+          return Promise.reject(error)
+        }
+      }
+    }
 
     if (status === 401) {
-      // Auto logout on 401 - token expired/invalid
       localStorage.removeItem('token')
       localStorage.removeItem('refresh_token')
       localStorage.removeItem('user')
       localStorage.removeItem('auth')
       if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+        alert('Your session has expired. Please log in again.')
         window.location.href = '/login'
       }
     }
-
-    // Optional: show toast / log
-    // console.error('[API Error]', error.response?.data || error.message)
 
     return Promise.reject(error)
   }

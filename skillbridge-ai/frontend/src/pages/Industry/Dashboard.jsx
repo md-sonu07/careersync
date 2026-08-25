@@ -37,8 +37,8 @@ export default function IndustryDashboard() {
           <p className="mt-1 text-sm text-muted">Recruitment + internship pipeline connected live to CareerSync Django ORM Analytics.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Link to="/industry/internships"><Button variant="outline" size="sm" icon="work">Post Internship</Button></Link>
-          <Link to="/industry/jobs"><Button variant="primary" size="sm" icon="business_center">Post Job</Button></Link>
+          <Link to="/industry/internship/new"><Button variant="outline" size="sm" icon="work">Post Internship</Button></Link>
+          <Link to="/industry/job/new"><Button variant="primary" size="sm" icon="business_center">Post Job</Button></Link>
         </div>
       </div>
 
