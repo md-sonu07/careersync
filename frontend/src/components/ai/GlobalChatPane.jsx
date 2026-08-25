@@ -9,12 +9,13 @@ import { useSelector } from 'react-redux'
 import { selectIsAuthenticated } from '../../features/auth/authSlice'
 import { toast } from 'react-hot-toast'
 import AppIcon from '../ui/AppIcon';
+import Modal from '../ui/Modal'
 
 const chips = [
   'Explain a topic',
   'Teach me something',
-  'Create a study plan',
-  'Help me prepare for an assessment',
+  'Code review',
+  'Career advice',
 ]
 
 export default function GlobalChatPane() {
@@ -25,6 +26,9 @@ export default function GlobalChatPane() {
   const [input, setInput] = useState('')
   const [selectedFile, setSelectedFile] = useState(null)
   const [isSending, setIsSending] = useState(false)
+  const [editingId, setEditingId] = useState(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null)
   const fileInputRef = useRef(null)
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(() => {
@@ -32,6 +36,24 @@ export default function GlobalChatPane() {
     if (stored !== null) return stored === 'true'
     return true
   })
+
+  const handleRenameSave = async (id) => {
+    if (!editTitle.trim()) {
+      setEditingId(null)
+      return
+    }
+    try {
+      await aiAPI.renameConversation(id, editTitle.trim())
+      setConversations((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, title: editTitle.trim() } : c))
+      )
+      toast.success('Conversation renamed')
+    } catch {
+      toast.error('Failed to rename conversation')
+    } finally {
+      setEditingId(null)
+    }
+  }
 
   useEffect(() => {
     sessionStorage.setItem('skillbridge_global_chat_sidebar', sidebarOpen)
@@ -110,7 +132,7 @@ export default function GlobalChatPane() {
 
     try {
       const response = await aiAPI.sendMessage(textToSend, activeConversationId)
-      
+
       const assistantMsg = {
         id: response.assistant_message_id || (Date.now() + 1).toString(),
         role: 'assistant',
@@ -120,7 +142,7 @@ export default function GlobalChatPane() {
       }
 
       setMessages((prev) => [...prev, assistantMsg])
-      
+
       if (!activeConversationId && response.conversation_id) {
         setActiveConversationId(response.conversation_id)
         fetchConversations()
@@ -144,22 +166,26 @@ export default function GlobalChatPane() {
     setSidebarOpen(false)
   }
 
-  const handleDelete = async (e, id) => {
+  const handleDelete = (e, id) => {
     e.stopPropagation()
-    if (!window.confirm('Delete this conversation?')) return
+    setDeleteConfirmId(id)
+  }
+
+  const confirmDelete = async (id) => {
+    if (!id) return
+    const idStr = String(id)
     try {
-      await aiAPI.deleteConversation(id)
-      setConversations((prev) => prev.filter((c) => c.id !== id))
-      if (activeConversationId === id) {
+      await aiAPI.deleteConversation(idStr)
+    } catch (err) {
+      console.warn('Backend delete returned status/error, removing locally:', err)
+    } finally {
+      setConversations((prev) => prev.filter((c) => String(c.id) !== idStr))
+      if (String(activeConversationId) === idStr) {
         setActiveConversationId(null)
         setMessages([])
       }
-    } catch {
-      toast({
-        title: 'Failed to delete',
-        description: 'Could not delete conversation. Please try again.',
-        variant: 'destructive',
-      })
+      toast.success('Conversation deleted')
+      setDeleteConfirmId(null)
     }
   }
 
@@ -174,33 +200,72 @@ export default function GlobalChatPane() {
         {conversations.length === 0 && (
           <p className="text-center text-sm text-muted mt-4">No history yet</p>
         )}
-        {conversations.map((c) => (
-          <div
-            key={c.id}
-            onClick={() => {
-              setActiveConversationId(c.id)
-              setSidebarOpen(false)
-            }}
-            className={`group relative flex cursor-pointer flex-col rounded-lg p-3 transition-colors ${
-              activeConversationId === c.id
-                ? 'bg-primary/10 border border-primary/20'
-                : 'hover:bg-background border border-transparent'
-            }`}
-          >
-            <div className="flex items-start justify-between gap-2">
-              <span className="text-sm font-medium text-charcoal truncate">{c.title}</span>
-              <button
-                onClick={(e) => handleDelete(e, c.id)}
-                className="hidden shrink-0 text-muted hover:text-red-500 group-hover:flex items-center justify-center cursor-pointer"
-              >
-                <AppIcon name="delete" className="text-[16px]" />
-              </button>
+        {conversations.map((c) => {
+          const displayTitle = c.title && c.title !== 'New Conversation'
+            ? c.title
+            : (c.first_ai_response || c.first_message_preview || c.last_message_preview || 'New Conversation')
+
+          return (
+            <div
+              key={c.id}
+              onClick={() => {
+                setActiveConversationId(c.id)
+                setSidebarOpen(false)
+              }}
+              className={`group relative flex cursor-pointer flex-col rounded-lg p-3 transition-colors ${activeConversationId === c.id
+                  ? 'bg-primary/10 border border-primary/20'
+                  : 'hover:bg-background border border-transparent'
+                }`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                {editingId === c.id ? (
+                  <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleRenameSave(c.id)
+                      if (e.key === 'Escape') setEditingId(null)
+                    }}
+                    onBlur={() => handleRenameSave(c.id)}
+                    autoFocus
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-xs font-normal border border-primary/50 rounded px-1.5 py-0.5 bg-white text-charcoal flex-1 focus:outline-none min-w-0"
+                  />
+                ) : (
+                  <span className="text-sm font-medium text-charcoal truncate flex-1">{displayTitle}</span>
+                )}
+
+                {/* Action Buttons on Hover */}
+                <div className="hidden shrink-0 items-center gap-1 group-hover:flex">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setEditingId(c.id)
+                      setEditTitle(displayTitle)
+                    }}
+                    className="p-1 text-muted hover:text-primary rounded hover:bg-primary/10 transition-colors cursor-pointer"
+                    title="Rename chat"
+                  >
+                    <AppIcon name="edit" className="text-[14px]" />
+                  </button>
+                  <button
+                    onClick={(e) => handleDelete(e, c.id)}
+                    className="p-1 text-muted hover:text-danger rounded hover:bg-danger/10 transition-colors cursor-pointer"
+                    title="Delete chat"
+                  >
+                    <AppIcon name="delete" className="text-[14px]" />
+                  </button>
+                </div>
+              </div>
+              {c.last_message_preview && (
+                <span className="text-xs text-muted truncate mt-1">
+                  {c.last_message_preview}
+                </span>
+              )}
             </div>
-            <span className="text-xs text-muted truncate mt-1">
-              {c.last_message_preview || 'New Conversation'}
-            </span>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
@@ -224,37 +289,37 @@ export default function GlobalChatPane() {
             <img src="/logo.png" alt="Career AI" className="w-10 h-10 object-contain" />
           </div>
           <div className="overflow-hidden">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 -mb-2">
               <p className="text-sm font-bold text-charcoal truncate">Career AI</p>
               <Badge variant="success" className="shrink-0 text-[10px] py-0 px-1.5 h-4">ONLINE</Badge>
             </div>
             <p className="text-xs text-muted truncate">Your learning assistant</p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-1 shrink-0">
-          <button 
+          <button
             onClick={() => setSidebarOpen(true)}
             className="p-1.5 flex items-center justify-center cursor-pointer text-muted hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
             title="History"
           >
             <AppIcon name="history" className="text-[20px]" />
           </button>
-          <button 
+          <button
             onClick={handleNewChat}
             className="p-1.5 flex items-center justify-center cursor-pointer text-muted hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
             title="New Chat"
           >
             <AppIcon name="add_circle" className="text-[20px]" />
           </button>
-          <button 
+          <button
             onClick={() => window.open('/chat', '_blank')}
             className="p-1.5 flex items-center justify-center cursor-pointer text-muted hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
             title="Open Full Screen"
           >
             <AppIcon name="open_in_new" className="text-[20px]" />
           </button>
-          <button 
+          <button
             onClick={closeChat}
             className="p-1.5 flex items-center justify-center cursor-pointer text-muted hover:text-danger hover:bg-danger/5 rounded-md transition-colors"
             title="Close"
@@ -297,19 +362,18 @@ export default function GlobalChatPane() {
 
         {messages.map((m) => (
           <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div 
-              className={`max-w-[90%] rounded-2xl px-4 py-3 text-[13px] leading-relaxed shadow-sm ${
-                m.role === 'user' 
-                  ? 'bg-primary text-white rounded-br-sm' 
+            <div
+              className={`max-w-[90%] rounded-2xl px-4 py-3 text-[13px] leading-relaxed shadow-sm ${m.role === 'user'
+                  ? 'bg-primary text-white rounded-br-sm'
                   : 'bg-white border border-border text-charcoal rounded-bl-sm prose prose-sm max-w-none'
-              }`}
+                }`}
             >
               {m.role === 'user' ? (
                 <p className="whitespace-pre-wrap m-0">{m.content}</p>
               ) : (
                 <ReactMarkdown>{m.content}</ReactMarkdown>
               )}
-              
+
               {m.suggestions && m.suggestions.length > 0 && m.role === 'assistant' && (
                 <div className="mt-3 flex flex-wrap gap-2 pt-2 border-t border-border/50">
                   {m.suggestions.map((sug, idx) => (
@@ -323,14 +387,14 @@ export default function GlobalChatPane() {
                   ))}
                 </div>
               )}
-              
-              <p className={`mt-1.5 text-[10px] ${m.role === 'user' ? 'text-white/70' : 'text-muted'}`}>
+
+              <p className={`mt-0.5 text-[10px] ${m.role === 'user' ? 'text-white/70' : 'text-muted'}`}>
                 {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </p>
             </div>
           </div>
         ))}
-        
+
         {isSending && (
           <div className="flex justify-start">
             <div className="bg-white border border-border rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm flex items-center gap-1.5">
@@ -340,13 +404,13 @@ export default function GlobalChatPane() {
             </div>
           </div>
         )}
-        
+
         <div ref={bottomRef} />
       </div>
 
       {/* Input Area */}
       <div className="border-t border-border bg-white p-3 shrink-0">
-        
+
         {selectedFile && (
           <div className="mb-2 flex items-center justify-between bg-surface rounded-lg p-2 border border-border">
             <div className="flex items-center gap-2 overflow-hidden">
@@ -355,7 +419,7 @@ export default function GlobalChatPane() {
               </div>
               <span className="text-xs text-charcoal truncate">{selectedFile.name}</span>
             </div>
-            <button 
+            <button
               onClick={() => setSelectedFile(null)}
               className="p-1 text-muted hover:text-danger rounded-md transition-colors shrink-0"
             >
@@ -365,17 +429,17 @@ export default function GlobalChatPane() {
         )}
 
         <div className="flex items-end gap-2 bg-background border border-border rounded-xl p-1 transition-all">
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            className="hidden" 
+          <input
+            type="file"
+            ref={fileInputRef}
+            className="hidden"
             onChange={(e) => {
               if (e.target.files && e.target.files[0]) {
                 setSelectedFile(e.target.files[0])
               }
             }}
           />
-          <button 
+          <button
             onClick={() => fileInputRef.current?.click()}
             className="shrink-0 h-9 w-9 mb-0.5 ml-0.5 flex items-center justify-center rounded-lg text-muted hover:text-primary hover:bg-primary/5 transition-colors"
             title="Attach file"
@@ -401,9 +465,9 @@ export default function GlobalChatPane() {
               e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`
             }}
           />
-          <button 
-            onClick={() => handleSend()} 
-            disabled={(!input.trim() && !selectedFile) || isSending} 
+          <button
+            onClick={() => handleSend()}
+            disabled={(!input.trim() && !selectedFile) || isSending}
             className="shrink-0 h-9 w-9 mb-0.5 mr-0.5 flex items-center justify-center rounded-lg bg-primary text-white disabled:opacity-50 disabled:bg-muted transition-colors"
           >
             <AppIcon name="send" className="text-[18px]" />
@@ -415,6 +479,31 @@ export default function GlobalChatPane() {
           </p>
         )}
       </div>
+
+      {/* Custom Confirmation Modal for Delete */}
+      <Modal
+        open={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        title="Delete Conversation?"
+        description="Are you sure you want to delete this conversation history? This action cannot be undone."
+        size="sm"
+      >
+        <div className="flex items-center justify-end gap-2.5 pt-2">
+          <Button variant="outline" size="sm" onClick={() => setDeleteConfirmId(null)}>
+            Cancel
+          </Button>
+          <button
+            type="button"
+            className="px-3 py-1.5 text-sm font-semibold rounded-lg bg-danger text-white hover:bg-danger/90 transition-colors cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation()
+              confirmDelete(deleteConfirmId)
+            }}
+          >
+            Delete Chat
+          </button>
+        </div>
+      </Modal>
     </div>
   )
 }

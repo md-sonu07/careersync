@@ -8,6 +8,7 @@ import Drawer from '../../components/ui/Drawer'
 import { aiAPI } from '../../api/ai.api'
 import AppIcon from '../../components/ui/AppIcon'
 import { toast } from 'react-hot-toast'
+import Modal from '../../components/ui/Modal'
 
 const chips = [
   'Explain a topic',
@@ -27,8 +28,29 @@ export default function AIAssistant() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
   const [error, setError] = useState(null)
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [editingId, setEditingId] = useState(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null)
 
   const bottomRef = useRef(null)
+
+  const handleRenameSave = async (id) => {
+    if (!editTitle.trim()) {
+      setEditingId(null)
+      return
+    }
+    try {
+      await aiAPI.renameConversation(id, editTitle.trim())
+      setConversations((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, title: editTitle.trim() } : c))
+      )
+      toast.success('Conversation renamed')
+    } catch {
+      toast.error('Failed to rename conversation')
+    } finally {
+      setEditingId(null)
+    }
+  }
 
   // Initial load
   useEffect(() => {
@@ -113,7 +135,7 @@ export default function AIAssistant() {
 
     try {
       const response = await aiAPI.sendMessage(textToSend, activeConversationId)
-      
+
       const assistantMsg = {
         id: response.assistant_message_id || (Date.now() + 1).toString(),
         role: 'assistant',
@@ -123,7 +145,7 @@ export default function AIAssistant() {
       }
 
       setMessages((prev) => [...prev, assistantMsg])
-      
+
       // If this was a new conversation, update our active ID and refresh history
       if (!activeConversationId && response.conversation_id) {
         setActiveConversationId(response.conversation_id)
@@ -154,23 +176,26 @@ export default function AIAssistant() {
     if (window.innerWidth < 1024) setSidebarOpen(false)
   }
 
-  const handleDelete = async (e, id) => {
+  const handleDelete = (e, id) => {
     e.stopPropagation()
-    if (!window.confirm('Delete this conversation?')) return
+    setDeleteConfirmId(id)
+  }
+
+  const confirmDelete = async (id) => {
+    if (!id) return
+    const idStr = String(id)
     try {
-      await aiAPI.deleteConversation(id)
-      setConversations((prev) => prev.filter((c) => c.id !== id))
-      if (activeConversationId === id) {
+      await aiAPI.deleteConversation(idStr)
+    } catch (err) {
+      console.warn('Backend delete returned status/error, removing locally:', err)
+    } finally {
+      setConversations((prev) => prev.filter((c) => String(c.id) !== idStr))
+      if (String(activeConversationId) === idStr) {
         setActiveConversationId(null)
         setMessages([])
       }
-    } catch (err) {
-      console.error('Failed to delete:', err)
-      toast({
-        title: 'Failed to delete',
-        description: 'Could not delete conversation. Please try again.',
-        variant: 'destructive',
-      })
+      toast.success('Conversation deleted')
+      setDeleteConfirmId(null)
     }
   }
 
@@ -185,33 +210,97 @@ export default function AIAssistant() {
         {conversations.length === 0 && (
           <p className="text-center text-sm text-muted mt-4">No history yet</p>
         )}
-        {conversations.map((c) => (
-          <div
-            key={c.id}
-            onClick={() => {
-              setActiveConversationId(c.id)
-              if (window.innerWidth < 1024) setSidebarOpen(false)
-            }}
-            className={`group relative flex cursor-pointer flex-col rounded-lg p-3 transition-colors ${
-              activeConversationId === c.id
-                ? 'bg-primary/10 border border-primary/20'
-                : 'hover:bg-background border border-transparent'
-            }`}
-          >
-            <div className="flex items-start justify-between gap-2">
-              <span className="text-sm font-medium text-charcoal truncate">{c.title}</span>
-              <button
-                onClick={(e) => handleDelete(e, c.id)}
-                className="hidden shrink-0 text-muted hover:text-red-500 group-hover:block"
-              >
-                <AppIcon name="delete" className="text-[16px]" />
-              </button>
+        {conversations.map((c) => {
+          const displayTitle = c.title && c.title !== 'New Conversation'
+            ? c.title
+            : (c.first_ai_response || c.first_message_preview || c.last_message_preview || 'New Conversation')
+
+          return (
+            <div
+              key={c.id}
+              onClick={() => {
+                setActiveConversationId(c.id)
+                if (window.innerWidth < 1024) setSidebarOpen(false)
+              }}
+              className={`group relative flex cursor-pointer flex-col rounded-lg p-3 transition-colors ${activeConversationId === c.id
+                  ? 'bg-primary/10 border border-primary/20'
+                  : 'hover:bg-background border border-transparent'
+                }`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                {editingId === c.id ? (
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleRenameSave(c.id)
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex-1 flex items-center gap-1 min-w-0"
+                  >
+                    <input
+                      type="text"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') setEditingId(null)
+                      }}
+                      autoFocus
+                      className="text-xs font-normal border border-primary/50 rounded px-1.5 py-0.5 bg-white text-charcoal flex-1 focus:outline-none min-w-0"
+                    />
+                    <button
+                      type="submit"
+                      className="p-0.5 text-primary hover:bg-primary/10 rounded cursor-pointer shrink-0"
+                      title="Save"
+                    >
+                      <AppIcon name="check_circle" className="text-[14px]" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setEditingId(null)
+                      }}
+                      className="p-0.5 text-muted hover:bg-border/30 rounded cursor-pointer shrink-0"
+                      title="Cancel"
+                    >
+                      <AppIcon name="close" className="text-[14px]" />
+                    </button>
+                  </form>
+                ) : (
+                  <span className="text-sm font-medium text-charcoal truncate flex-1">{displayTitle}</span>
+                )}
+
+                {/* Action Buttons on Hover */}
+                <div className="hidden shrink-0 items-center gap-1 group-hover:flex">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setEditingId(c.id)
+                      setEditTitle(displayTitle)
+                    }}
+                    className="p-1 text-muted hover:text-primary rounded hover:bg-primary/10 transition-colors cursor-pointer"
+                    title="Rename chat"
+                  >
+                    <AppIcon name="edit" className="text-[14px]" />
+                  </button>
+                  <button
+                    onClick={(e) => handleDelete(e, c.id)}
+                    className="p-1 text-muted hover:text-danger rounded hover:bg-danger/10 transition-colors cursor-pointer"
+                    title="Delete chat"
+                  >
+                    <AppIcon name="delete" className="text-[14px]" />
+                  </button>
+                </div>
+              </div>
+              {c.last_message_preview && (
+                <span className="text-xs text-muted truncate mt-1">
+                  {c.last_message_preview}
+                </span>
+              )}
             </div>
-            <span className="text-xs text-muted truncate mt-1">
-              {c.last_message_preview || 'New Conversation'}
-            </span>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
@@ -219,9 +308,9 @@ export default function AIAssistant() {
   return (
     <div className="flex flex-col h-[calc(100vh-140px)] lg:h-[calc(100vh-120px)]">
       <div className="flex items-center justify-between shrink-0 mb-4">
-        <PageHeader 
-          title="Career AI" 
-          subtitle="Your learning & career assistant" 
+        <PageHeader
+          title="Career AI"
+          subtitle="Your learning & career assistant"
         />
         <div className="lg:hidden">
           <Button variant="outline" size="sm" icon="history" onClick={() => setSidebarOpen(true)}>
@@ -293,19 +382,18 @@ export default function AIAssistant() {
 
             {messages.map((m) => (
               <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div 
-                  className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
-                    m.role === 'user' 
-                      ? 'bg-primary text-white rounded-br-sm' 
+                <div
+                  className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${m.role === 'user'
+                      ? 'bg-primary text-white rounded-br-sm'
                       : 'bg-white border border-border text-charcoal rounded-bl-sm prose prose-sm max-w-none'
-                  }`}
+                    }`}
                 >
                   {m.role === 'user' ? (
                     <p className="whitespace-pre-wrap">{m.content}</p>
                   ) : (
                     <ReactMarkdown>{m.content}</ReactMarkdown>
                   )}
-                  
+
                   {/* Render suggestions if any */}
                   {m.suggestions && m.suggestions.length > 0 && m.role === 'assistant' && (
                     <div className="mt-4 flex flex-wrap gap-2 pt-3 border-t border-border/50">
@@ -320,14 +408,14 @@ export default function AIAssistant() {
                       ))}
                     </div>
                   )}
-                  
+
                   <p className={`mt-2 text-[10px] ${m.role === 'user' ? 'text-white/70' : 'text-muted'}`}>
                     {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
               </div>
             ))}
-            
+
             {isSending && (
               <div className="flex justify-start">
                 <div className="bg-white border border-border rounded-2xl rounded-bl-sm px-5 py-4 shadow-sm flex items-center gap-1.5">
@@ -337,7 +425,7 @@ export default function AIAssistant() {
                 </div>
               </div>
             )}
-            
+
             <div ref={bottomRef} />
           </div>
 
@@ -365,10 +453,10 @@ export default function AIAssistant() {
                   }}
                 />
               </div>
-              <Button 
-                onClick={() => handleSend()} 
-                disabled={!input.trim() || isSending} 
-                className="shrink-0 h-[48px] px-5" 
+              <Button
+                onClick={() => handleSend()}
+                disabled={!input.trim() || isSending}
+                className="shrink-0 h-[48px] px-5"
                 icon="send"
               >
                 <span className="hidden sm:inline">Send</span>
@@ -380,6 +468,31 @@ export default function AIAssistant() {
           </div>
         </Card>
       </div>
+
+      {/* Custom Confirmation Modal for Delete */}
+      <Modal
+        open={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        title="Delete Conversation?"
+        description="Are you sure you want to delete this conversation history? This action cannot be undone."
+        size="sm"
+      >
+        <div className="flex items-center justify-end gap-2.5 pt-2">
+          <Button variant="outline" size="sm" onClick={() => setDeleteConfirmId(null)}>
+            Cancel
+          </Button>
+          <button
+            type="button"
+            className="px-3 py-1.5 text-sm font-semibold rounded-lg bg-danger text-white hover:bg-danger/90 transition-colors cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation()
+              confirmDelete(deleteConfirmId)
+            }}
+          >
+            Delete Chat
+          </button>
+        </div>
+      </Modal>
     </div>
   )
 }

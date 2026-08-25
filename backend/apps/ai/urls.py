@@ -9,7 +9,7 @@ urlpatterns = [
         'get': 'list',
         'post': 'create',
     }), name='conversations'),
-    path('conversations/<uuid:pk>/', AIConversationViewSet.as_view({
+    path('conversations/<str:pk>/', AIConversationViewSet.as_view({
         'get': 'retrieve',
         'patch': 'update',
         'delete': 'destroy',

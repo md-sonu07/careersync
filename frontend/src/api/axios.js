@@ -68,13 +68,16 @@ apiClient.interceptors.response.use(
     }
 
     if (status === 401) {
-      localStorage.removeItem('token')
-      localStorage.removeItem('refresh_token')
-      localStorage.removeItem('user')
-      localStorage.removeItem('auth')
-      if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
-        alert('Your session has expired. Please log in again.')
-        window.location.href = '/login'
+      const hasToken = localStorage.getItem('token')
+      if (hasToken) {
+        localStorage.removeItem('token')
+        localStorage.removeItem('refresh_token')
+        localStorage.removeItem('user')
+        localStorage.removeItem('auth')
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+          alert('Your session has expired. Please log in again.')
+          window.location.href = '/login'
+        }
       }
     }
 

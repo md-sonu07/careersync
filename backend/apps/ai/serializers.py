@@ -13,12 +13,14 @@ class AIMessageSerializer(serializers.ModelSerializer):
 class AIConversationSerializer(serializers.ModelSerializer):
     message_count = serializers.SerializerMethodField()
     last_message_preview = serializers.SerializerMethodField()
+    first_message_preview = serializers.SerializerMethodField()
+    first_ai_response = serializers.SerializerMethodField()
 
     class Meta:
         model = AIConversation
         fields = [
             'id', 'title', 'created_at', 'updated_at',
-            'message_count', 'last_message_preview', 'guest_id',
+            'message_count', 'last_message_preview', 'first_message_preview', 'first_ai_response', 'guest_id',
         ]
         read_only_fields = ['id', 'user', 'created_at', 'updated_at', 'guest_id']
 
@@ -28,7 +30,22 @@ class AIConversationSerializer(serializers.ModelSerializer):
     def get_last_message_preview(self, obj):
         msg = obj.messages.order_by('-created_at').first()
         if msg:
-            return msg.content[:80].strip() + ('...' if len(msg.content) > 80 else '')
+            clean = msg.content.replace('#', '').replace('*', '').replace('\n', ' ').strip()
+            return clean[:80].strip() + ('...' if len(clean) > 80 else '')
+        return None
+
+    def get_first_message_preview(self, obj):
+        msg = obj.messages.order_by('created_at').first()
+        if msg:
+            clean = msg.content.replace('#', '').replace('*', '').replace('\n', ' ').strip()
+            return clean[:80].strip() + ('...' if len(clean) > 80 else '')
+        return None
+
+    def get_first_ai_response(self, obj):
+        msg = obj.messages.filter(role='assistant').order_by('created_at').first()
+        if msg and msg.content:
+            clean = msg.content.replace('#', '').replace('*', '').replace('\n', ' ').strip()
+            return clean[:80].strip() + ('...' if len(clean) > 80 else '')
         return None
 
 

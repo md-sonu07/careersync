@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from django.shortcuts import get_object_or_404
-from django.db import transaction
+from django.db import models, transaction
 from django.utils import timezone
 
 from .models import AIConversation, AIMessage
@@ -23,11 +23,7 @@ class IsStudent(permissions.BasePermission):
     Allows access only to authenticated users with 'student' role.
     """
     def has_permission(self, request, view):
-        return bool(
-            request.user and
-            request.user.is_authenticated and
-            request.user.role == 'student'
-        )
+        return request.user.is_authenticated and getattr(request.user, 'role', None) == 'student'
 
 
 class AIConversationViewSet(viewsets.ModelViewSet):
@@ -40,11 +36,11 @@ class AIConversationViewSet(viewsets.ModelViewSet):
     DELETE /api/ai/conversations/{id}/
     """
     serializer_class = AIConversationSerializer
+    permission_classes = [permissions.AllowAny]
+    pagination_class = None
 
     def get_permissions(self):
-        if self.action in ['retrieve', 'list', 'create', 'send_message', 'destroy']:
-            return [permissions.AllowAny()]
-        return [permissions.IsAuthenticated()]
+        return [permissions.AllowAny()]
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
@@ -52,30 +48,26 @@ class AIConversationViewSet(viewsets.ModelViewSet):
         return super().get_serializer_class()
 
     def get_queryset(self):
-        if self.request.user.is_authenticated:
+        if self.request.user and self.request.user.is_authenticated:
             return AIConversation.objects.filter(user=self.request.user).order_by('-updated_at')
         guest_id = self.request.META.get('HTTP_X_GUEST_ID')
         if guest_id:
-            return AIConversation.objects.filter(guest_id=guest_id).order_by('-updated_at')
-        return AIConversation.objects.filter(user__isnull=True, guest_id__isnull=True).order_by('-updated_at')
+            return AIConversation.objects.filter(
+                models.Q(guest_id=guest_id) | models.Q(user__isnull=True)
+            ).order_by('-updated_at')
+        return AIConversation.objects.filter(user__isnull=True).order_by('-updated_at')
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        user = self.request.user if self.request.user.is_authenticated else None
+        serializer.save(user=user)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.user and instance.user != request.user:
-            from rest_framework.exceptions import PermissionDenied
-            raise PermissionDenied("You do not have access to this conversation.")
-        guest_id = request.META.get('HTTP_X_GUEST_ID')
-        if not instance.user and instance.guest_id and instance.guest_id != guest_id:
-            from rest_framework.exceptions import PermissionDenied
-            raise PermissionDenied("You do not have access to this conversation.")
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop('partial', True)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
@@ -138,6 +130,11 @@ class AIChatView(generics.GenericAPIView):
             content=message_text,
         )
 
+        # Update title if it's currently 'New Conversation' or blank
+        if not conversation.title or conversation.title == 'New Conversation':
+            conversation.title = message_text[:100].strip() or 'New Conversation'
+            conversation.save(update_fields=['title', 'updated_at'])
+
         # Build conversation history and call AI service
         try:
             response_data = chat_service.generate_response(
@@ -153,6 +150,12 @@ class AIChatView(generics.GenericAPIView):
                 content=response_data.get('message', ''),
                 suggestions=response_data.get('suggestions', []),
             )
+
+            # Update conversation title to first AI assistant response snippet
+            ai_msg_text = response_data.get('message', '').replace('#', '').replace('*', '').replace('\n', ' ').strip()
+            if ai_msg_text and (not conversation.title or conversation.title == 'New Conversation' or conversation.title == message_text[:100].strip()):
+                conversation.title = ai_msg_text[:100].strip()
+                conversation.save(update_fields=['title', 'updated_at'])
 
             # Build response
             response_serializer = ChatResponseSerializer({

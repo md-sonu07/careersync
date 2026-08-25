@@ -2,13 +2,13 @@ import React from 'react';
 import {
   Plus, PlusCircle, Route, Building2, ArrowLeft, ArrowRight, ArrowUpRight, ArrowUp,
   ClipboardList, Sparkles, BookOpen, BarChart3, Building, MessageCircle, CheckCircle2,
-  ChevronRight, ChevronDown, ChevronLeft, ChevronUp, X, CloudSync, UploadCloud, Code2, ArrowRightLeft, Wrench, Trash2,
+  ChevronRight, ChevronDown, ChevronLeft, ChevronUp, X, CloudSync, UploadCloud, Code2, ArrowRightLeft, Wrench, Trash2, Pencil,
   FileText, Download, AlertCircle, Flag, History, Home, Hourglass, Info, Globe, Paperclip,
   PanelLeftClose, PanelLeftOpen, Lightbulb, Link as LinkIcon, Flame, MapPin, Lock, LogOut,
   Mail, Menu, Medal, Activity, MoreHorizontal, Bell, ExternalLink, Banknote, UserSearch,
   Play, PlayCircle, BrainCircuit, FileQuestion, Clock, GraduationCap, Search, Send,
   Shield, Bot, Star, Timer, TrendingUp, BadgeCheck, UserCheck, Eye, AlertTriangle, Hand,
-  Briefcase, Award, Zap, Share2, Users, AtSign, Monitor, Infinity, Video, UserPlus
+  Briefcase, Award, Zap, Share2, Users, AtSign, Monitor, Infinity, Video, UserPlus , SquarePen
 } from 'lucide-react';
 
 // Custom Brand SVGs
@@ -76,6 +76,7 @@ const iconMap = {
   description: FileText,
   devices: Monitor,
   download: Download,
+  edit: Pencil,
   error: AlertCircle,
   flag: Flag,
   group: Users,
@@ -132,7 +133,10 @@ const iconMap = {
   web: Globe,
   work: Briefcase,
   work_history: History,
-  workspace_premium: Award,
+  square_pen: SquarePen,
+  SquarePen: SquarePen,
+  create: SquarePen,
+  edit_note: SquarePen,
   
   // Brands
   google: GoogleIcon,
