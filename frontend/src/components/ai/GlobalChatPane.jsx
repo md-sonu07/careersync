@@ -191,8 +191,8 @@ export default function GlobalChatPane() {
 
   const SidebarContent = () => (
     <div className="flex h-full flex-col bg-white">
-      <div className="p-4 border-b border-border">
-        <Button onClick={handleNewChat} className="w-full justify-center" icon="add">
+      <div className="p-3 border-b border-border">
+        <Button onClick={handleNewChat} className="w-full justify-center cursor-pointer" icon="add">
           New Chat
         </Button>
       </div>
@@ -219,44 +219,71 @@ export default function GlobalChatPane() {
             >
               <div className="flex items-center justify-between gap-2">
                 {editingId === c.id ? (
-                  <input
-                    type="text"
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleRenameSave(c.id)
-                      if (e.key === 'Escape') setEditingId(null)
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleRenameSave(c.id)
                     }}
-                    onBlur={() => handleRenameSave(c.id)}
-                    autoFocus
                     onClick={(e) => e.stopPropagation()}
-                    className="text-xs font-normal border border-primary/50 rounded px-1.5 py-0.5 bg-white text-charcoal flex-1 focus:outline-none min-w-0"
-                  />
+                    className="flex-1 flex items-center gap-1 min-w-0"
+                  >
+                    <input
+                      type="text"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') setEditingId(null)
+                      }}
+                      autoFocus
+                      className="text-xs font-normal border border-primary/50 rounded px-1.5 py-0.5 bg-white text-charcoal flex-1 focus:outline-none min-w-0"
+                    />
+                    <button
+                      type="submit"
+                      className="p-0.5 text-primary hover:bg-primary/10 rounded cursor-pointer shrink-0"
+                      title="Save"
+                    >
+                      <AppIcon name="check_circle" className="text-[14px]" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setEditingId(null)
+                      }}
+                      className="p-0.5 text-muted hover:bg-border/30 rounded cursor-pointer shrink-0"
+                      title="Cancel"
+                    >
+                      <AppIcon name="close" className="text-[14px]" />
+                    </button>
+                  </form>
                 ) : (
                   <span className="text-sm font-medium text-charcoal truncate flex-1">{displayTitle}</span>
                 )}
 
                 {/* Action Buttons on Hover */}
-                <div className="hidden shrink-0 items-center gap-1 group-hover:flex">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setEditingId(c.id)
-                      setEditTitle(displayTitle)
-                    }}
-                    className="p-1 text-muted hover:text-primary rounded hover:bg-primary/10 transition-colors cursor-pointer"
-                    title="Rename chat"
-                  >
-                    <AppIcon name="edit" className="text-[14px]" />
-                  </button>
-                  <button
-                    onClick={(e) => handleDelete(e, c.id)}
-                    className="p-1 text-muted hover:text-danger rounded hover:bg-danger/10 transition-colors cursor-pointer"
-                    title="Delete chat"
-                  >
-                    <AppIcon name="delete" className="text-[14px]" />
-                  </button>
-                </div>
+                {editingId !== c.id && (
+                  <div className="hidden shrink-0 items-center gap-1 group-hover:flex">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setEditingId(c.id)
+                        setEditTitle(displayTitle)
+                      }}
+                      className="p-1 text-muted hover:text-primary rounded hover:bg-primary/10 transition-colors cursor-pointer"
+                      title="Rename chat"
+                    >
+                      <AppIcon name="edit" className="text-[14px]" />
+                    </button>
+                    <button
+                      onClick={(e) => handleDelete(e, c.id)}
+                      className="p-1 text-muted hover:text-danger rounded hover:bg-danger/10 transition-colors cursor-pointer"
+                      title="Delete chat"
+                    >
+                      <AppIcon name="delete" className="text-[14px]" />
+                    </button>
+                  </div>
+                )}
               </div>
               {c.last_message_preview && (
                 <span className="text-xs text-muted truncate mt-1">
@@ -274,10 +301,11 @@ export default function GlobalChatPane() {
     <div className="flex flex-col h-full w-full bg-white relative">
       {/* Drawer for history */}
       <Drawer
-        isOpen={sidebarOpen}
+        open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         title="Conversation History"
-        placement="left"
+        side="right"
+        size="md"
       >
         <SidebarContent />
       </Drawer>
@@ -288,12 +316,12 @@ export default function GlobalChatPane() {
           <div className="flex h-10 w-10 items-center justify-center rounded-lgshrink-0">
             <img src="/logo.png" alt="Career AI" className="w-10 h-10 object-contain" />
           </div>
-          <div className="overflow-hidden">
-            <div className="flex items-center gap-2 -mb-2">
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-2">
               <p className="text-sm font-bold text-charcoal truncate">Career AI</p>
-              <Badge variant="success" className="shrink-0 text-[10px] py-0 px-1.5 h-4">ONLINE</Badge>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 shrink-0">v01</span>
             </div>
-            <p className="text-xs text-muted truncate">Your learning assistant</p>
+            <p className="text-xs text-muted truncate mt-0.5">Your learning assistant</p>
           </div>
         </div>
 

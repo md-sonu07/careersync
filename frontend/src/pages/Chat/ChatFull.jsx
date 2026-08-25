@@ -366,7 +366,7 @@ export default function ChatFull() {
 
         {/* Topbar */}
         <div className="absolute top-0 left-0 w-full p-4 flex items-center justify-between z-10 pointer-events-none">
-          <div className="pointer-events-auto">
+          <div className="pointer-events-auto flex items-center gap-2">
             {!sidebarOpen && (
               <button
                 onClick={() => setSidebarOpen(true)}
@@ -375,6 +375,11 @@ export default function ChatFull() {
                 <AppIcon name="left_panel_open" className="text-[18px]" />
               </button>
             )}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/90 backdrop-blur-sm border border-border/60 shadow-sm cursor-default">
+              <img src="/logo.png" alt="Career AI" className="w-5 h-5 object-contain" />
+              <span className="text-sm font-bold text-charcoal">Career AI</span>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">v01</span>
+            </div>
           </div>
           <div className="pointer-events-auto flex items-center gap-3">
             <Link to="/" className="text-sm font-medium text-charcoal/70 hover:text-charcoal transition-colors bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-border/50 shadow-sm flex items-center gap-1.5">
@@ -458,7 +463,7 @@ export default function ChatFull() {
                       user?.avatar_url || user?.profile_image ? (
                         <img src={user.avatar_url || user.profile_image} alt="User" className="w-8 h-8 rounded-full object-cover shadow-sm border border-border/50" />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-charcoal text-white flex items-center justify-center font-black text-xl shadow-sm">
+                        <div className="w-10 h-10 rounded-full bg-charcoal text-white flex items-center justify-center font-black text-md shadow-sm">
                           {(user?.full_name || user?.name || user?.email || 'Y').charAt(0).toUpperCase()}
                         </div>
                       )

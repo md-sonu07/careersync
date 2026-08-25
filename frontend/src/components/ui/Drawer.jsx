@@ -78,7 +78,7 @@ const Drawer = ({
               <button
                 onClick={onClose}
                 aria-label="Close drawer"
-                className="rounded-lg p-1.5 text-muted transition-colors hover:bg-background hover:text-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+                className="rounded-lg p-1.5 cursor-pointer text-muted transition-colors hover:bg-background hover:text-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
                   <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
