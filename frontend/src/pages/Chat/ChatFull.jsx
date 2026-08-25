@@ -11,6 +11,7 @@ import AppIcon from '../../components/ui/AppIcon'
 import Modal from '../../components/ui/Modal'
 import Button from '../../components/ui/Button'
 import MCQQuizWidget, { parseMCQsFromText } from '../../components/ai/MCQQuizWidget'
+import ResumeRecommendationsWidget, { detectTechStack } from '../../components/ai/ResumeRecommendationsWidget'
 
 const chips = [
   'Course Recommendations',
@@ -29,85 +30,91 @@ function MarkdownRenderer({ content, theme }) {
       </div>
     )
   }
+
+  const stack = detectTechStack(content)
+
   return (
-    <ReactMarkdown
-      components={{
-        h1: ({ children }) => (
-          <h1 className={`text-xl font-bold mt-5 mb-2.5 flex items-center gap-2 ${theme === 'dark' ? 'text-white' : 'text-charcoal'}`}>
-            {children}
-          </h1>
-        ),
-        h2: ({ children }) => (
-          <h2 className={`text-lg font-bold mt-4 mb-2 flex items-center gap-2 ${theme === 'dark' ? 'text-white' : 'text-charcoal'}`}>
-            {children}
-          </h2>
-        ),
-        h3: ({ children }) => (
-          <h3 className={`text-base font-bold mt-3 mb-1.5 flex items-center gap-2 ${theme === 'dark' ? 'text-white' : 'text-charcoal'}`}>
-            {children}
-          </h3>
-        ),
-        p: ({ children }) => (
-          <p className={`text-[15px] leading-7 my-2.5 ${theme === 'dark' ? 'text-[#ececec]' : 'text-[#0d0d0d]'}`}>
-            {children}
-          </p>
-        ),
-        ul: ({ children }) => (
-          <ul className={`space-y-2 list-disc pl-5 text-[15px] my-3 ${theme === 'dark' ? 'text-[#ececec]' : 'text-[#0d0d0d]'}`}>
-            {children}
-          </ul>
-        ),
-        ol: ({ children }) => (
-          <ol className={`space-y-2 list-decimal pl-5 text-[15px] my-3 ${theme === 'dark' ? 'text-[#ececec]' : 'text-[#0d0d0d]'}`}>
-            {children}
-          </ol>
-        ),
-        li: ({ children }) => <li className="leading-7 pl-1">{children}</li>,
-        blockquote: ({ children }) => (
-          <blockquote className={`border-l-4 pl-4 py-1.5 my-3 italic ${theme === 'dark' ? 'border-primary text-gray-300 bg-[#2d2d2d]/50' : 'border-primary text-gray-700 bg-primary/5'} rounded-r-lg`}>
-            {children}
-          </blockquote>
-        ),
-        code: ({ node, inline, className, children, ...props }) => {
-          const match = /language-(\w+)/.exec(className || '')
-          const lang = match ? match[1] : ''
-          if (!inline) {
-            return (
-              <div className="my-4 rounded-xl overflow-hidden border border-gray-700 bg-[#1e1e1e] shadow-md text-left">
-                <div className="flex items-center justify-between px-4 py-1.5 bg-[#2d2d2d] border-b border-gray-700 text-xs text-gray-300 font-mono">
-                  <span className="font-semibold capitalize">{lang || 'code'}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigator.clipboard.writeText(String(children).replace(/\n$/, ''))
-                      toast.success('Code copied to clipboard!')
-                    }}
-                    className="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-xs text-gray-400"
-                  >
-                    <AppIcon name="Copy" className="text-[13px]" />
-                    <span>Copy code</span>
-                  </button>
+    <div className="space-y-4">
+      <ReactMarkdown
+        components={{
+          h1: ({ children }) => (
+            <h1 className={`text-xl font-bold mt-5 mb-2.5 flex items-center gap-2 ${theme === 'dark' ? 'text-white' : 'text-charcoal'}`}>
+              {children}
+            </h1>
+          ),
+          h2: ({ children }) => (
+            <h2 className={`text-lg font-bold mt-4 mb-2 flex items-center gap-2 ${theme === 'dark' ? 'text-white' : 'text-charcoal'}`}>
+              {children}
+            </h2>
+          ),
+          h3: ({ children }) => (
+            <h3 className={`text-base font-bold mt-3 mb-1.5 flex items-center gap-2 ${theme === 'dark' ? 'text-white' : 'text-charcoal'}`}>
+              {children}
+            </h3>
+          ),
+          p: ({ children }) => (
+            <p className={`text-[15px] leading-7 my-2.5 ${theme === 'dark' ? 'text-[#ececec]' : 'text-[#0d0d0d]'}`}>
+              {children}
+            </p>
+          ),
+          ul: ({ children }) => (
+            <ul className={`space-y-2 list-disc pl-5 text-[15px] my-3 ${theme === 'dark' ? 'text-[#ececec]' : 'text-[#0d0d0d]'}`}>
+              {children}
+            </ul>
+          ),
+          ol: ({ children }) => (
+            <ol className={`space-y-2 list-decimal pl-5 text-[15px] my-3 ${theme === 'dark' ? 'text-[#ececec]' : 'text-[#0d0d0d]'}`}>
+              {children}
+            </ol>
+          ),
+          li: ({ children }) => <li className="leading-7 pl-1">{children}</li>,
+          blockquote: ({ children }) => (
+            <blockquote className={`border-l-4 pl-4 py-1.5 my-3 italic ${theme === 'dark' ? 'border-primary text-gray-300 bg-[#2d2d2d]/50' : 'border-primary text-gray-700 bg-primary/5'} rounded-r-lg`}>
+              {children}
+            </blockquote>
+          ),
+          code: ({ node, inline, className, children, ...props }) => {
+            const match = /language-(\w+)/.exec(className || '')
+            const lang = match ? match[1] : ''
+            if (!inline) {
+              return (
+                <div className="my-4 rounded-xl overflow-hidden border border-gray-700 bg-[#1e1e1e] shadow-md text-left">
+                  <div className="flex items-center justify-between px-4 py-1.5 bg-[#2d2d2d] border-b border-gray-700 text-xs text-gray-300 font-mono">
+                    <span className="font-semibold capitalize">{lang || 'code'}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(String(children).replace(/\n$/, ''))
+                        toast.success('Code copied to clipboard!')
+                      }}
+                      className="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-xs text-gray-400"
+                    >
+                      <AppIcon name="Copy" className="text-[13px]" />
+                      <span>Copy code</span>
+                    </button>
+                  </div>
+                  <pre className="p-4 text-xs font-mono text-emerald-400 overflow-x-auto m-0 leading-relaxed">
+                    <code>{children}</code>
+                  </pre>
                 </div>
-                <pre className="p-4 text-xs font-mono text-emerald-400 overflow-x-auto m-0 leading-relaxed">
-                  <code>{children}</code>
-                </pre>
-              </div>
+              )
+            }
+            return (
+              <code
+                className={`px-1.5 py-0.5 rounded text-xs font-mono font-semibold ${theme === 'dark' ? 'bg-[#383838] text-emerald-400' : 'bg-gray-200 text-primary'
+                  }`}
+                {...props}
+              >
+                {children}
+              </code>
             )
           }
-          return (
-            <code
-              className={`px-1.5 py-0.5 rounded text-xs font-mono font-semibold ${theme === 'dark' ? 'bg-[#383838] text-emerald-400' : 'bg-gray-200 text-primary'
-                }`}
-              {...props}
-            >
-              {children}
-            </code>
-          )
-        }
-      }}
-    >
-      {content}
-    </ReactMarkdown>
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+      {stack && <ResumeRecommendationsWidget stack={stack} content={content} theme={theme} />}
+    </div>
   )
 }
 
@@ -198,13 +205,10 @@ export default function ChatFull() {
       setConversations(data)
       const savedId = localStorage.getItem('public_chat_conversation_id')
 
-      if (savedId === 'new') {
-        // Stay on New Chat if user explicitly clicked New Chat
+      if (savedId === 'new' || !savedId) {
         setActiveConversationId(null)
       } else if (savedId && data.some((c) => String(c.id) === String(savedId))) {
         setActiveConversationId(savedId)
-      } else if (data.length > 0 && !savedId) {
-        setActiveConversationId(data[0].id)
       }
     } catch {
       toast({
@@ -741,7 +745,7 @@ export default function ChatFull() {
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-start gap-3 max-w-[85%] sm:max-w-[80%]">
+                    <div className="flex items-start gap-3 mt-10 max-w-[85%] sm:max-w-[80%]">
                       <div
                         className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 mt-1 shadow-xs ${theme === 'dark'
                             ? 'bg-[#2f2f2f]'
@@ -750,7 +754,7 @@ export default function ChatFull() {
                       >
                         <img src="/logo.png" alt="Career AI" className="w-9 h-9 object-contain" />
                       </div>
-                      <div className="flex-1 space-y-1">
+                      <div className="flex-1 space-y-1 ">
                         <div className="flex items-center gap-2">
                           <span
                             className={`font-semibold text-sm -mb-4 ${theme === 'dark' ? 'text-white' : 'text-charcoal'
@@ -759,7 +763,7 @@ export default function ChatFull() {
                             Career AI
                           </span>
                           <span
-                            className={`text-[10px] opacity-0 group-hover:opacity-100 transition-opacity ${theme === 'dark' ? 'text-gray-400' : 'text-muted'
+                            className={`text-[10px] -mb-4 opacity-0 group-hover:opacity-100 transition-opacity ${theme === 'dark' ? 'text-gray-400' : 'text-muted'
                               }`}
                           >
                             {new Date(m.created_at).toLocaleTimeString([], {

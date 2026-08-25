@@ -10,6 +10,7 @@ import AppIcon from '../../components/ui/AppIcon'
 import { toast } from 'react-hot-toast'
 import Modal from '../../components/ui/Modal'
 import MCQQuizWidget, { parseMCQsFromText } from '../../components/ai/MCQQuizWidget'
+import ResumeRecommendationsWidget, { detectTechStack } from '../../components/ai/ResumeRecommendationsWidget'
 
 const chips = [
   'Explain a topic',
@@ -30,52 +31,61 @@ function MarkdownRenderer({ content }) {
       </div>
     )
   }
+
+  const stack = detectTechStack(content)
+
   return (
-    <ReactMarkdown
-      components={{
-        h1: ({ children }) => <h1 className="text-base font-bold mt-3 mb-1 text-charcoal">{children}</h1>,
-        h2: ({ children }) => <h2 className="text-sm font-bold mt-2.5 mb-1 text-charcoal">{children}</h2>,
-        h3: ({ children }) => <h3 className="text-xs font-bold mt-2 mb-1 text-charcoal">{children}</h3>,
-        p: ({ children }) => <p className="text-[14px] leading-relaxed text-charcoal/90 my-2">{children}</p>,
-        ul: ({ children }) => <ul className="space-y-1.5 list-disc pl-4 text-[14px] my-2 text-charcoal/90">{children}</ul>,
-        ol: ({ children }) => <ol className="space-y-1.5 list-decimal pl-4 text-[14px] my-2 text-charcoal/90">{children}</ol>,
-        li: ({ children }) => <li className="leading-relaxed">{children}</li>,
-        code: ({ node, inline, className, children, ...props }) => {
-          const match = /language-(\w+)/.exec(className || '')
-          const lang = match ? match[1] : ''
-          if (!inline) {
-            return (
-              <div className="my-3 rounded-lg overflow-hidden border border-gray-700 bg-[#1e1e1e] shadow-xs text-left">
-                <div className="flex items-center justify-between px-3.5 py-1.5 bg-[#2d2d2d] border-b border-gray-700 text-xs text-gray-300 font-mono">
-                  <span className="font-semibold capitalize">{lang || 'code'}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigator.clipboard.writeText(String(children).replace(/\n$/, ''))
-                      toast.success('Code copied!')
-                    }}
-                    className="hover:text-white transition-colors cursor-pointer flex items-center gap-1 text-xs text-gray-400"
-                  >
-                    <AppIcon name="Copy" className="text-[12px]" />
-                    <span>Copy code</span>
-                  </button>
+    <div className="space-y-3">
+      <ReactMarkdown
+        components={{
+          h1: ({ children }) => <h1 className="text-base font-bold mt-3 mb-1 text-charcoal">{children}</h1>,
+          h2: ({ children }) => <h2 className="text-sm font-bold mt-2.5 mb-1 text-charcoal">{children}</h2>,
+          h3: ({ children }) => <h3 className="text-xs font-bold mt-2 mb-1 text-charcoal">{children}</h3>,
+          p: ({ children }) => <p className="text-[14px] leading-relaxed text-charcoal/90 my-2">{children}</p>,
+          ul: ({ children }) => <ul className="space-y-1.5 list-disc pl-4 text-[14px] my-2 text-charcoal/90">{children}</ul>,
+          ol: ({ children }) => <ol className="space-y-1.5 list-decimal pl-4 text-[14px] my-2 text-charcoal/90">{children}</ol>,
+          li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+          code: ({ node, inline, className, children, ...props }) => {
+            const match = /language-(\w+)/.exec(className || '')
+            const lang = match ? match[1] : ''
+            if (!inline) {
+              return (
+                <div className="my-3 rounded-lg overflow-hidden border border-gray-700 bg-[#1e1e1e] shadow-xs text-left">
+                  <div className="flex items-center justify-between px-3.5 py-1.5 bg-[#2d2d2d] border-b border-gray-700 text-xs text-gray-300 font-mono">
+                    <span className="font-semibold capitalize">{lang || 'code'}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(String(children).replace(/\n$/, ''))
+                        toast.success('Code copied!')
+                      }}
+                      className="hover:text-white transition-colors cursor-pointer flex items-center gap-1 text-xs text-gray-400"
+                    >
+                      <AppIcon name="Copy" className="text-[13px]" />
+                      <span>Copy</span>
+                    </button>
+                  </div>
+                  <pre className="p-3.5 text-xs font-mono text-emerald-400 overflow-x-auto m-0 leading-relaxed">
+                    <code>{children}</code>
+                  </pre>
                 </div>
-                <pre className="p-3.5 text-xs font-mono text-emerald-400 overflow-x-auto m-0 leading-relaxed">
-                  <code>{children}</code>
-                </pre>
-              </div>
+              )
+            }
+            return (
+              <code
+                className="px-1.5 py-0.5 rounded text-xs font-mono font-semibold bg-gray-200 text-primary"
+                {...props}
+              >
+                {children}
+              </code>
             )
           }
-          return (
-            <code className="bg-gray-100 text-primary px-1.5 py-0.5 rounded text-xs font-mono font-semibold" {...props}>
-              {children}
-            </code>
-          )
-        }
-      }}
-    >
-      {content}
-    </ReactMarkdown>
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+      {stack && <ResumeRecommendationsWidget stack={stack} content={content} theme="light" />}
+    </div>
   )
 }
 
