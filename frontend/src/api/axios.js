@@ -15,8 +15,12 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
-    const guestId = localStorage.getItem('skillbridge_guest_id')
-    if (guestId && !token) {
+    let guestId = localStorage.getItem('skillbridge_guest_id')
+    if (!guestId) {
+      guestId = 'guest_' + Math.random().toString(36).substring(2, 15)
+      localStorage.setItem('skillbridge_guest_id', guestId)
+    }
+    if (!token) {
       config.headers['X-Guest-ID'] = guestId
     }
     return config

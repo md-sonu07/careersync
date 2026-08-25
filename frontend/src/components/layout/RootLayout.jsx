@@ -1,13 +1,22 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useChatContext } from '../../context/ChatContext';
 import GlobalChatPane from '../ai/GlobalChatPane';
 
 export default function RootLayout() {
-  const { isChatOpen } = useChatContext();
+  const location = useLocation();
+  const { isChatOpen, closeChat } = useChatContext();
   const [chatWidth, setChatWidth] = useState(600);
   const [isResizing, setIsResizing] = useState(false);
   const containerRef = useRef(null);
+
+  // Automatically close popup chat drawer on any non-dashboard route
+  useEffect(() => {
+    const isDashboard = location.pathname.endsWith('/dashboard') || location.pathname === '/'
+    if (!isDashboard) {
+      closeChat();
+    }
+  }, [location.pathname, closeChat]);
 
   const startResizing = useCallback((e) => {
     e.preventDefault();
@@ -64,7 +73,7 @@ export default function RootLayout() {
       {isChatOpen && (
         <div 
           className="h-full bg-white border-l border-border shadow-xl shrink-0 z-40"
-          style={{ width: `${chatWidth}px` }}
+          style={{ width: `${chatWidth}px`, minWidth: '400px', maxWidth: '70vw' }}
         >
           <GlobalChatPane />
         </div>

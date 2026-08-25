@@ -31,6 +31,8 @@ const Placeholder = ({ title, subtitle }) => (
   </div>
 )
 
+import AIAssistant from '../pages/Student/AIAssistant'
+
 export const industryRoutes = {
   path: '/industry',
   element: <ProtectedRoute allowedRoles={['industry']} />,
@@ -41,6 +43,7 @@ export const industryRoutes = {
       children: [
         { index: true, element: <IndustryDashboard /> },
         { path: 'dashboard', element: <IndustryDashboard /> },
+        { path: 'ai-assistant', element: <AIAssistant /> },
         { path: 'profile', element: <CompanyProfile /> },
         { path: 'verification', element: <IndustryVerification /> },
         { path: 'team', element: <Team /> },

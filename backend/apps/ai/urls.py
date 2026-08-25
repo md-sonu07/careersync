@@ -1,5 +1,8 @@
 from django.urls import path
-from .views import AIConversationViewSet, AIChatView
+from .views import (
+    AIConversationViewSet, AIChatView,
+    AIDocumentUploadView, AIDocumentDetailView, AIDocumentChatView,
+)
 
 app_name = 'ai'
 
@@ -17,4 +20,9 @@ urlpatterns = [
 
     # Chat endpoint
     path('chat/', AIChatView.as_view(), name='chat'),
+
+    # Document Analysis Endpoints
+    path('documents/upload/', AIDocumentUploadView.as_view(), name='document-upload'),
+    path('documents/<str:pk>/', AIDocumentDetailView.as_view(), name='document-detail'),
+    path('documents/<str:pk>/chat/', AIDocumentChatView.as_view(), name='document-chat'),
 ]

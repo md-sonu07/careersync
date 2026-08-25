@@ -37,22 +37,22 @@ export default function AdminDashboard() {
   const applicationsCount = stats?.applications_count ?? 0
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 @container">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white">
-            <AppIcon name="shield" />
+          <div className="flex h-10 w-10 @2xl:h-12 @2xl:w-12 items-center justify-center rounded-xl bg-slate-900 text-white shrink-0 shadow-sm">
+            <AppIcon name="shield" className="text-xl @2xl:text-2xl" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-charcoal">Admin Dashboard</h1>
-            <p className="text-sm text-muted">Governance console — live user activity, courses, opportunities & system metrics</p>
+            <h1 className="text-xl sm:text-2xl @5xl:text-3xl font-extrabold text-charcoal tracking-tight">Admin Dashboard</h1>
+            <p className="text-xs sm:text-sm text-muted">Governance console — live user activity, courses, opportunities & system metrics</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={loadData} disabled={loading}>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button variant="outline" size="sm" onClick={loadData} disabled={loading} className="text-xs sm:text-sm">
             <AppIcon name="refresh" className="text-[16px]" /> Refresh
           </Button>
-          <Badge variant="default" className="!bg-slate-900 !text-white">Admin</Badge>
+          <Badge variant="default" className="!bg-slate-900 !text-white text-xs">Admin</Badge>
           <span className="hidden items-center gap-1 rounded-full bg-success/10 px-3 py-1 text-xs font-bold text-success sm:inline-flex">
             <span className="h-2 w-2 rounded-full bg-success animate-pulse" /> System healthy
           </span>
@@ -66,28 +66,29 @@ export default function AdminDashboard() {
         </Card>
       ) : (
         <>
-          {/* Top stats */}
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 xl:grid-cols-5">
+          {/* Top 4 User & Org Stats */}
+          <div className="grid grid-cols-1 @md:grid-cols-2 @4xl:grid-cols-4 gap-3.5 sm:gap-5">
             <StatCard label="Total Registered Users" value={totalUsers} icon="group" trend={100} trendLabel="verified" />
             <StatCard label="Students" value={studentsCount} icon="school" trend={100} trendLabel="active" />
             <StatCard label="Industry Partners" value={industryCount} icon="business" trend={100} trendLabel="companies" />
             <StatCard label="Institute Institutions" value={instituteCount} icon="apartment" trend={100} trendLabel="colleges" />
-            <StatCard label="Active Courses" value={coursesCount} icon="menu_book" trend={100} trendLabel="published" className="col-span-2 xl:col-span-1" />
           </div>
 
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+          {/* Bottom 4 Platform Metrics */}
+          <div className="grid grid-cols-1 @md:grid-cols-2 @4xl:grid-cols-4 gap-3.5 sm:gap-5">
+            <StatCard label="Active Courses" value={coursesCount} icon="menu_book" trend={100} trendLabel="published" />
             <StatCard label="Posted Opportunities" value={opportunitiesCount} icon="work" trend={100} trendLabel="total" />
             <StatCard label="Total Applications" value={applicationsCount} icon="assignment" trend={100} trendLabel="submitted" />
             <StatCard label="AI System Health" value="100%" icon="smart_toy" trend={100} trendLabel="operational" />
           </div>
 
           {/* Governance breakdown */}
-          <Card className="!p-0 overflow-hidden">
-            <div className="flex items-center justify-between border-b border-border px-6 py-4">
-              <h3 className="font-bold text-charcoal">Platform User Breakdown</h3>
+          <Card className="!p-0 overflow-hidden border border-border rounded-2xl shadow-subtle">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border px-4 py-3.5 sm:px-6 sm:py-4 gap-2">
+              <h3 className="font-bold text-sm sm:text-base text-charcoal">Platform User Breakdown</h3>
               <span className="text-xs text-muted">Live Django Database Metrics</span>
             </div>
-            <div className="grid grid-cols-2 gap-0 divide-x divide-border lg:grid-cols-5">
+            <div className="grid grid-cols-2 @md:grid-cols-3 @4xl:grid-cols-5 divide-y @md:divide-y-0 divide-x-0 @md:divide-x divide-border">
               {[
                 { k: 'Students', active: studentsCount, c: 'text-primary' },
                 { k: 'Industries', active: industryCount, c: 'text-accent' },
@@ -95,10 +96,10 @@ export default function AdminDashboard() {
                 { k: 'Admins', active: adminsCount, c: 'text-charcoal' },
                 { k: 'Total', active: totalUsers, c: 'text-charcoal font-bold' },
               ].map((r) => (
-                <div key={r.k} className="p-4 text-center">
-                  <p className="text-xs font-bold uppercase tracking-widest text-muted">{r.k}</p>
-                  <p className={`mt-1 text-lg font-bold ${r.c}`}>{r.active}</p>
-                  <p className="text-xs text-muted">Verified account</p>
+                <div key={r.k} className="p-3.5 sm:p-4 text-center">
+                  <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-muted">{r.k}</p>
+                  <p className={`mt-1 text-base sm:text-lg font-bold ${r.c}`}>{r.active}</p>
+                  <p className="text-[10px] sm:text-xs text-muted">Verified account</p>
                 </div>
               ))}
             </div>

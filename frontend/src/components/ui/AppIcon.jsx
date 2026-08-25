@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Plus, PlusCircle, Route, Building2, ArrowLeft, ArrowRight, ArrowUpRight, ArrowUp,
   ClipboardList, Sparkles, BookOpen, BarChart3, Building, MessageCircle, CheckCircle2,
@@ -8,7 +7,8 @@ import {
   Mail, Menu, Medal, Activity, MoreHorizontal, Bell, ExternalLink, Banknote, UserSearch,
   Play, PlayCircle, BrainCircuit, FileQuestion, Clock, GraduationCap, Search, Send,
   Shield, Bot, Star, Timer, TrendingUp, BadgeCheck, UserCheck, Eye, AlertTriangle, Hand,
-  Briefcase, Award, Zap, Share2, Users, AtSign, Monitor, Infinity, Video, UserPlus , SquarePen
+  Briefcase, Award, Zap, Share2, Users, AtSign, Monitor, Infinity, Video, UserPlus, SquarePen,
+  Sun, Moon, Copy
 } from 'lucide-react';
 
 // Custom Brand SVGs
@@ -61,6 +61,8 @@ const iconMap = {
   auto_stories: BookOpen,
   bar_chart: BarChart3,
   bolt: Zap,
+  briefcase: Briefcase,
+  Briefcase: Briefcase,
   business: Building,
   business_center: Briefcase,
   chat_bubble: MessageCircle,
@@ -137,6 +139,12 @@ const iconMap = {
   SquarePen: SquarePen,
   create: SquarePen,
   edit_note: SquarePen,
+  Sun: Sun,
+  sun: Sun,
+  Moon: Moon,
+  moon: Moon,
+  Copy: Copy,
+  copy: Copy,
   
   // Brands
   google: GoogleIcon,

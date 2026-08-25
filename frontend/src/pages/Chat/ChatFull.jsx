@@ -7,9 +7,11 @@ import { aiAPI } from '../../api/ai.api'
 import { useAuth } from '../../hooks/useAuth'
 import Logo from '../../components/ui/Logo'
 import { toast } from 'react-hot-toast'
-import AppIcon from '../../components/ui/AppIcon';
+import AppIcon from '../../components/ui/AppIcon'
 import Modal from '../../components/ui/Modal'
 import Button from '../../components/ui/Button'
+import MCQQuizWidget, { parseMCQsFromText } from '../../components/ai/MCQQuizWidget'
+import ResumeRecommendationsWidget, { detectTechStack } from '../../components/ai/ResumeRecommendationsWidget'
 
 const chips = [
   'Course Recommendations',
@@ -18,11 +20,118 @@ const chips = [
   'Resume Review',
 ]
 
-export default function ChatFull() {
+function MarkdownRenderer({ content, theme }) {
+  const mcqs = parseMCQsFromText(content)
+
+  if (mcqs && mcqs.length > 0) {
+    return (
+      <div className="space-y-3">
+        <MCQQuizWidget questions={mcqs} theme={theme} />
+      </div>
+    )
+  }
+
+  const stack = detectTechStack(content)
+
+  return (
+    <div className="space-y-4">
+      <ReactMarkdown
+        components={{
+          h1: ({ children }) => (
+            <h1 className={`text-xl font-bold mt-5 mb-2.5 flex items-center gap-2 ${theme === 'dark' ? 'text-white' : 'text-charcoal'}`}>
+              {children}
+            </h1>
+          ),
+          h2: ({ children }) => (
+            <h2 className={`text-lg font-bold mt-4 mb-2 flex items-center gap-2 ${theme === 'dark' ? 'text-white' : 'text-charcoal'}`}>
+              {children}
+            </h2>
+          ),
+          h3: ({ children }) => (
+            <h3 className={`text-base font-bold mt-3 mb-1.5 flex items-center gap-2 ${theme === 'dark' ? 'text-white' : 'text-charcoal'}`}>
+              {children}
+            </h3>
+          ),
+          p: ({ children }) => (
+            <p className={`text-[15px] leading-7 my-2.5 ${theme === 'dark' ? 'text-[#ececec]' : 'text-[#0d0d0d]'}`}>
+              {children}
+            </p>
+          ),
+          ul: ({ children }) => (
+            <ul className={`space-y-2 list-disc pl-5 text-[15px] my-3 ${theme === 'dark' ? 'text-[#ececec]' : 'text-[#0d0d0d]'}`}>
+              {children}
+            </ul>
+          ),
+          ol: ({ children }) => (
+            <ol className={`space-y-2 list-decimal pl-5 text-[15px] my-3 ${theme === 'dark' ? 'text-[#ececec]' : 'text-[#0d0d0d]'}`}>
+              {children}
+            </ol>
+          ),
+          li: ({ children }) => <li className="leading-7 pl-1">{children}</li>,
+          blockquote: ({ children }) => (
+            <blockquote className={`border-l-4 pl-4 py-1.5 my-3 italic ${theme === 'dark' ? 'border-primary text-gray-300 bg-[#2d2d2d]/50' : 'border-primary text-gray-700 bg-primary/5'} rounded-r-lg`}>
+              {children}
+            </blockquote>
+          ),
+          code: ({ node, inline, className, children, ...props }) => {
+            const match = /language-(\w+)/.exec(className || '')
+            const lang = match ? match[1] : ''
+            if (!inline) {
+              return (
+                <div className="my-4 rounded-xl overflow-hidden border border-gray-700 bg-[#1e1e1e] shadow-md text-left">
+                  <div className="flex items-center justify-between px-4 py-1.5 bg-[#2d2d2d] border-b border-gray-700 text-xs text-gray-300 font-mono">
+                    <span className="font-semibold capitalize">{lang || 'code'}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(String(children).replace(/\n$/, ''))
+                        toast.success('Code copied to clipboard!')
+                      }}
+                      className="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-xs text-gray-400"
+                    >
+                      <AppIcon name="Copy" className="text-[13px]" />
+                      <span>Copy code</span>
+                    </button>
+                  </div>
+                  <pre className="p-4 text-xs font-mono text-emerald-400 overflow-x-auto m-0 leading-relaxed">
+                    <code>{children}</code>
+                  </pre>
+                </div>
+              )
+            }
+            return (
+              <code
+                className={`px-1.5 py-0.5 rounded text-xs font-mono font-semibold ${theme === 'dark' ? 'bg-[#383838] text-emerald-400' : 'bg-gray-200 text-primary'
+                  }`}
+                {...props}
+              >
+                {children}
+              </code>
+            )
+          }
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+      {stack && <ResumeRecommendationsWidget stack={stack} content={content} theme={theme} />}
+    </div>
+  )
+}
+
+export default function ChatFull({ isEmbedded = false, onOpenMobileMenu = null }) {
   const isAuthenticated = useSelector(selectIsAuthenticated)
   const user = useSelector(selectCurrentUser)
   const { logout } = useAuth()
   const navigate = useNavigate()
+
+  // Theme State
+  const [theme, setTheme] = useState(() => localStorage.getItem('chat_theme') || 'dark')
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light'
+    setTheme(nextTheme)
+    localStorage.setItem('chat_theme', nextTheme)
+  }
 
   const [conversations, setConversations] = useState([])
   const [messages, setMessages] = useState([])
@@ -30,15 +139,20 @@ export default function ChatFull() {
   const [isSending, setIsSending] = useState(false)
   const [isLoadingMessages, setIsLoadingMessages] = useState(false)
   const [isLoadingConversations, setIsLoadingConversations] = useState(true)
+
+  // Track active conversation ID persistent across refresh
+  const initialSavedId = localStorage.getItem('public_chat_conversation_id')
   const [activeConversationId, setActiveConversationId] = useState(
-    localStorage.getItem('public_chat_conversation_id') || null
+    initialSavedId === 'new' ? null : initialSavedId
   )
+
   const [editingId, setEditingId] = useState(null)
   const [editTitle, setEditTitle] = useState('')
   const [deleteConfirmId, setDeleteConfirmId] = useState(null)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(!isEmbedded)
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
-
+  const [selectedFile, setSelectedFile] = useState(null)
+  const fileInputRef = useRef(null)
   const bottomRef = useRef(null)
 
   const handleRenameSave = async (id) => {
@@ -59,16 +173,22 @@ export default function ChatFull() {
     }
   }
 
+  const skipFetchRef = useRef(false)
+
   useEffect(() => {
     fetchConversations()
   }, [])
 
   useEffect(() => {
-    if (activeConversationId) {
-      localStorage.setItem('public_chat_conversation_id', activeConversationId);
+    if (activeConversationId && activeConversationId !== 'new') {
+      localStorage.setItem('public_chat_conversation_id', activeConversationId)
+      if (skipFetchRef.current) {
+        skipFetchRef.current = false
+        return
+      }
       fetchMessages(activeConversationId)
     } else {
-      localStorage.removeItem('public_chat_conversation_id');
+      localStorage.setItem('public_chat_conversation_id', 'new')
       setMessages([])
     }
   }, [activeConversationId])
@@ -84,8 +204,12 @@ export default function ChatFull() {
     try {
       const data = await aiAPI.getConversations()
       setConversations(data)
-      if (data.length > 0 && !activeConversationId) {
-        setActiveConversationId(data[0].id)
+      const savedId = localStorage.getItem('public_chat_conversation_id')
+
+      if (savedId === 'new' || !savedId) {
+        setActiveConversationId(null)
+      } else if (savedId && data.some((c) => String(c.id) === String(savedId))) {
+        setActiveConversationId(savedId)
       }
     } catch {
       toast({
@@ -116,21 +240,44 @@ export default function ChatFull() {
 
   const handleSend = async (textOverride = null) => {
     const textToSend = textOverride !== null ? textOverride : input
-    if (!textToSend.trim()) return
+    if (!textToSend.trim() && !selectedFile) return
+
+    const attachedFile = selectedFile
+    const messageContent = textToSend.trim() || (attachedFile ? `Please analyze this file: ${attachedFile.name}` : '')
 
     const userMsg = {
       id: Date.now().toString(),
       role: 'user',
-      content: textToSend,
+      content: messageContent,
       created_at: new Date().toISOString(),
+      attachment: attachedFile ? { name: attachedFile.name, size: attachedFile.size } : null,
     }
 
     setMessages((prev) => [...prev, userMsg])
     setInput('')
+    setSelectedFile(null)
     setIsSending(true)
 
     try {
-      const response = await aiAPI.sendMessage(textToSend, activeConversationId)
+      let docContextText = null
+      if (attachedFile) {
+        try {
+          const docRes = await aiAPI.uploadDocument(attachedFile)
+          if (docRes) {
+            let docText = docRes.extracted_text || ''
+            if (!docText && docRes.analysis_result?.summary) {
+              docText = `Summary: ${docRes.analysis_result.summary}`
+            }
+            docContextText = docText.slice(0, 3000)
+          }
+        } catch (fileErr) {
+          console.warn('Document extraction fallback in chat:', fileErr)
+        }
+      }
+
+      const targetId = activeConversationId === 'new' ? null : activeConversationId
+      const attachmentPayload = attachedFile ? { name: attachedFile.name, size: attachedFile.size } : null
+      const response = await aiAPI.sendMessage(messageContent, targetId, docContextText, attachmentPayload)
 
       const assistantMsg = {
         id: response.assistant_message_id || (Date.now() + 1).toString(),
@@ -142,10 +289,10 @@ export default function ChatFull() {
 
       setMessages((prev) => [...prev, assistantMsg])
 
-      if (!activeConversationId && response.conversation_id) {
+      if (response.conversation_id) {
+        localStorage.setItem('public_chat_conversation_id', response.conversation_id)
+        skipFetchRef.current = true
         setActiveConversationId(response.conversation_id)
-        fetchConversations()
-      } else {
         fetchConversations()
       }
     } catch {
@@ -159,9 +306,25 @@ export default function ChatFull() {
     }
   }
 
+  useEffect(() => {
+    const handleCustomSend = (e) => {
+      if (e.detail?.text) {
+        handleSend(e.detail.text)
+      }
+    }
+    window.addEventListener('careersync:chat:send', handleCustomSend)
+    return () => window.removeEventListener('careersync:chat:send', handleCustomSend)
+  }, [activeConversationId, input, selectedFile])
+
   const handleNewChat = () => {
+    localStorage.setItem('public_chat_conversation_id', 'new')
     setActiveConversationId(null)
     setMessages([])
+  }
+
+  const handleSelectConversation = (id) => {
+    localStorage.setItem('public_chat_conversation_id', id)
+    setActiveConversationId(id)
   }
 
   const handleDelete = (e, id) => {
@@ -179,8 +342,7 @@ export default function ChatFull() {
     } finally {
       setConversations((prev) => prev.filter((c) => String(c.id) !== idStr))
       if (String(activeConversationId) === idStr) {
-        setActiveConversationId(null)
-        setMessages([])
+        handleNewChat()
       }
       toast.success('Conversation deleted')
       setDeleteConfirmId(null)
@@ -188,20 +350,27 @@ export default function ChatFull() {
   }
 
   return (
-    <div className="flex h-screen w-full bg-[#FCFCFC] overflow-hidden text-charcoal font-sans">
-
+    <div
+      className={`flex ${isEmbedded ? 'h-full' : 'h-screen'} w-full font-sans overflow-hidden transition-colors ${theme === 'dark' ? 'bg-[#212121] text-[#ececec]' : 'bg-[#FCFCFC] text-charcoal'
+        }`}
+    >
       {/* Sidebar */}
       <div
-        className={`bg-[#F9F9F9] border-r border-border/60 transition-all duration-300 flex flex-col ${sidebarOpen ? 'w-[280px]' : 'w-[0px] opacity-0 overflow-hidden border-none'}`}
+        className={`border-r transition-all duration-300 flex flex-col ${theme === 'dark' ? 'bg-[#171717] border-[#2f2f2f]' : 'bg-[#F9F9F9] border-border/60'
+          } ${sidebarOpen ? 'w-[280px]' : 'w-[0px] opacity-0 overflow-hidden border-none'}`}
       >
         <div className="p-4 flex items-center justify-between">
           <Logo
             imageClassName="h-6"
-            textClassName="text-[15px] font-extrabold tracking-tight"
+            textClassName={`text-[15px] font-extrabold tracking-tight ${theme === 'dark' ? 'text-white' : 'text-charcoal'
+              }`}
           />
           <button
             onClick={() => setSidebarOpen(false)}
-            className="p-1.5 flex items-center justify-center cursor-pointer text-muted hover:text-charcoal rounded-md hover:bg-border/50 transition-colors"
+            className={`p-1.5 flex items-center justify-center cursor-pointer rounded-md transition-colors ${theme === 'dark'
+                ? 'text-gray-400 hover:text-white hover:bg-[#2f2f2f]'
+                : 'text-muted hover:text-charcoal hover:bg-border/50'
+              }`}
           >
             <AppIcon name="left_panel_close" className="text-[18px]" />
           </button>
@@ -210,7 +379,10 @@ export default function ChatFull() {
         <div className="px-3 pb-2 pt-3">
           <button
             onClick={handleNewChat}
-            className="flex items-center gap-2 rounded-lg bg-primary text-white hover:bg-primary-dark shadow-subtle hover:shadow-soft transition-all text-sm font-semibold py-2.5 px-3 cursor-pointer w-full active:scale-[0.98]"
+            className={`flex items-center gap-2 rounded-lg font-semibold py-2.5 px-3 cursor-pointer w-full text-sm transition-all shadow-sm active:scale-[0.98] ${theme === 'dark'
+                ? 'bg-[#2f2f2f] text-white hover:bg-[#383838] border border-[#3a3a3a]'
+                : 'bg-primary text-white hover:bg-primary-dark shadow-subtle'
+              }`}
           >
             <AppIcon name="SquarePen" className="text-[15px]" />
             <span>New Chat</span>
@@ -220,27 +392,46 @@ export default function ChatFull() {
         <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1">
           {isLoadingConversations ? (
             <div className="flex justify-center py-6">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary" />
             </div>
           ) : conversations.length === 0 ? (
-            <div className="text-center text-xs text-muted mt-6">No conversation history</div>
+            <div
+              className={`text-center text-xs mt-6 ${theme === 'dark' ? 'text-gray-500' : 'text-muted'
+                }`}
+            >
+              No conversation history
+            </div>
           ) : (
-            <div className="text-xs font-semibold text-muted/60 uppercase tracking-wider px-2 py-2 mb-1">
+            <div
+              className={`text-xs font-semibold uppercase tracking-wider px-2 py-2 mb-1 ${theme === 'dark' ? 'text-gray-500' : 'text-muted/60'
+                }`}
+            >
               Recent
             </div>
           )}
+
           {conversations.map((c) => {
-            const displayTitle = c.title && c.title !== 'New Conversation'
-              ? c.title
-              : (c.first_ai_response || c.first_message_preview || c.last_message_preview || 'New Conversation')
+            const displayTitle =
+              c.title && c.title !== 'New Conversation'
+                ? c.title
+                : c.first_ai_response ||
+                c.first_message_preview ||
+                c.last_message_preview ||
+                'New Conversation'
+
+            const isActive = String(activeConversationId) === String(c.id)
 
             return (
               <div
                 key={c.id}
-                onClick={() => setActiveConversationId(c.id)}
-                className={`group relative flex items-center gap-2 cursor-pointer rounded-lg px-3 py-2 transition-colors ${activeConversationId === c.id
-                    ? 'bg-primary/10 text-primary font-medium'
-                    : 'hover:bg-border/30 text-charcoal/80'
+                onClick={() => handleSelectConversation(c.id)}
+                className={`group relative flex items-center gap-2 cursor-pointer rounded-lg px-3 py-2 transition-colors ${isActive
+                    ? theme === 'dark'
+                      ? 'bg-[#2f2f2f] text-white font-medium'
+                      : 'bg-primary/10 text-primary font-medium'
+                    : theme === 'dark'
+                      ? 'hover:bg-[#252525] text-gray-300'
+                      : 'hover:bg-border/30 text-charcoal/80'
                   }`}
               >
                 <AppIcon name="chat_bubble" className="text-[16px] shrink-0 opacity-70" />
@@ -263,7 +454,10 @@ export default function ChatFull() {
                         if (e.key === 'Escape') setEditingId(null)
                       }}
                       autoFocus
-                      className="text-xs font-normal border border-primary/50 rounded px-1.5 py-0.5 bg-white text-charcoal flex-1 focus:outline-none min-w-0"
+                      className={`text-xs font-normal border rounded px-1.5 py-0.5 flex-1 focus:outline-none min-w-0 ${theme === 'dark'
+                          ? 'bg-[#171717] border-gray-600 text-white'
+                          : 'bg-white border-primary/50 text-charcoal'
+                        }`}
                     />
                     <button
                       type="submit"
@@ -314,37 +508,61 @@ export default function ChatFull() {
           })}
         </div>
 
-        {/* User Profile in Sidebar Bottom */}
-        <div className="p-3 border-t border-border/60">
+        {/* Sidebar Bottom User Profile */}
+        <div
+          className={`p-3 border-t ${theme === 'dark' ? 'border-[#2f2f2f]' : 'border-border/60'
+            }`}
+        >
           {isAuthenticated ? (
             <div className="relative">
               <button
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="w-full flex items-center gap-2.5 p-2 rounded-lg hover:bg-border/40 transition-colors"
+                className={`w-full flex items-center gap-2.5 p-2 rounded-lg transition-colors ${theme === 'dark' ? 'hover:bg-[#252525]' : 'hover:bg-border/40'
+                  }`}
               >
                 {user?.avatar_url || user?.profile_image ? (
-                  <img src={user.avatar_url || user.profile_image} alt="Profile" className="w-8 h-8 rounded-full object-cover border border-border" />
+                  <img
+                    src={user.avatar_url || user.profile_image}
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full object-cover border border-border"
+                  />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-charcoal text-white flex items-center justify-center font-bold text-xs">
                     {(user?.full_name || user?.name || user?.email || '?').charAt(0).toUpperCase()}
                   </div>
                 )}
                 <div className="text-left truncate flex-1">
-                  <div className="text-sm font-semibold truncate">{user?.full_name || user?.name || 'User'}</div>
-                  <div className="text-[10px] text-muted truncate capitalize">{user?.role || 'Student'}</div>
+                  <div className="text-sm font-semibold truncate">
+                    {user?.full_name || user?.name || 'User'}
+                  </div>
+                  <div
+                    className={`text-[10px] truncate capitalize ${theme === 'dark' ? 'text-gray-400' : 'text-muted'
+                      }`}
+                  >
+                    {user?.role || 'Student'}
+                  </div>
                 </div>
                 <AppIcon name="more_horiz" className="text-[16px] text-muted" />
               </button>
 
               {profileDropdownOpen && (
-                <div className="absolute bottom-full left-0 w-full mb-1 bg-white border border-border shadow-lg rounded-xl overflow-hidden py-1 z-50 animate-in fade-in slide-in-from-bottom-2">
-                  <Link to="/student/dashboard" className="block px-4 py-2 text-sm hover:bg-background transition-colors">
+                <div
+                  className={`absolute bottom-full left-0 w-full mb-1 border shadow-lg rounded-xl overflow-hidden py-1 z-50 animate-in fade-in slide-in-from-bottom-2 ${theme === 'dark'
+                      ? 'bg-[#2f2f2f] border-[#383838] text-white'
+                      : 'bg-white border-border'
+                    }`}
+                >
+                  <Link
+                    to="/student/dashboard"
+                    className={`block px-4 py-2 text-sm transition-colors ${theme === 'dark' ? 'hover:bg-[#383838]' : 'hover:bg-background'
+                      }`}
+                  >
                     Dashboard
                   </Link>
                   <button
                     onClick={async () => {
-                      await logout();
-                      navigate('/login');
+                      await logout()
+                      navigate('/login')
                     }}
                     className="w-full text-left px-4 py-2 text-sm text-danger hover:bg-danger/5 transition-colors"
                   >
@@ -354,7 +572,13 @@ export default function ChatFull() {
               )}
             </div>
           ) : (
-            <Link to="/login" className="block w-full text-center py-2 text-sm font-medium text-charcoal hover:bg-border/40 rounded-lg transition-colors">
+            <Link
+              to="/login"
+              className={`block w-full text-center py-2 text-sm font-medium rounded-lg transition-colors ${theme === 'dark'
+                  ? 'text-gray-300 hover:bg-[#2f2f2f]'
+                  : 'text-charcoal hover:bg-border/40'
+                }`}
+            >
               Sign In
             </Link>
           )}
@@ -362,223 +586,398 @@ export default function ChatFull() {
       </div>
 
       {/* Main Area */}
-      <div className="flex-1 flex flex-col relative bg-white">
-
-        {/* Topbar */}
+      <div
+        className={`flex-1 flex flex-col relative transition-colors ${theme === 'dark' ? 'bg-[#212121]' : 'bg-white'
+          }`}
+      >
+        {/* Top Header Bar */}
         <div className="absolute top-0 left-0 w-full p-4 flex items-center justify-between z-10 pointer-events-none">
           <div className="pointer-events-auto flex items-center gap-2">
+            {onOpenMobileMenu && (
+              <button
+                onClick={onOpenMobileMenu}
+                className={`p-1.5 lg:hidden flex items-center justify-center cursor-pointer rounded-md backdrop-blur-sm border shadow-sm transition-colors ${theme === 'dark'
+                    ? 'bg-[#2f2f2f]/80 text-gray-300 border-[#383838] hover:text-white'
+                    : 'bg-white/80 text-muted border-border/50 hover:text-charcoal'
+                  }`}
+                title="Open Navigation"
+              >
+                <AppIcon name="menu" className="text-[18px]" />
+              </button>
+            )}
             {!sidebarOpen && (
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="p-1.5 flex items-center justify-center cursor-pointer text-muted hover:text-charcoal rounded-md hover:bg-border/50 transition-colors bg-white/80 backdrop-blur-sm border border-border/50 shadow-sm"
+                className={`p-1.5 flex items-center justify-center cursor-pointer rounded-md backdrop-blur-sm border shadow-sm transition-colors ${theme === 'dark'
+                    ? 'bg-[#2f2f2f]/80 text-gray-300 border-[#383838] hover:text-white'
+                    : 'bg-white/80 text-muted border-border/50 hover:text-charcoal'
+                  }`}
               >
                 <AppIcon name="left_panel_open" className="text-[18px]" />
               </button>
             )}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/90 backdrop-blur-sm border border-border/60 shadow-sm cursor-default">
+            <div
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-md backdrop-blur-sm border shadow-sm cursor-default ${theme === 'dark'
+                  ? 'bg-[#2f2f2f]/90 border-[#3a3a3a] text-white'
+                  : 'bg-white/90 border-border/60 text-charcoal'
+                }`}
+            >
               <img src="/logo.png" alt="Career AI" className="w-5 h-5 object-contain" />
-              <span className="text-sm font-bold text-charcoal">Career AI</span>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">v01</span>
+              <span className="text-sm font-bold">Career AI</span>
+              <span
+                className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${theme === 'dark'
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                    : 'bg-primary/10 text-primary border border-primary/20'
+                  }`}
+              >
+                v01
+              </span>
             </div>
           </div>
+
           <div className="pointer-events-auto flex items-center gap-3">
-            <Link to="/" className="text-sm font-medium text-charcoal/70 hover:text-charcoal transition-colors bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-border/50 shadow-sm flex items-center gap-1.5">
-              Exit Chat <AppIcon name="arrow_outward" className="text-[16px]" />
-            </Link>
+            {/* Dark / Light Mode Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              className={`p-2 rounded-lg cursor-pointer transition-colors flex items-center justify-center border shadow-sm ${theme === 'dark'
+                  ? 'bg-[#2f2f2f] text-amber-400 border-[#3a3a3a] hover:bg-[#383838]'
+                  : 'bg-white text-charcoal border-border/60 hover:bg-gray-100'
+                }`}
+            >
+              {theme === 'dark' ? (
+                <AppIcon name="Sun" className="text-[18px]" />
+              ) : (
+                <AppIcon name="Moon" className="text-[18px]" />
+              )}
+            </button>
+
+            {!isEmbedded && (
+              <Link
+                to="/"
+                className={`text-sm font-medium backdrop-blur-sm px-3 py-1.5 rounded-lg border shadow-sm flex items-center gap-1.5 transition-colors ${theme === 'dark'
+                    ? 'bg-[#2f2f2f] text-gray-300 border-[#3a3a3a] hover:text-white'
+                    : 'bg-white/80 text-charcoal/70 border-border/50 hover:text-charcoal'
+                  }`}
+              >
+                Exit Chat <AppIcon name="arrow_outward" className="text-[16px]" />
+              </Link>
+            )}
           </div>
         </div>
 
         {/* Content Container */}
         <div className="flex-1 overflow-y-auto w-full pb-36 pt-16 scroll-smooth">
-          {(!activeConversationId && messages.length === 0) ? (
-
+          {!activeConversationId || activeConversationId === 'new' || messages.length === 0 ? (
             /* Empty State Hero */
-            <div className="flex flex-col items-center justify-center h-full max-w-3xl mx-auto px-6 text-center animate-in fade-in zoom-in-95 duration-500">
-              <h1 className="text-4xl md:text-5xl font-[400] text-[#1A1A1A] tracking-tight mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-220px)] max-w-3xl mx-auto px-6 text-center animate-in fade-in zoom-in-95 duration-500">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 via-primary/5 to-transparent border border-primary/20 shadow-md flex items-center justify-center mb-6 backdrop-blur-md">
+                <img src="/logo.png" alt="Career AI" className="w-10 h-10 object-contain drop-shadow-sm" />
+              </div>
+              <h1
+                className={`text-4xl md:text-5xl font-[400] tracking-tight mb-4 ${theme === 'dark' ? 'text-white' : 'text-[#1A1A1A]'
+                  }`}
+                style={{ fontFamily: 'Georgia, serif' }}
+              >
                 What can I do for you?
               </h1>
-              <p className="text-[#666666] text-sm md:text-base mb-10">
-                Interact with Career AI and explore your career possibilities
+              <p
+                className={`text-sm md:text-base mb-8 max-w-md ${theme === 'dark' ? 'text-gray-400' : 'text-[#666666]'
+                  }`}
+              >
+                Interact with Career AI to learn concepts, prepare for interviews, or explore your career path.
               </p>
 
-              {/* Main Input Box (Empty State) */}
-              <div className="w-full max-w-2xl bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-border/60 hover:border-border transition-all flex flex-col">
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault()
-                      handleSend()
-                    }
-                  }}
-                  disabled={isSending}
-                  placeholder="How can I help you today?"
-                  className="w-full resize-none bg-transparent px-5 py-4 text-[15px] text-charcoal placeholder:text-muted/70 focus:outline-none disabled:opacity-50 min-h-[100px]"
-                />
-
-                <div className="px-3 pb-3 flex items-center justify-between">
-                  <div className="flex items-center gap-1">
-                    <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted hover:text-charcoal hover:bg-border/40 transition-colors">
-                      <AppIcon name="add" className="text-[20px]" />
-                    </button>
-                    <button className="w-8 h-8 rounded-full flex items-center justify-center text-muted hover:text-charcoal hover:bg-border/40 transition-colors">
-                      <AppIcon name="language" className="text-[18px]" />
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={() => handleSend()}
-                    disabled={!input.trim() || isSending}
-                    className="w-8 h-8 rounded-full flex items-center justify-center bg-charcoal text-white disabled:bg-muted/30 disabled:text-muted transition-colors shadow-sm"
-                  >
-                    <AppIcon name="arrow_upward" className="text-[16px]" />
-                  </button>
-                </div>
-              </div>
-
               {/* Suggestion Chips */}
-              <div className="flex flex-wrap justify-center gap-3 mt-8">
+              <div className="flex flex-wrap justify-center gap-3">
                 {chips.map((c) => (
                   <button
                     key={c}
                     onClick={() => handleSend(c)}
-                    className="px-4 py-2 rounded-xl border border-border/60 bg-white text-xs font-medium text-charcoal/80 shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all"
+                    className={`px-4 py-2 rounded-xl border text-xs font-medium shadow-xs transition-all cursor-pointer ${theme === 'dark'
+                        ? 'border-[#3a3a3a] bg-[#2f2f2f] text-gray-200 hover:bg-[#383838] hover:border-primary/50'
+                        : 'border-border/60 bg-white text-charcoal/80 hover:border-primary/30 hover:text-primary hover:bg-primary/5'
+                      }`}
                   >
                     {c}
                   </button>
                 ))}
               </div>
             </div>
-
           ) : (
-
             /* Active Chat Messages */
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-8 pb-10">
+            <div className="max-w-3xl mx-auto space-y-6">
               {messages.map((m) => (
-                <div key={m.id} className="flex gap-4 group">
-                  {/* Avatar */}
-                  <div className="shrink-0 mt-1">
-                    {m.role === 'user' ? (
-                      user?.avatar_url || user?.profile_image ? (
-                        <img src={user.avatar_url || user.profile_image} alt="User" className="w-8 h-8 rounded-full object-cover shadow-sm border border-border/50" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-charcoal text-white flex items-center justify-center font-black text-md shadow-sm">
-                          {(user?.full_name || user?.name || user?.email || 'Y').charAt(0).toUpperCase()}
-                        </div>
-                      )
-                    ) : (
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm">
-                        <img src="/logo.png" alt="Career AI" className="w-10 h-10 object-contain" />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Message Content */}
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-sm text-charcoal">
-                        {m.role === 'user' ? (user?.full_name || user?.name || 'You') : 'Career AI'}
-                      </span>
-                      <span className="text-[10px] text-muted opacity-0 group-hover:opacity-100 transition-opacity">
-                        {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    </div>
-
-                    <div className="prose prose-sm prose-slate max-w-none text-[15px] leading-relaxed">
-                      {m.role === 'user' ? (
-                        <p className="whitespace-pre-wrap m-0">{m.content}</p>
-                      ) : (
-                        <ReactMarkdown>{m.content}</ReactMarkdown>
-                      )}
-                    </div>
-
-                    {m.suggestions && m.suggestions.length > 0 && m.role === 'assistant' && (
-                      <div className="flex flex-wrap gap-2 pt-3">
-                        {m.suggestions.map((sug, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => handleSend(sug)}
-                            className="rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary hover:text-white transition-colors"
+                <div
+                  key={m.id}
+                  className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} group`}
+                >
+                  {m.role === 'user' ? (
+                    <div className="flex items-end gap-3 max-w-[85%] sm:max-w-[75%]">
+                      <div
+                        className={`rounded-2xl rounded-br-sm px-4 py-3 text-[14px] leading-relaxed font-medium shadow-xs ${theme === 'dark'
+                            ? 'bg-[#2f2f2f] text-white'
+                            : 'bg-[#f4f4f4] text-charcoal'
+                          }`}
+                      >
+                        {m.attachment && (
+                          <div
+                            title={typeof m.attachment === 'string' ? m.attachment : (m.attachment.name || 'Attached File')}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold mb-2 w-fit border shadow-2xs ${theme === 'dark'
+                                ? 'bg-white/10 text-white border-white/20'
+                                : 'bg-charcoal/10 text-charcoal border-charcoal/20'
+                              }`}
                           >
-                            {sug}
-                          </button>
-                        ))}
+                            <AppIcon name="description" className="text-[16px] shrink-0" />
+                            <span className="truncate max-w-[240px] leading-tight">
+                              {typeof m.attachment === 'string' ? m.attachment : (m.attachment.name || 'Attached File')}
+                            </span>
+                          </div>
+                        )}
+                        {m.content && m.content.split('\n\n[ATTACHED DOCUMENT')[0].trim() ? (
+                          <p className="whitespace-pre-wrap m-0">{m.content.split('\n\n[ATTACHED DOCUMENT')[0].trim()}</p>
+                        ) : null}
                       </div>
-                    )}
-                  </div>
+                      <div className="shrink-0 mb-0.5">
+                        {user?.avatar_url || user?.profile_image ? (
+                          <img
+                            src={user.avatar_url || user.profile_image}
+                            alt="User"
+                            className="w-9 h-9 rounded-full object-cover shadow-xs"
+                          />
+                        ) : (
+                          <div
+                            className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shadow-xs ${theme === 'dark'
+                                ? 'bg-white text-black'
+                                : 'bg-charcoal text-white'
+                              }`}
+                          >
+                            {(user?.full_name || user?.name || user?.email || 'U')
+                              .charAt(0)
+                              .toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-start gap-3 mt-10 max-w-[85%] sm:max-w-[80%]">
+                      <div
+                        className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 mt-1 shadow-xs ${theme === 'dark'
+                            ? 'bg-[#2f2f2f]'
+                            : 'bg-white'
+                          }`}
+                      >
+                        <img src="/logo.png" alt="Career AI" className="w-9 h-9 object-contain" />
+                      </div>
+                      <div className="flex-1 space-y-1 ">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`font-semibold text-sm -mb-4 ${theme === 'dark' ? 'text-white' : 'text-charcoal'
+                              }`}
+                          >
+                            Career AI
+                          </span>
+                          <span
+                            className={`text-[10px] -mb-4 opacity-0 group-hover:opacity-100 transition-opacity ${theme === 'dark' ? 'text-gray-400' : 'text-muted'
+                              }`}
+                          >
+                            {new Date(m.created_at).toLocaleTimeString([], {
+                              hour: 'numeric',
+                              minute: '2-digit',
+                              hour12: true,
+                            })}
+                          </span>
+                        </div>
+
+                        {/* ChatGPT-style Borderless Markdown Display */}
+                        <div className="pt-0.5">
+                          <MarkdownRenderer content={m.content} theme={theme} />
+                        </div>
+
+                        {m.suggestions && m.suggestions.length > 0 && (
+                          <div className="flex flex-wrap gap-2 pt-3">
+                            {m.suggestions.map((sug, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => handleSend(sug)}
+                                className={`rounded-full border px-3.5 py-1.5 text-xs font-medium transition-all ${theme === 'dark'
+                                    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-black'
+                                    : 'border-primary/20 bg-primary/5 text-primary hover:bg-primary hover:text-white'
+                                  }`}
+                              >
+                                {sug}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
 
               {isLoadingMessages && (
                 <div className="flex justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
                 </div>
               )}
 
               {isSending && (
-                <div className="flex gap-4 animate-pulse">
-                  <div className="shrink-0 mt-1">
-                    <div className="w-8 h-8 rounded-full bg-primary/40 flex items-center justify-center" />
+                <div className="flex items-start gap-3 max-w-[85%] sm:max-w-[80%] animate-in fade-in duration-200">
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1 shadow-xs ${theme === 'dark'
+                        ? 'bg-[#2f2f2f]'
+                        : 'bg-white'
+                      }`}
+                  >
+                    <img src="/logo.png" alt="Career AI" className="w-7 h-7 object-contain" />
                   </div>
-                  <div className="space-y-3 flex-1 pt-2">
-                    <div className="h-4 bg-muted/20 rounded w-1/3" />
-                    <div className="h-4 bg-muted/20 rounded w-1/2" />
+                  <div className="flex-1 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`font-semibold text-xs ${theme === 'dark' ? 'text-white' : 'text-charcoal'
+                          }`}
+                      >
+                        Career AI
+                      </span>
+                    </div>
+
+                    <div
+                      className={`rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5 w-fit ${theme === 'dark'
+                          ? 'bg-[#2f2f2f]'
+                          : 'bg-[#f4f4f4]'
+                        }`}
+                    >
+                      <div
+                        className={`w-2 h-2 rounded-full animate-bounce [animation-delay:-0.3s] ${theme === 'dark' ? 'bg-white' : 'bg-charcoal/70'
+                          }`}
+                      />
+                      <div
+                        className={`w-2 h-2 rounded-full animate-bounce [animation-delay:-0.15s] ${theme === 'dark' ? 'bg-white' : 'bg-charcoal/70'
+                          }`}
+                      />
+                      <div
+                        className={`w-2 h-2 rounded-full animate-bounce ${theme === 'dark' ? 'bg-white' : 'bg-charcoal/70'
+                          }`}
+                      />
+                      <div
+                        className={`w-2 h-2 rounded-full animate-bounce [animation-delay:0.15s] ${theme === 'dark' ? 'bg-white' : 'bg-charcoal/70'
+                          }`}
+                      />
+                    </div>
                   </div>
                 </div>
               )}
 
               <div ref={bottomRef} className="h-4" />
             </div>
-
           )}
         </div>
 
-        {/* Floating Input Area (Active State) */}
-        {(activeConversationId || messages.length > 0) && (
-          <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white via-white to-transparent pt-10 pb-6 px-4">
-            <div className="max-w-3xl mx-auto w-full bg-white rounded-2xl shadow-[0_0_15px_rgb(0,0,0,0.05)] border border-border/80 transition-all flex flex-col">
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault()
-                    handleSend()
-                  }
-                }}
-                disabled={isSending}
-                placeholder="Message Career AI..."
-                className="w-full resize-none bg-transparent px-4 py-3.5 text-[14px] text-charcoal placeholder:text-muted focus:outline-none disabled:opacity-50"
-                rows={1}
-                style={{ minHeight: '52px', maxHeight: '200px' }}
-                onInput={(e) => {
-                  e.target.style.height = 'auto'
-                  e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`
-                }}
-              />
+        {/* Permanent Floating Input Area at Bottom */}
+        <div
+          className={`absolute bottom-0 left-0 w-full pt-10 pb-6 px-4 ${theme === 'dark'
+              ? 'bg-gradient-to-t from-[#212121] via-[#212121] to-transparent'
+              : 'bg-gradient-to-t from-white via-white to-transparent'
+            }`}
+        >
+          <input
+            type="file"
+            ref={fileInputRef}
+            className="hidden"
+            accept=".pdf,.docx,.doc,.txt,.png,.jpg,.jpeg"
+            onChange={(e) => {
+              if (e.target.files && e.target.files[0]) {
+                setSelectedFile(e.target.files[0])
+              }
+            }}
+          />
 
-              <div className="px-3 pb-2.5 flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <button className="w-7 h-7 rounded-full flex items-center justify-center text-muted hover:text-charcoal hover:bg-border/40 transition-colors">
-                    <AppIcon name="add" className="text-[18px]" />
+          <div
+            className={`max-w-3xl mx-auto w-full rounded-2xl shadow-lg border transition-all flex flex-col ${theme === 'dark'
+                ? 'bg-[#2f2f2f] border-[#383838] focus-within:border-gray-500'
+                : 'bg-white border-border/80 focus-within:border-primary/50'
+              }`}
+          >
+            {/* Selected File Preview Chip */}
+            {selectedFile && (
+              <div className="px-4 pt-3 flex items-center gap-2">
+                <div
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border ${theme === 'dark'
+                      ? 'bg-primary/20 text-primary-light border-primary/30'
+                      : 'bg-primary/10 text-primary border-primary/20'
+                    }`}
+                >
+                  <AppIcon name="description" className="text-[16px]" />
+                  <span className="truncate max-w-[200px]">{selectedFile.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedFile(null)}
+                    className="ml-1 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
+                  >
+                    <AppIcon name="close" className="text-[14px]" />
                   </button>
                 </div>
+              </div>
+            )}
 
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  handleSend()
+                }
+              }}
+              disabled={isSending}
+              placeholder="Message Career AI..."
+              className={`w-full resize-none bg-transparent px-4 py-3.5 text-[14px] focus:outline-none disabled:opacity-50 ${theme === 'dark'
+                  ? 'text-white placeholder:text-gray-400'
+                  : 'text-charcoal placeholder:text-muted'
+                }`}
+              rows={1}
+              style={{ minHeight: '52px', maxHeight: '200px' }}
+              onInput={(e) => {
+                e.target.style.height = 'auto'
+                e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`
+              }}
+            />
+
+            <div className="px-3 pb-2.5 flex items-center justify-between">
+              <div className="flex items-center gap-1">
                 <button
-                  onClick={() => handleSend()}
-                  disabled={!input.trim() || isSending}
-                  className="w-7 h-7 rounded-full flex items-center justify-center bg-charcoal text-white disabled:bg-muted/30 disabled:text-muted transition-colors shadow-sm"
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors cursor-pointer ${theme === 'dark'
+                      ? 'text-gray-400 hover:text-white hover:bg-[#383838]'
+                      : 'text-muted hover:text-charcoal hover:bg-border/40'
+                    }`}
+                  title="Attach file"
                 >
-                  <AppIcon name="arrow_upward" className="text-[14px]" />
+                  <AppIcon name="add" className="text-[18px]" />
                 </button>
               </div>
-            </div>
-            <div className="text-center mt-2 text-[10px] text-muted">
-              AI can make mistakes. Check important info.
+
+              <button
+                onClick={() => handleSend()}
+                disabled={(!input.trim() && !selectedFile) || isSending}
+                className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors shadow-sm cursor-pointer ${theme === 'dark'
+                    ? 'bg-white text-black disabled:bg-gray-600 disabled:text-gray-400'
+                    : 'bg-charcoal text-white disabled:bg-muted/30 disabled:text-muted'
+                  }`}
+              >
+                <AppIcon name="arrow_upward" className="text-[14px]" />
+              </button>
             </div>
           </div>
-        )}
+          <div
+            className={`mt-2 text-center text-[11px] ${theme === 'dark' ? 'text-gray-500' : 'text-muted'
+              }`}
+          >
+            Career AI can make mistakes. Verify important info.
+          </div>
+        </div>
       </div>
 
       {/* Custom Confirmation Modal for Delete */}

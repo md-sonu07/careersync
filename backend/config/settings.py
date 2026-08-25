@@ -212,9 +212,24 @@ SIMPLE_JWT = {
 
 
 # AI Configuration
+# AI_PROVIDER is retained for legacy callers. Chat uses the primary/fallback
+# settings below so the browser never needs access to an AI provider or key.
 AI_PROVIDER = config('AI_PROVIDER', default='mock')
+
+# Chat defaults: local Ollama first, then Gemini when Ollama cannot respond.
+AI_CHAT_PRIMARY_PROVIDER = config('AI_CHAT_PRIMARY_PROVIDER', default='ollama')
+AI_CHAT_FALLBACK_ENABLED = config('AI_CHAT_FALLBACK_ENABLED', default=True, cast=bool)
+AI_CHAT_FALLBACK_PROVIDER = config('AI_CHAT_FALLBACK_PROVIDER', default='gemini')
+
+OLLAMA_BASE_URL = config('OLLAMA_BASE_URL', default='http://127.0.0.1:11434')
+OLLAMA_MODEL = config('OLLAMA_MODEL', default='qwen3:8b')
+OLLAMA_TIMEOUT_SECONDS = config('OLLAMA_TIMEOUT_SECONDS', default=30, cast=int)
+
 GEMINI_API_KEY = config('GEMINI_API_KEY', default='')
-AI_MODEL = config('AI_MODEL', default='gemini-3.6-flash')
+# AI_MODEL remains supported for existing .env files.
+GEMINI_MODEL = config('GEMINI_MODEL', default=config('AI_MODEL', default='gemini-3.6-flash'))
+GEMINI_TIMEOUT_SECONDS = config('GEMINI_TIMEOUT_SECONDS', default=30, cast=int)
+
 # OpenAI-compatible provider settings (only used when AI_PROVIDER=openai)
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
 OPENAI_BASE_URL = config('OPENAI_BASE_URL', default='https://opencode.ai/zen/v1/chat/completions')
@@ -244,5 +259,4 @@ RAZORPAY_WEBHOOK_SECRET = config('RAZORPAY_WEBHOOK_SECRET', default='5094022fbfb
 IMAGEKIT_PUBLIC_KEY = config('IMAGEKIT_PUBLIC_KEY', default='public_vNSu+tU1Im8jNsOi7Ipd1Ptt92c=')
 IMAGEKIT_PRIVATE_KEY = config('IMAGEKIT_PRIVATE_KEY', default='private_Epzp01NXplITplT8YKI4Rk7ZLO0=')
 IMAGEKIT_URL_ENDPOINT = config('IMAGEKIT_URL_ENDPOINT', default='https://ik.imagekit.io/crms')
-
 

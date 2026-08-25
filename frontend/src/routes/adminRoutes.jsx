@@ -39,6 +39,8 @@ const Placeholder = ({ title, subtitle }) => (
   </div>
 )
 
+import AIAssistant from '../pages/Student/AIAssistant'
+
 export const adminRoutes = {
   path: '/admin',
   element: <ProtectedRoute allowedRoles={['admin']} />,
@@ -49,6 +51,7 @@ export const adminRoutes = {
       children: [
         { index: true, element: <AdminDashboard /> },
         { path: 'dashboard', element: <AdminDashboard /> },
+        { path: 'ai-assistant', element: <AIAssistant /> },
         { path: 'users', element: <AdminUsers defaultRole="All" /> },
         { path: 'students', element: <AdminUsers defaultRole="student" /> },
         { path: 'industries', element: <AdminUsers defaultRole="industry" /> },

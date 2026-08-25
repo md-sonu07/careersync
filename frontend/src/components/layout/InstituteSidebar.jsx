@@ -3,7 +3,12 @@ import { useAuth } from '../../hooks/useAuth'
 import AppIcon from '../ui/AppIcon';
 
 const navSections = [
-  { label: 'Overview', items: [{ label: 'Dashboard', icon: 'dashboard', path: '/institute' }] },
+  {
+    label: 'Overview', items: [
+      { label: 'Dashboard', icon: 'dashboard', path: '/institute/dashboard' },
+      { label: 'Chat with Career AI', icon: 'smart_toy', path: '/institute/ai-assistant' },
+    ]
+  },
   {
     label: 'Student Intelligence', items: [
       { label: 'Students Directory', icon: 'group', path: '/institute/students' },

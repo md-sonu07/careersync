@@ -18,8 +18,9 @@ export function ChatProvider({ children }) {
   const [isChatOpen, setIsChatOpen] = useState(
     sessionStorage.getItem('public_chat_is_open') === 'true'
   );
+  const initialSavedId = localStorage.getItem('public_chat_conversation_id')
   const [activeConversationId, setActiveConversationId] = useState(
-    localStorage.getItem('public_chat_conversation_id') || null
+    !initialSavedId || initialSavedId === 'new' ? null : initialSavedId
   );
   const [guestId] = useState(() => getOrCreateGuestId())
 
