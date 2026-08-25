@@ -77,6 +77,7 @@ Desktop.ini
 # MISC
 # ──────────────────────────────────────────
 scratch/
+list_opencode_models.py
 *.zip
 *.tar.gz
 coverage/
