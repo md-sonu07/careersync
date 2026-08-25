@@ -21,20 +21,13 @@ export default function StudentHeader({ onMenuClick }) {
         <AppIcon name="menu" />
       </button>
       <div className="hidden lg:flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900 text-white">
-          <AppIcon name="school" className="text-[18px]" />
-        </div>
-        <div>
-          <p className="text-sm font-bold leading-none text-charcoal">Student Workspace</p>
-          <p className="text-xs text-muted">Learn • Practice • Get Hired</p>
-        </div>
         <span className="ml-2 hidden items-center gap-1.5 rounded-lg bg-sage border border-border px-2.5 py-1 text-xs font-bold text-primary xl:inline-flex">
           <span className="h-2 w-2 rounded-lg bg-primary animate-pulse" /> Active Session
         </span>
       </div>
       <div className="flex flex-1 items-center justify-center px-2 sm:px-4 lg:px-8">
         <div className="relative w-full max-w-[560px]">
-          <span className="pointer-events-none absolute left-3 top-6 -translate-y-1/2 text-muted">
+          <span className="pointer-events-none absolute left-3 top-5 -translate-y-1/2 text-muted">
             <AppIcon name="search" className="text-[20px]" />
           </span>
           <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search courses, internships, skills…" className="w-full rounded-lg border border-border bg-background pl-10 pr-[88px] py-2.5 text-sm text-charcoal placeholder:text-muted/60 shadow-soft focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-colors" />

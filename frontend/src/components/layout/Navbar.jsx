@@ -18,10 +18,14 @@ const Navbar = () => {
   const [isReturning, setIsReturning] = useState(false)
 
   useEffect(() => {
-    if (localStorage.getItem('hasVisited')) {
-      setIsReturning(true)
-    } else {
-      setTimeout(() => localStorage.setItem('hasVisited', 'true'), 2000)
+    try {
+      if (typeof localStorage !== 'undefined' && localStorage.getItem('hasVisited')) {
+        setIsReturning(true)
+      } else if (typeof localStorage !== 'undefined') {
+        setTimeout(() => localStorage.setItem('hasVisited', 'true'), 2000)
+      }
+    } catch (e) {
+      // Ignore storage errors in restricted/test environments
     }
   }, [])
 
