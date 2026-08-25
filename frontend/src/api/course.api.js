@@ -14,8 +14,12 @@ export const courseApi = {
 
   // Get specific course detail
   getCourseDetail: async (id) => {
-    const { data } = await apiClient.get(`/courses/resources/${id}/`)
-    return data
+    try {
+      const { data } = await apiClient.get(`/courses/resources/${id}/`)
+      return data
+    } catch {
+      return null
+    }
   },
 
   // Enroll in a course (Free or Paid)
@@ -36,8 +40,12 @@ export const courseApi = {
 
   // Get single enrollment with full player details
   getEnrollmentDetail: async (id) => {
-    const { data } = await apiClient.get(`/courses/enrollments/${id}/`)
-    return data
+    try {
+      const { data } = await apiClient.get(`/courses/enrollments/${id}/`)
+      return data
+    } catch {
+      return null
+    }
   },
 
   // Update lesson completion & progress

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { toast as hotToast } from 'react-hot-toast';
 import { setCredentials, loginUser, logout } from "../../features/auth/authSlice";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
@@ -54,6 +55,7 @@ export default function Login() {
     const validationErrors = validate();
     if (Object.keys(validationErrors).length) {
       setErrors(validationErrors);
+      hotToast.error("Please fix the validation errors");
       return;
     }
     setLoading(true);
@@ -70,19 +72,23 @@ export default function Login() {
         // Check for admin approval if user is Institute or Industry
         if ((userRole === "academician" || userRole === "institute" || userRole === "industry") && !user?.is_verified) {
           await dispatch(logout());
+          const msg = "Your account is pending Admin Approval. Please wait for an administrator to verify your account before signing in.";
           setToast({
             type: "danger",
-            message: "Your account is pending Admin Approval. Please wait for an administrator to verify your account before signing in.",
+            message: msg,
           });
+          hotToast.error(msg);
           return;
         }
 
         if (form.rememberMe) localStorage.setItem("rememberMe", "true");
 
+        const welcomeMsg = `Welcome back${user?.first_name ? `, ${user.first_name}` : ""}! Redirecting...`;
         setToast({
           type: "success",
-          message: `Welcome back${user?.first_name ? `, ${user.first_name}` : ""}! Redirecting...`,
+          message: welcomeMsg,
         });
+        hotToast.success(welcomeMsg);
 
         const target = redirectParam || ROLE_ROUTES[userRole] || ROLE_ROUTES.student;
         setTimeout(() => navigate(target), 600);
@@ -92,12 +98,15 @@ export default function Login() {
           type: "danger",
           message: errorMsg,
         });
+        hotToast.error(errorMsg);
       }
     } catch (err) {
+      const errorMsg = err.message || "An unexpected error occurred during sign in.";
       setToast({
         type: "danger",
-        message: err.message || "An unexpected error occurred during sign in.",
+        message: errorMsg,
       });
+      hotToast.error(errorMsg);
     } finally {
       setLoading(false);
     }

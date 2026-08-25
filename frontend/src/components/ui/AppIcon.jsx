@@ -112,6 +112,7 @@ const iconMap = {
   person_search: UserSearch,
   play_arrow: Play,
   play_circle: PlayCircle,
+  play_circle_outline: PlayCircle,
   play_lesson: Video,
   psychology: BrainCircuit,
   public: Globe,

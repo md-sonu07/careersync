@@ -120,7 +120,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             StudentProfile.objects.get_or_create(
                 user=user,
                 defaults={
-                    'phone': student_phone,
                     'institution': inst_obj
                 }
             )

@@ -100,11 +100,7 @@ export default function GlobalChatPane() {
   const [deleteConfirmId, setDeleteConfirmId] = useState(null)
   const fileInputRef = useRef(null)
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    const stored = sessionStorage.getItem('skillbridge_global_chat_sidebar')
-    if (stored !== null) return stored === 'true'
-    return true
-  })
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const handleRenameSave = async (id) => {
     if (!editTitle.trim()) {

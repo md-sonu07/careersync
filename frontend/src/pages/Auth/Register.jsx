@@ -98,6 +98,7 @@ export default function Register() {
 
     if (Object.keys(errs).length) {
       setErrors(errs);
+      hotToast.error("Please fill in all required registration fields");
       return;
     }
     setErrors({});
@@ -154,7 +155,9 @@ export default function Register() {
           } catch {
             // Profile fallback
           }
-          setToast({ type: "success", message: "Student account created! Redirecting…" });
+          const msg = "Student account created! Redirecting…";
+          setToast({ type: "success", message: msg });
+          hotToast.success(msg);
           const target = redirectParam || "/student/dashboard";
           setTimeout(() => navigate(target), 600);
         } else if (activeRole === "industry") {
@@ -165,6 +168,7 @@ export default function Register() {
             name: industryForm.companyName,
             email: industryForm.companyEmail,
           });
+          hotToast.success("Registration submitted! Pending admin verification.");
         } else {
           // Clear session since approval is needed
           await dispatch(logout());
@@ -173,15 +177,18 @@ export default function Register() {
             name: InstituteForm.name,
             email: InstituteForm.email,
           });
+          hotToast.success("Registration submitted! Pending admin verification.");
         }
       } else {
         const errorData = resultAction.payload;
         if (typeof errorData === "object" && errorData !== null) {
           setErrors(errorData);
-          const firstErr = Object.values(errorData).flat()[0];
-          setToast({ type: "error", message: firstErr || "Registration failed. Please check inputs." });
+          const firstErr = Object.values(errorData).flat()[0] || "Registration failed";
+          hotToast.error(firstErr);
         } else {
-          setToast({ type: "error", message: String(errorData || "Registration failed.") });
+          const msg = errorData || "Registration failed. Please check your info.";
+          setToast({ type: "error", message: msg });
+          hotToast.error(msg);
         }
       }
     } catch (err) {
