@@ -170,12 +170,12 @@ class AIChatView(generics.GenericAPIView):
 
             return Response(response_serializer.data, status=status.HTTP_200_OK)
 
-        except Exception as e:
-            logger.exception("AI service error")
+        except Exception:
+            logger.exception("All configured AI chat providers failed")
             return Response(
                 {
                     'error': 'AI service temporarily unavailable. Please try again.',
                     'conversation_id': str(conversation.id),
                 },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )

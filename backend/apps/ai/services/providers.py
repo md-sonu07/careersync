@@ -9,6 +9,10 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
+class AIProviderError(Exception):
+    """A provider failed to produce a usable AI response."""
+
+
 class AIProvider(abc.ABC):
     """Abstract base for AI provider implementations."""
 
@@ -145,16 +149,15 @@ class GeminiProvider(AIProvider):
 
     def __init__(self):
         self.api_key = getattr(settings, 'GEMINI_API_KEY', None)
-        self.model = getattr(settings, 'AI_MODEL', 'gemini-3.6-flash')
+        self.model = getattr(settings, 'GEMINI_MODEL', getattr(settings, 'AI_MODEL', 'gemini-3.6-flash'))
         self.base_url = 'https://generativelanguage.googleapis.com/v1beta/models'
-        print(f"[DEBUG] GeminiProvider initialized with model: {self.model}, api_key starts with: {str(self.api_key)[:10]}")
 
     def get_model_name(self):
         return self.model
 
     def generate(self, messages):
         if not self.api_key:
-            raise ValueError("GEMINI_API_KEY not configured")
+            raise AIProviderError("GEMINI_API_KEY is not configured.")
 
         # Build the prompt from messages
         # Gemini uses a different format: system instruction + contents
@@ -198,7 +201,9 @@ class GeminiProvider(AIProvider):
                 method='POST',
             )
 
-            with urllib.request.urlopen(req, timeout=30) as response:
+            with urllib.request.urlopen(
+                req, timeout=getattr(settings, 'GEMINI_TIMEOUT_SECONDS', 30)
+            ) as response:
                 result = json.loads(response.read().decode('utf-8'))
 
             # Extract the response text from Gemini format
@@ -233,20 +238,113 @@ class GeminiProvider(AIProvider):
 
         except urllib.error.HTTPError as e:
             error_body = e.fp.read().decode('utf-8') if getattr(e, 'fp', None) else str(e)
-            print(f"[DEBUG] Gemini API HTTP error: {e.code} - {error_body}")
-            print(f"[DEBUG] URL was: {url}")
+            logger.error("Gemini API HTTP error %s: %s", e.code, error_body)
             if e.code == 403:
-                raise ValueError("Gemini API access denied. Check GEMINI_API_KEY and permissions.")
-            raise ValueError(f"Gemini API error: {e.code}")
+                raise AIProviderError("Gemini API access denied.") from e
+            raise AIProviderError(f"Gemini API error: {e.code}") from e
         except urllib.error.URLError as e:
-            logger.error(f"Gemini API URL error: {e.reason}")
-            raise ValueError("Gemini API temporarily unavailable. Please try again.")
+            logger.error("Gemini API network error: %s", e.reason)
+            raise AIProviderError("Gemini API temporarily unavailable.") from e
         except json.JSONDecodeError as e:
-            logger.error(f"Gemini API JSON decode error: {e}")
-            raise ValueError("Gemini API response parse error.")
+            logger.error("Gemini API JSON decode error: %s", e)
+            raise AIProviderError("Gemini API response parse error.") from e
         except Exception as e:
-            logger.error(f"Gemini API unexpected error: {e}")
+            logger.error("Gemini API unexpected error: %s", e)
             raise
+
+
+class OllamaProvider(AIProvider):
+    """Local Ollama provider for the non-streaming chat API."""
+
+    def __init__(self):
+        self.base_url = getattr(settings, 'OLLAMA_BASE_URL', 'http://127.0.0.1:11434').rstrip('/')
+        self.model = getattr(settings, 'OLLAMA_MODEL', 'qwen3:8b')
+        self.timeout = getattr(settings, 'OLLAMA_TIMEOUT_SECONDS', 30)
+
+    def get_model_name(self):
+        return self.model
+
+    def generate(self, messages):
+        formatted_messages = []
+        for msg in messages:
+            role = msg.get('role', 'user')
+            if role == 'model':
+                role = 'assistant'
+            formatted_messages.append({
+                'role': role,
+                'content': msg.get('content', '')
+            })
+
+        payload = {
+            'model': self.model,
+            'messages': formatted_messages,
+            'stream': False,
+            'keep_alive': '30m',
+            'options': {
+                'num_predict': 2048,
+                'temperature': 0.7,
+                'top_k': 40,
+                'top_p': 0.9,
+                'num_ctx': 4096,
+                'num_thread': 8,
+            }
+        }
+        request = urllib.request.Request(
+            f'{self.base_url}/api/chat',
+            data=json.dumps(payload).encode('utf-8'),
+            headers={'Content-Type': 'application/json'},
+            method='POST',
+        )
+
+        try:
+            with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                result = json.loads(response.read().decode('utf-8'))
+            message = result.get('message', {}).get('content', '').strip()
+            if not message:
+                raise AIProviderError('Ollama returned an empty response.')
+            return {'message': message, 'suggestions': [], 'actions': []}
+        except urllib.error.HTTPError as error:
+            logger.warning("Ollama HTTP error %s; falling back if configured.", error.code)
+            raise AIProviderError(f'Ollama API error: {error.code}') from error
+        except (urllib.error.URLError, TimeoutError, OSError) as error:
+            logger.warning("Ollama is unavailable or timed out; falling back if configured: %s", error)
+            raise AIProviderError('Ollama is unavailable.') from error
+        except json.JSONDecodeError as error:
+            logger.warning("Ollama returned invalid JSON; falling back if configured: %s", error)
+            raise AIProviderError('Ollama returned an invalid response.') from error
+
+
+class FallbackAIProvider(AIProvider):
+    """Try a primary provider and then one configured backup provider."""
+
+    def __init__(self, primary, fallback=None):
+        self.primary = primary
+        self.fallback = fallback
+
+    def get_model_name(self):
+        return self.primary.get_model_name()
+
+    def generate(self, messages):
+        try:
+            result = self.primary.generate(messages)
+            logger.info("AI chat response served by primary provider %s.", self.primary.__class__.__name__)
+            return result
+        except Exception as primary_error:
+            if not self.fallback:
+                raise AIProviderError('Primary AI provider is unavailable.') from primary_error
+            logger.warning(
+                "AI primary provider %s failed; using fallback %s.",
+                self.primary.__class__.__name__, self.fallback.__class__.__name__,
+            )
+            try:
+                result = self.fallback.generate(messages)
+                logger.info("AI chat response served by fallback provider %s.", self.fallback.__class__.__name__)
+                return result
+            except Exception as fallback_error:
+                logger.error(
+                    "AI fallback provider %s also failed.", self.fallback.__class__.__name__,
+                )
+                raise AIProviderError('All configured AI providers are unavailable.') from fallback_error
 
 
 class OpenAIProvider(AIProvider):
@@ -272,7 +370,7 @@ class OpenAIProvider(AIProvider):
         self.api_key = getattr(settings, 'OPENAI_API_KEY', getattr(settings, 'GEMINI_API_KEY', None))
         self.model = getattr(settings, 'AI_MODEL', 'nemotron-3.5-lightning-free')
         self.base_url = getattr(settings, 'OPENAI_BASE_URL', 'https://opencode.ai/zen/v1/chat/completions')
-        print(f"[DEBUG] OpenAIProvider initialized with model: {self.model}, base_url: {self.base_url}, api_key starts with: {str(self.api_key)[:10]}")
+        logger.debug("OpenAI-compatible provider initialized with model %s at %s", self.model, self.base_url)
 
     def get_model_name(self):
         return self.model
@@ -361,14 +459,31 @@ class OpenAIProvider(AIProvider):
         raise ValueError("AI service temporarily unavailable. All models failed. Please try again later.")
 
 
-def get_ai_provider():
-    """Factory function to get the configured AI provider instance."""
-    provider_name = getattr(settings, 'AI_PROVIDER', 'mock').lower()
-
-    if provider_name == 'gemini':
+def _provider_for_name(provider_name):
+    """Build a provider from its configuration name."""
+    normalized_name = (provider_name or '').lower()
+    if normalized_name == 'ollama':
+        return OllamaProvider()
+    if normalized_name == 'gemini':
         return GeminiProvider()
-    elif provider_name == 'openai':
+    if normalized_name == 'openai':
         return OpenAIProvider()
-    else:
-        # Default to mock provider
+    if normalized_name == 'mock':
         return MockProvider()
+    raise ValueError(f'Unsupported AI provider: {provider_name}')
+
+
+def get_chat_provider():
+    """Return the Ollama-first provider used by the chat endpoint."""
+    primary = _provider_for_name(getattr(settings, 'AI_CHAT_PRIMARY_PROVIDER', 'ollama'))
+    fallback = None
+    if getattr(settings, 'AI_CHAT_FALLBACK_ENABLED', True):
+        fallback_name = getattr(settings, 'AI_CHAT_FALLBACK_PROVIDER', 'gemini')
+        if fallback_name.lower() != getattr(settings, 'AI_CHAT_PRIMARY_PROVIDER', 'ollama').lower():
+            fallback = _provider_for_name(fallback_name)
+    return FallbackAIProvider(primary, fallback)
+
+
+def get_ai_provider():
+    """Legacy provider factory retained for non-chat callers."""
+    return _provider_for_name(getattr(settings, 'AI_PROVIDER', 'mock'))
