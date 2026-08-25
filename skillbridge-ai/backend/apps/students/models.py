@@ -28,6 +28,7 @@ class StudentProfile(models.Model):
     graduation_year = models.PositiveIntegerField(null=True, blank=True)
 
     bio = models.TextField(blank=True)
+    career_goal = models.CharField(max_length=150, blank=True, default='Full Stack Developer')
     resume = models.FileField(upload_to='resumes/', null=True, blank=True)
     linkedin_url = models.URLField(blank=True)
     github_url = models.URLField(blank=True)

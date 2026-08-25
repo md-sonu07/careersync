@@ -23,6 +23,14 @@ export const authApi = {
     return data
   },
 
+  updateMe: async (payload) => {
+    const isFormData = payload instanceof FormData
+    const { data } = await apiClient.patch(ENDPOINTS.AUTH.ME, payload, {
+      headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : {},
+    })
+    return data
+  },
+
   refreshToken: async (refreshToken) => {
     const refresh = refreshToken || localStorage.getItem('refresh_token')
     const { data } = await apiClient.post(ENDPOINTS.AUTH.REFRESH, { refresh })

@@ -7,10 +7,23 @@ import Select from '../../components/ui/Select'
 import Badge from '../../components/ui/Badge'
 import Modal from '../../components/ui/Modal'
 import Textarea from '../../components/ui/Textarea'
-import AppIcon from '../../components/ui/AppIcon';
+import AppIcon from '../../components/ui/AppIcon'
 import { applicationApi } from '../../api/application.api'
+import { toast } from 'react-hot-toast'
 
 const STATUSES = ['Applied', 'Screening', 'Shortlisted', 'Interview', 'Selected', 'Rejected']
+
+const mapBackendToDisplay = (st) => {
+  if (!st) return 'Applied'
+  const lower = st.toLowerCase()
+  if (lower === 'under_review') return 'Screening'
+  if (lower === 'applied') return 'Applied'
+  if (lower === 'shortlisted') return 'Shortlisted'
+  if (lower === 'interview') return 'Interview'
+  if (lower === 'selected') return 'Selected'
+  if (lower === 'rejected') return 'Rejected'
+  return st.charAt(0).toUpperCase() + st.slice(1)
+}
 
 const statusColor = {
   Applied: 'bg-slate-100 text-slate-700 border-slate-200',
@@ -62,30 +75,31 @@ export default function Applications() {
   const [noteText, setNoteText] = useState('')
   const [compareList, setCompareList] = useState([])
 
+  const loadApplications = async () => {
+    try {
+      setLoading(true)
+      const data = await applicationApi.getCompanyApplications()
+      const formatted = (Array.isArray(data) ? data : data?.results || []).map((a) => ({
+        id: a.id,
+        name: a.student?.user?.full_name || a.student_name || 'Candidate',
+        role: a.opportunity?.title || a.opportunity_title || 'Opportunity',
+        avatar: '',
+        match: a.match_score || 85,
+        status: mapBackendToDisplay(a.status),
+        date: a.applied_at ? a.applied_at.split('T')[0] : 'Recent',
+        skills: a.verified_skills || ['React', 'Python'],
+        notes: a.remarks || ''
+      }))
+      setApps(formatted)
+    } catch {
+      setApps([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    let isMounted = true
-    applicationApi.getCompanyApplications()
-      .then((data) => {
-        if (isMounted) {
-          const formatted = (Array.isArray(data) ? data : data?.results || []).map((a) => ({
-            id: a.id,
-            name: a.student_name || 'Candidate',
-            role: a.opportunity_title || 'Opportunity',
-            avatar: '',
-            match: a.match_score || 85,
-            status: a.status ? a.status.charAt(0).toUpperCase() + a.status.slice(1) : 'Applied',
-            date: a.applied_at ? a.applied_at.split('T')[0] : 'Recent',
-            skills: a.verified_skills || ['React', 'Python'],
-            notes: a.remarks || ''
-          }))
-          setApps(formatted)
-        }
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (isMounted) setLoading(false)
-      })
-    return () => { isMounted = false }
+    loadApplications()
   }, [])
 
   const filtered = apps.filter((a) => {
@@ -95,11 +109,55 @@ export default function Applications() {
     return true
   })
 
-  const handleStatusChange = (id, status) => setApps((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)))
+  const handleStatusChange = async (id, newDisplayStatus) => {
+    // Optimistic UI update
+    setApps((prev) => prev.map((a) => (a.id === id ? { ...a, status: newDisplayStatus } : a)))
+
+    const statusMap = {
+      Applied: 'applied',
+      Screening: 'under_review',
+      Shortlisted: 'shortlisted',
+      Interview: 'interview',
+      Selected: 'selected',
+      Rejected: 'rejected',
+    }
+    const backendStatus = statusMap[newDisplayStatus] || newDisplayStatus.toLowerCase()
+
+    try {
+      await applicationApi.updateApplicationStatus(id, backendStatus)
+      toast.success(`Application status saved as "${newDisplayStatus}" on Django Database!`)
+    } catch (err) {
+      toast.error('Failed to save status on database: ' + (err.response?.data?.detail || err.message))
+      loadApplications() // Revert on failure
+    }
+  }
 
   const openNotes = (app) => { setNoteTarget(app); setNoteText(app.notes || '') }
-  const saveNote = () => {
-    if (noteTarget) { setApps((prev) => prev.map((a) => (a.id === noteTarget.id ? { ...a, notes: noteText } : a))); setNoteTarget(null) }
+
+  const saveNote = async () => {
+    if (noteTarget) {
+      const targetId = noteTarget.id
+      const currentDisplayStatus = noteTarget.status
+      const statusMap = {
+        Applied: 'applied',
+        Screening: 'under_review',
+        Shortlisted: 'shortlisted',
+        Interview: 'interview',
+        Selected: 'selected',
+        Rejected: 'rejected',
+      }
+      const backendStatus = statusMap[currentDisplayStatus] || currentDisplayStatus.toLowerCase()
+
+      setApps((prev) => prev.map((a) => (a.id === targetId ? { ...a, notes: noteText } : a)))
+      setNoteTarget(null)
+
+      try {
+        await applicationApi.updateApplicationStatus(targetId, backendStatus, noteText)
+        toast.success('Notes saved to database successfully!')
+      } catch (err) {
+        toast.error('Failed to save notes: ' + (err.response?.data?.detail || err.message))
+      }
+    }
   }
 
   const toggleCompare = (app) => {

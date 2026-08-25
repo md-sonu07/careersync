@@ -21,6 +21,7 @@ class UserResponseSerializer(serializers.ModelSerializer):
             'last_name',
             'full_name',
             'role',
+            'profile_picture',
             'is_active',
             'is_verified',
             'created_at',

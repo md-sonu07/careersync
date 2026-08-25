@@ -19,8 +19,10 @@ def calculate_student_skill_gaps(student: StudentProfile, career_role: CareerRol
     for a target CareerRole and calculates gap_score, severity, and status.
     """
     if not career_role:
-        # Default to first career role if student hasn't selected a role
-        career_role = CareerRole.objects.first()
+        if hasattr(student, 'career_goal') and student.career_goal:
+            career_role = CareerRole.objects.filter(title__iexact=student.career_goal).first()
+        if not career_role:
+            career_role = CareerRole.objects.first()
 
     if not career_role:
         return []
