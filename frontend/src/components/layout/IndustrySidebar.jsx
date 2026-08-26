@@ -12,8 +12,8 @@ const navSections = [
   {
     label: 'Company', items: [
       { label: 'Company Profile', icon: 'business', path: '/industry/profile' },
-      { label: 'Verification', icon: 'verified_user', path: '/industry/verification' },
-      { label: 'Team', icon: 'group', path: '/industry/team' },
+      // { label: 'Verification', icon: 'verified_user', path: '/industry/verification' },
+      // { label: 'Team', icon: 'group', path: '/industry/team' },
     ]
   },
   {
@@ -22,23 +22,23 @@ const navSections = [
       { label: 'Jobs', icon: 'business_center', path: '/industry/jobs' },
       { label: 'Candidates', icon: 'person_search', path: '/industry/candidates' },
       { label: 'Applications', icon: 'assignment', path: '/industry/applications' },
-      { label: 'Shortlists', icon: 'star', path: '/industry/shortlists' },
-      { label: 'Interviews', icon: 'event', path: '/industry/interviews' },
+      // { label: 'Shortlists', icon: 'star', path: '/industry/shortlists' },
+      // { label: 'Interviews', icon: 'event', path: '/industry/interviews' },
     ]
   },
   {
     label: 'Skill Intelligence', items: [
-      { label: 'Required Skills', icon: 'military_tech', path: '/industry/skills' },
-      { label: 'Candidate Matching', icon: 'hub', path: '/industry/matching' },
-      { label: 'Skill Analytics', icon: 'bar_chart', path: '/industry/skill-analytics' },
+      // { label: 'Required Skills', icon: 'military_tech', path: '/industry/skills' },
+      // { label: 'Candidate Matching', icon: 'hub', path: '/industry/matching' },
+      // { label: 'Skill Analytics', icon: 'bar_chart', path: '/industry/skill-analytics' },
     ]
   },
-  { label: 'Placements', items: [{ label: 'Selected Candidates', icon: 'workspace_premium', path: '/industry/placements' }] },
-  { label: 'Insights', items: [{ label: 'Analytics', icon: 'analytics', path: '/industry/analytics' }] },
+  // { label: 'Placements', items: [{ label: 'Selected Candidates', icon: 'workspace_premium', path: '/industry/placements' }] },
+  // { label: 'Insights', items: [{ label: 'Analytics', icon: 'analytics', path: '/industry/analytics' }] },
   {
     label: 'Account', items: [
-      { label: 'Notifications', icon: 'notifications', path: '/industry/notifications' },
-      { label: 'Settings', icon: 'settings', path: '/industry/settings' },
+      // { label: 'Notifications', icon: 'notifications', path: '/industry/notifications' },
+      // { label: 'Settings', icon: 'settings', path: '/industry/settings' },
     ]
   },
 ]
