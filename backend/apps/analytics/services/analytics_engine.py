@@ -144,7 +144,16 @@ def get_academician_analytics(user=None):
     if user and getattr(user, 'role', None) == 'academician' and hasattr(user, 'academician_profile'):
         inst = getattr(user.academician_profile, 'institution', None)
         if inst:
-            students_qs = students_qs.filter(institution=inst)
+            from django.db.models import Q
+            inst_name = (inst.name or '').strip()
+            query = Q(institution=inst)
+            if '(' in inst_name and ')' in inst_name:
+                abbr = inst_name.split('(')[-1].split(')')[0].strip()
+                if abbr:
+                    query |= Q(institution__name__iexact=abbr) | Q(institution__name__icontains=abbr)
+            if inst_name:
+                query |= Q(institution__name__iexact=inst_name) | Q(institution__name__icontains=inst_name)
+            students_qs = students_qs.filter(query).distinct()
         else:
             students_qs = StudentProfile.objects.none()
 
@@ -169,14 +178,34 @@ def get_academician_analytics(user=None):
 
     needs_focus_students = max(0, total_students - (job_ready_students + improving_students))
 
-    # Placement statistics
-    apps_qs = Application.objects.filter(student__in=students_qs)
+    # Placement statistics & detailed application records
+    apps_qs = Application.objects.filter(student__in=students_qs).select_related(
+        'student__user', 'opportunity__company'
+    ).order_by('-applied_at')
+
     total_apps = apps_qs.count()
     shortlisted_apps = apps_qs.filter(
         status__in=[ApplicationStatus.SHORTLISTED, ApplicationStatus.INTERVIEW, ApplicationStatus.SELECTED]
     ).count()
-
     selected_apps = apps_qs.filter(status=ApplicationStatus.SELECTED).count()
+    rejected_apps = apps_qs.filter(status=ApplicationStatus.REJECTED).count()
+    under_review_apps = apps_qs.filter(status__in=[ApplicationStatus.APPLIED, ApplicationStatus.UNDER_REVIEW]).count()
+
+    student_applications_list = [
+        {
+            "id": str(app.id),
+            "student_id": str(app.student.id),
+            "student_name": f"{app.student.user.first_name} {app.student.user.last_name}".strip() or app.student.user.email.split('@')[0],
+            "student_email": app.student.user.email,
+            "student_phone": getattr(app.student, 'phone', '') or '—',
+            "opportunity_title": app.opportunity.title,
+            "opportunity_type": getattr(app.opportunity, 'opportunity_type', 'job'),
+            "company_name": app.opportunity.company.company_name if hasattr(app.opportunity, 'company') and app.opportunity.company else "Corporate Partner",
+            "status": app.status,
+            "applied_at": app.applied_at.isoformat() if app.applied_at else None,
+        }
+        for app in apps_qs
+    ]
 
     return {
         "total_students": total_students,
@@ -191,7 +220,10 @@ def get_academician_analytics(user=None):
             "total_applications": total_apps,
             "shortlisted_applications": shortlisted_apps,
             "selected_applications": selected_apps,
-        }
+            "rejected_applications": rejected_apps,
+            "under_review_applications": under_review_apps,
+        },
+        "student_applications": student_applications_list
     }
 
 

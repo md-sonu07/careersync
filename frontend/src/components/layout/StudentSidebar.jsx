@@ -14,7 +14,7 @@ const navSections = [
       { label: 'Profile', icon: 'person', path: '/student/profile' },
       { label: 'Career Goal', icon: 'flag', path: '/student/career-goal' },
       { label: 'Skills', icon: 'military_tech', path: '/student/skills' },
-      { label: 'Skill Assessment', icon: 'quiz', path: '/student/assessment' },
+      // { label: 'Skill Assessment', icon: 'quiz', path: '/student/assessment' },
       { label: 'Skill Gap', icon: 'compare', path: '/student/skill-gap' },
       { label: 'Career Roadmap', icon: 'map', path: '/student/roadmap' },
     ]
@@ -25,8 +25,8 @@ const navSections = [
       { label: 'My Learning', icon: 'auto_stories', path: '/student/my-learning' },
       // { label: 'Assignments', icon: 'assignment', path: '/student/assignments' },
       { label: 'Quizzes', icon: 'help', path: '/student/quizzes' },
-      { label: 'AI Practice', icon: 'smart_toy', path: '/student/ai-practice' },
-      { label: 'Career AI', icon: 'chat', path: '/student/ai-assistant' },
+      { label: 'Mock Test', icon: 'smart_toy', path: '/student/ai-practice' },
+      // { label: 'Career AI', icon: 'chat', path: '/student/ai-assistant' },
       // { label: 'Certificates', icon: 'workspace_premium', path: '/student/certificates' },
     ]
   },
