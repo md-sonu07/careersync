@@ -1,4 +1,4 @@
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import AppIcon from '../ui/AppIcon';
 
@@ -94,7 +94,7 @@ export default function AdminSidebar({ onNavigate }) {
   const handleLogout = async () => { await logout(); if (onNavigate) onNavigate(); navigate('/login') }
   return (
     <div className="flex h-full flex-col">
-      <div className="hidden lg:flex h-[68px] shrink-0 items-center gap-3 px-5 border-b border-white/10">
+      <Link to="/" className="hidden lg:flex h-[68px] shrink-0 items-center gap-3 px-5 border-b border-white/10 hover:bg-white/5 transition-colors">
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-slate-900 font-bold text-sm">CS</div>
         <div className="min-w-0">
           <p className="text-sm font-bold text-white leading-none">CareerSync</p>
@@ -103,14 +103,14 @@ export default function AdminSidebar({ onNavigate }) {
         <span className="ml-auto hidden items-center gap-1 rounded-full bg-white/10 border border-white/10 px-2 py-0.5 text-[10px] font-bold text-white lg:inline-flex">
           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" /> LIVE
         </span>
-      </div>
-      <div className="flex lg:hidden items-center gap-3 px-5 py-4 border-b border-white/10">
+      </Link>
+      <Link to="/" className="flex lg:hidden items-center gap-3 px-5 py-4 border-b border-white/10 hover:bg-white/5 transition-colors">
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-slate-900 font-bold text-sm">CS</div>
         <div className="min-w-0">
           <p className="text-sm font-bold text-white leading-none">CareerSync</p>
           <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400">Admin Console</p>
         </div>
-      </div>
+      </Link>
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
         {navSections.map((section) => (
           <div key={section.label}>

@@ -70,18 +70,34 @@ const PaymentModal = ({ open, onClose, course, onPaymentSuccess }) => {
     }
   }
 
-  const handleLaunchRazorpay = () => {
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleLaunchRazorpay = async () => {
     const txId = 'PAY_RZP_' + Math.floor(10000000 + Math.random() * 90000000)
     setStep('processing')
 
-    if (window.Razorpay) {
+    const isLoaded = await loadRazorpayScript()
+
+    if (isLoaded && window.Razorpay) {
       const options = {
         key: razorpayKey,
         amount: totalPayable * 100, // Amount in paise
         currency: 'INR',
         name: 'CareerSync',
         description: `Enrollment for ${course.title}`,
-        image: 'https://ik.imagekit.io/crms/logo.png',
+        image: window.location.origin + '/logo.png',
         handler: async function (response) {
           const liveTx = response.razorpay_payment_id || txId
           setTransactionId(liveTx)
