@@ -23,11 +23,11 @@ const navSections = [
     label: 'Learning', items: [
       { label: 'Explore Courses', icon: 'explore', path: '/student/learning' },
       { label: 'My Learning', icon: 'auto_stories', path: '/student/my-learning' },
-      { label: 'Assignments', icon: 'assignment', path: '/student/assignments' },
+      // { label: 'Assignments', icon: 'assignment', path: '/student/assignments' },
       { label: 'Quizzes', icon: 'help', path: '/student/quizzes' },
       { label: 'AI Practice', icon: 'smart_toy', path: '/student/ai-practice' },
       { label: 'Career AI', icon: 'chat', path: '/student/ai-assistant' },
-      { label: 'Certificates', icon: 'workspace_premium', path: '/student/certificates' },
+      // { label: 'Certificates', icon: 'workspace_premium', path: '/student/certificates' },
     ]
   },
   {
@@ -35,17 +35,17 @@ const navSections = [
       { label: 'Internships', icon: 'work', path: '/student/internships' },
       { label: 'Jobs', icon: 'business_center', path: '/student/jobs' },
       { label: 'Recommended', icon: 'star', path: '/student/recommended' },
-      { label: 'Saved', icon: 'bookmark', path: '/student/saved' },
+      // { label: 'Saved', icon: 'bookmark', path: '/student/saved' },
       { label: 'Applications', icon: 'description', path: '/student/applications' },
     ]
   },
-  {
-    label: 'My Work', items: [
-      { label: 'Projects', icon: 'folder', path: '/student/projects' },
-      { label: 'Resume', icon: 'article', path: '/student/resume' },
-      { label: 'Portfolio', icon: 'language', path: '/student/portfolio' },
-    ]
-  },
+  // {
+  //   label: 'My Work', items: [
+      // { label: 'Projects', icon: 'folder', path: '/student/projects' },
+      // { label: 'Resume', icon: 'article', path: '/student/resume' },
+      // { label: 'Portfolio', icon: 'language', path: '/student/portfolio' },
+  //   ]
+  // },
   {
     label: 'Progress', items: [
       { label: 'Learning Analytics', icon: 'analytics', path: '/student/analytics' },
