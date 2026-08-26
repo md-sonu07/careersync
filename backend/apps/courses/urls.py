@@ -7,7 +7,9 @@ from courses.views import (
     MyEnrollmentsView,
     EnrollmentDetailView,
     UpdateCourseProgressView,
+    StudentResumeDownloadView,
     LearningRecommendationListView,
+    LearningRecommendationDetailView,
 )
 
 urlpatterns = [
@@ -19,6 +21,8 @@ urlpatterns = [
     path('my-enrollments/', MyEnrollmentsView.as_view(), name='my_course_enrollments'),
     path('enrollments/<uuid:pk>/', EnrollmentDetailView.as_view(), name='enrollment_detail'),
     path('enrollments/<uuid:pk>/progress/', UpdateCourseProgressView.as_view(), name='update_course_progress'),
+    path('resume/download/', StudentResumeDownloadView.as_view(), name='student_resume_download'),
 
     path('recommendations/', LearningRecommendationListView.as_view(), name='learning_recommendation_list'),
+    path('recommendations/<uuid:pk>/', LearningRecommendationDetailView.as_view(), name='learning_recommendation_detail'),
 ]

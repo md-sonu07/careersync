@@ -11,6 +11,7 @@ import FileUpload from '../../components/ui/FileUpload'
 import PageHeader from '../../components/common/PageHeader'
 import { selectCurrentUser, setCredentials } from '../../features/auth/authSlice'
 import { profileApi } from '../../api/profile.api'
+import { courseApi } from '../../api/course.api'
 import { authApi } from '../../api/auth.api'
 import AppIcon from '../../components/ui/AppIcon'
 import { toast } from 'react-hot-toast'
@@ -45,6 +46,7 @@ export default function Profile() {
   const [saving, setSaving] = useState(false)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [resumeUploaded, setResumeUploaded] = useState(false)
+  const [downloadingResume, setDownloadingResume] = useState(false)
   const [profilePicFile, setProfilePicFile] = useState(null)
   const [profilePicPreview, setProfilePicPreview] = useState(null)
   const [isCustomCollege, setIsCustomCollege] = useState(false)
@@ -192,6 +194,18 @@ export default function Profile() {
     }
   }
 
+  const handleDownloadResume = async () => {
+    try {
+      setDownloadingResume(true)
+      await courseApi.downloadResume()
+      toast.success('Your CareerSync resume has been downloaded.')
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Could not generate your resume. Please try again.')
+    } finally {
+      setDownloadingResume(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -278,6 +292,22 @@ export default function Profile() {
             </div>
             {resumeUploaded && <p className="mt-2 text-xs font-medium text-success flex items-center gap-1"><AppIcon name="check_circle" className="text-[16px]" /> Resume uploaded successfully</p>}
           </Card>
+
+          <Card className="border-primary/20 bg-primary/[0.03]">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-white">
+                <AppIcon name="description" className="text-[20px]" />
+              </div>
+              <div>
+                <h3 className="font-bold text-charcoal text-sm">CareerSync Resume</h3>
+                <p className="text-xs text-muted mt-1">Download a live resume with your profile, existing skills, course-earned skills, and completed certificates.</p>
+                <Button size="sm" onClick={handleDownloadResume} disabled={downloadingResume} className="mt-3 text-xs font-bold flex items-center gap-1">
+                  <AppIcon name="download" className="text-[16px]" />
+                  {downloadingResume ? 'Preparing resume…' : 'Download Resume'}
+                </Button>
+              </div>
+            </div>
+          </Card>
         </div>
 
         {/* Right Column — Model Detailed Cards */}
@@ -356,6 +386,7 @@ export default function Profile() {
                   <div key={item.id} className="flex items-center gap-2 rounded-xl border border-sage bg-sage/40 px-3 py-2 text-xs font-semibold text-primary">
                     <AppIcon name="check_circle" className="text-[16px] text-success" />
                     <span>{item.skill?.name || 'Skill'}</span>
+                    {item.source === 'course' && <span className="text-[10px] font-bold uppercase text-emerald-700">Course-earned</span>}
                     <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-charcoal shadow-xs">
                       {item.score || 85}% ({item.level || 'Expert'})
                     </span>
@@ -420,7 +451,7 @@ export default function Profile() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input label="First Name" value={editForm.first_name} onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })} placeholder="e.g. Raman" />
             <Input label="Last Name" value={editForm.last_name} onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })} placeholder="e.g. Raj" />
-            
+
             {/* Institution / College Select Dropdown Menu */}
             <div className="sm:col-span-2 space-y-2">
               <Select

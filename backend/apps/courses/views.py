@@ -1,7 +1,9 @@
 import uuid
+from html import escape
 from decimal import Decimal
 from django.db import transaction
 from django.db.models import Q, F
+from django.http import HttpResponse
 from django.utils import timezone
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
@@ -16,6 +18,7 @@ from courses.models import (
     CoursePayment,
     EnrollmentStatus,
     PaymentStatus,
+    RecommendationStatus,
 )
 from courses.serializers import (
     LearningResourceSerializer,
@@ -23,6 +26,7 @@ from courses.serializers import (
     CoursePaymentSerializer,
     LearningRecommendationSerializer,
 )
+from skills.models import StudentSkill, SkillScoreHistory, SkillSource
 from courses.services.recommendation_engine import generate_learning_recommendations
 
 
@@ -283,6 +287,28 @@ class UpdateCourseProgressView(APIView):
                 inst_code = "AKU"
                 enrollment.certificate_id = f"CS-{inst_code}-{uuid.uuid4().hex[:8].upper()}"
 
+            # A finished course becomes part of the student's current skill profile.
+            # Existing, higher assessment scores are never reduced by course completion.
+            student_skill, created = StudentSkill.objects.get_or_create(
+                student=enrollment.student,
+                skill=enrollment.resource.skill,
+                defaults={
+                    'score': 70,
+                    'source': SkillSource.COURSE,
+                    'last_assessed_at': timezone.now(),
+                },
+            )
+            if not created:
+                student_skill.score = max(student_skill.score, 70)
+                student_skill.last_assessed_at = timezone.now()
+                student_skill.save()
+            SkillScoreHistory.objects.create(
+                student=enrollment.student,
+                skill=enrollment.resource.skill,
+                score=student_skill.score,
+                source=SkillSource.COURSE,
+            )
+
         enrollment.save()
 
         return Response({
@@ -293,6 +319,52 @@ class UpdateCourseProgressView(APIView):
             "status": enrollment.status,
             "certificate_id": enrollment.certificate_id,
         }, status=status.HTTP_200_OK)
+
+
+class StudentResumeDownloadView(APIView):
+    """GET /api/courses/resume/download/ -> Download a resume built from the live student profile."""
+    permission_classes = [permissions.IsAuthenticated, IsStudent]
+
+    def get(self, request):
+        student, _ = StudentProfile.objects.get_or_create(user=request.user)
+        skills = StudentSkill.objects.filter(student=student).select_related('skill').order_by('-score', 'skill__name')
+        completed = CourseEnrollment.objects.filter(
+            student=student,
+            status=EnrollmentStatus.COMPLETED,
+        ).select_related('resource', 'resource__skill', 'resource__institution').order_by('-completed_at')
+
+        user = student.user
+        full_name = user.full_name or f"{user.first_name} {user.last_name}".strip() or user.email
+        education = ' · '.join(part for part in [student.course, student.specialization] if part) or 'Student'
+        institution = student.institution.name if student.institution else ''
+        contact = ' | '.join(part for part in [user.email, student.linkedin_url, student.github_url] if part)
+        skill_items = ''.join(
+            f'<li><strong>{escape(item.skill.name)}</strong> — {item.score}% ({escape(item.level)})</li>'
+            for item in skills
+        ) or '<li>Add skills from the Skills page or complete a course to build this section.</li>'
+        course_items = ''.join(
+            '<li><strong>{title}</strong> — {skill} · Completed {date}{certificate}</li>'.format(
+                title=escape(enrollment.resource.title),
+                skill=escape(enrollment.resource.skill.name),
+                date=enrollment.completed_at.strftime('%b %Y') if enrollment.completed_at else 'recently',
+                certificate=f' · Certificate: {escape(enrollment.certificate_id)}' if enrollment.certificate_id else '',
+            )
+            for enrollment in completed
+        ) or '<li>No completed courses yet.</li>'
+        summary = student.bio or f"{education} student pursuing {student.career_goal or 'career opportunities'} with verified learning progress on CareerSync."
+        grad = f"Expected graduation: {student.graduation_year}" if student.graduation_year else ''
+        html = f'''<!doctype html><html><head><meta charset="utf-8"><title>{escape(full_name)} Resume</title>
+        <style>body{{font-family:Arial,sans-serif;color:#18212f;max-width:760px;margin:36px auto;line-height:1.5}}h1{{margin:0;color:#0f766e}}h2{{font-size:15px;letter-spacing:.08em;text-transform:uppercase;border-bottom:2px solid #0f766e;padding-bottom:5px;margin-top:25px}}p{{margin:6px 0}}ul{{padding-left:20px}}.muted{{color:#52616b;font-size:13px}}</style></head><body>
+        <h1>{escape(full_name)}</h1><p class="muted">{escape(contact)}</p>
+        <h2>Professional Summary</h2><p>{escape(summary)}</p>
+        <h2>Education</h2><p><strong>{escape(education)}</strong>{' · ' + escape(institution) if institution else ''}</p><p class="muted">{escape(grad)}</p>
+        <h2>Skills</h2><ul>{skill_items}</ul>
+        <h2>Completed Courses & Certifications</h2><ul>{course_items}</ul>
+        <p class="muted">Generated from CareerSync profile, skills, and course completion records.</p></body></html>'''
+        filename = ''.join(char if char.isalnum() else '_' for char in full_name).strip('_') or 'student'
+        response = HttpResponse(html, content_type='text/html; charset=utf-8')
+        response['Content-Disposition'] = f'attachment; filename="{filename}_CareerSync_Resume.html"'
+        return response
 
 
 class LearningRecommendationListView(generics.ListAPIView):
@@ -307,3 +379,22 @@ class LearningRecommendationListView(generics.ListAPIView):
         if not student_profile:
             return LearningRecommendation.objects.none()
         return generate_learning_recommendations(student_profile)
+
+
+class LearningRecommendationDetailView(generics.UpdateAPIView):
+    """PATCH /api/courses/recommendations/{id}/ to track a student's recommendation state."""
+    serializer_class = LearningRecommendationSerializer
+    permission_classes = [permissions.IsAuthenticated, IsStudent]
+    http_method_names = ['patch']
+
+    def get_queryset(self):
+        student_profile = getattr(self.request.user, 'student_profile', None)
+        if not student_profile:
+            return LearningRecommendation.objects.none()
+        return LearningRecommendation.objects.filter(student=student_profile)
+
+    def perform_update(self, serializer):
+        recommendation = serializer.save()
+        if recommendation.status == RecommendationStatus.COMPLETED and not recommendation.completed_at:
+            recommendation.completed_at = timezone.now()
+            recommendation.save(update_fields=['completed_at'])

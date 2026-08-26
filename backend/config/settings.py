@@ -101,6 +101,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / config('DB_NAME', default='db.sqlite3'),
+        # SQLite permits one writer at a time. Let overlapping dashboard
+        # requests wait briefly instead of immediately failing with a lock.
+        'OPTIONS': {'timeout': 15},
     }
 }
 
@@ -259,4 +262,3 @@ RAZORPAY_WEBHOOK_SECRET = config('RAZORPAY_WEBHOOK_SECRET', default='5094022fbfb
 IMAGEKIT_PUBLIC_KEY = config('IMAGEKIT_PUBLIC_KEY', default='public_vNSu+tU1Im8jNsOi7Ipd1Ptt92c=')
 IMAGEKIT_PRIVATE_KEY = config('IMAGEKIT_PRIVATE_KEY', default='private_Epzp01NXplITplT8YKI4Rk7ZLO0=')
 IMAGEKIT_URL_ENDPOINT = config('IMAGEKIT_URL_ENDPOINT', default='https://ik.imagekit.io/crms')
-

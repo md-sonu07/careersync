@@ -54,6 +54,21 @@ export const courseApi = {
     return data
   },
 
+  // Download a resume generated from the current profile, skills, and completed courses.
+  downloadResume: async () => {
+    const response = await apiClient.get(ENDPOINTS.COURSES.RESUME_DOWNLOAD, { responseType: 'blob' })
+    const disposition = response.headers['content-disposition'] || ''
+    const filename = disposition.match(/filename="?([^";]+)"?/)?.[1] || 'CareerSync_Resume.html'
+    const url = URL.createObjectURL(response.data)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  },
+
   // Get courses created by authenticated institute
   getMyInstituteCourses: async () => {
     try {

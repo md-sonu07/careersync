@@ -724,7 +724,7 @@ export default function ResumeRecommendationsWidget({ stack, content = '', theme
                 <button
                   type="button"
                   onClick={() => {
-                    navigate('/jobs')
+                    navigate('/internships')
                     toast.success(`Redirecting to Internships matching ${inItem.title}...`)
                   }}
                   className="px-3 py-1 rounded-md bg-emerald-500 text-white font-bold text-xs hover:bg-emerald-600 transition-colors shadow-2xs cursor-pointer"
@@ -777,7 +777,7 @@ export default function ResumeRecommendationsWidget({ stack, content = '', theme
                 <button
                   type="button"
                   onClick={() => {
-                    navigate(`/courses/${c.id}`)
+                    navigate(`/courses`)
                   }}
                   className="px-3 py-1 rounded-md bg-primary text-white font-bold text-xs hover:bg-primary/90 transition-colors shadow-2xs cursor-pointer"
                 >

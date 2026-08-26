@@ -22,6 +22,7 @@ class SkillSource(models.TextChoices):
     RESUME = 'resume', 'Resume Parsing'
     ASSESSMENT = 'assessment', 'Skill Assessment'
     PRACTICE = 'practice', 'AI Practice'
+    COURSE = 'course', 'Course Completion'
 
 
 class Skill(models.Model):
@@ -256,4 +257,3 @@ class SkillGap(models.Model):
 
     def __str__(self):
         return f"{self.student.user.email} - {self.skill.name} Gap: {self.gap_score}% [{self.severity}] ({self.status})"
-
