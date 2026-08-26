@@ -149,7 +149,10 @@ export default function ChatFull({ isEmbedded = false, onOpenMobileMenu = null }
   const [editingId, setEditingId] = useState(null)
   const [editTitle, setEditTitle] = useState('')
   const [deleteConfirmId, setDeleteConfirmId] = useState(null)
-  const [sidebarOpen, setSidebarOpen] = useState(!isEmbedded)
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (isEmbedded) return false
+    return typeof window !== 'undefined' ? window.innerWidth >= 768 : true
+  })
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState(null)
   const fileInputRef = useRef(null)
@@ -309,11 +312,17 @@ export default function ChatFull({ isEmbedded = false, onOpenMobileMenu = null }
     localStorage.setItem('public_chat_conversation_id', 'new')
     setActiveConversationId(null)
     setMessages([])
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false)
+    }
   }
 
   const handleSelectConversation = (id) => {
     localStorage.setItem('public_chat_conversation_id', id)
     setActiveConversationId(id)
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false)
+    }
   }
 
   const handleDelete = (e, id) => {
@@ -345,7 +354,7 @@ export default function ChatFull({ isEmbedded = false, onOpenMobileMenu = null }
     >
       {/* Sidebar */}
       <div
-        className={`border-r transition-all duration-300 flex flex-col ${theme === 'dark' ? 'bg-[#171717] border-[#2f2f2f]' : 'bg-[#F9F9F9] border-border/60'
+        className={`border-r transition-all duration-300 flex flex-col absolute md:relative z-50 h-full ${theme === 'dark' ? 'bg-[#171717] border-[#2f2f2f]' : 'bg-[#F9F9F9] border-border/60'
           } ${sidebarOpen ? 'w-[280px]' : 'w-[0px] opacity-0 overflow-hidden border-none'}`}
       >
         <div className="p-4 flex items-center justify-between">
