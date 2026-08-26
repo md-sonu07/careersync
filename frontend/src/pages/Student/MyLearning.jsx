@@ -13,6 +13,7 @@ export default function MyLearning() {
   const [enrollments, setEnrollments] = useState([])
   const [recommendations, setRecommendations] = useState([])
   const [loading, setLoading] = useState(true)
+  const [downloadingResume, setDownloadingResume] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -47,6 +48,18 @@ export default function MyLearning() {
     }
   }
 
+  const handleDownloadResume = async () => {
+    try {
+      setDownloadingResume(true)
+      await courseApi.downloadResume()
+      toast.success('Your CareerSync resume has been downloaded.')
+    } catch {
+      toast.error('Could not generate your resume. Please try again.')
+    } finally {
+      setDownloadingResume(false)
+    }
+  }
+
   const completedCount = enrollments.filter(e => e.status === 'completed' || e.progress_percent >= 100).length
   const inProgressCount = enrollments.length - completedCount
 
@@ -55,6 +68,12 @@ export default function MyLearning() {
       <PageHeader
         title="My Learning & Course Dashboard"
         subtitle="Track your active university lecture series, video progress, and verified course certificates."
+        actions={
+          <Button variant="outline" size="sm" onClick={handleDownloadResume} disabled={downloadingResume} className="text-xs font-bold flex items-center gap-1">
+            <AppIcon name="download" className="text-[16px]" />
+            {downloadingResume ? 'Preparing resume…' : 'Download Resume'}
+          </Button>
+        }
       />
 
       {/* Top Metrics Cards */}

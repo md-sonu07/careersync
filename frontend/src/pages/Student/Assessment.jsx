@@ -31,19 +31,11 @@ export default function Assessment() {
       setLoading(true)
       const [assData, attemptsData] = await Promise.all([
         assessmentApi.getAssessments().catch(() => {
-          toast({
-            title: 'Failed to load assessments',
-            description: 'Could not load assessments. Please try again.',
-            variant: 'destructive',
-          })
+          toast.error('Could not load assessments. Please try again.')
           return []
         }),
         assessmentApi.getMyAttempts().catch(() => {
-          toast({
-            title: 'Failed to load attempts',
-            description: 'Could not load assessment attempts. Please try again.',
-            variant: 'destructive',
-          })
+          toast.error('Could not load assessment attempts. Please try again.')
           return []
         }),
       ])
@@ -57,11 +49,7 @@ export default function Assessment() {
         setAttempts(attemptsData)
       }
     } catch {
-      toast({
-        title: 'Error',
-        description: 'An unexpected error occurred. Please try again.',
-        variant: 'destructive',
-      })
+      toast.error('An unexpected error occurred. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -79,11 +67,7 @@ export default function Assessment() {
       const detail = await assessmentApi.getAssessmentDetail(selectedAssessment.id)
       const questions = detail.questions || []
       if (questions.length === 0) {
-        toast({
-          title: 'No questions available',
-          description: 'There are no questions currently available for this assessment.',
-          variant: 'destructive',
-        })
+        toast.error('There are no questions currently available for this assessment.')
         return
       }
 
@@ -96,11 +80,7 @@ export default function Assessment() {
       setResultSummary(null)
       setQuizModalOpen(true)
     } catch {
-      toast({
-        title: 'Failed to start assessment',
-        description: 'Failed to start assessment attempt.',
-        variant: 'destructive',
-      })
+      toast.error('Failed to start assessment attempt.')
     } finally {
       setSubmitting(false)
     }
@@ -128,17 +108,9 @@ export default function Assessment() {
 
       setResultSummary(result)
       loadData()
-      toast({
-        title: 'Assessment submitted',
-        description: 'Your assessment has been submitted successfully.',
-        variant: 'success',
-      })
+      toast.success('Your assessment has been submitted successfully.')
     } catch {
-      toast({
-        title: 'Failed to submit',
-        description: 'Failed to submit assessment.',
-        variant: 'destructive',
-      })
+      toast.error('Failed to submit assessment.')
     } finally {
       setSubmitting(false)
     }

@@ -2,6 +2,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
+from django.db.utils import OperationalError
 
 from accounts.permissions import IsStudent
 from students.models import StudentProfile
@@ -143,7 +144,11 @@ class StudentSkillGapView(APIView):
         if role_id:
             career_role = generics.get_object_or_404(CareerRole, id=role_id)
 
-        gaps = calculate_student_skill_gaps(student, career_role)
+        try:
+            gaps = calculate_student_skill_gaps(student, career_role)
+        except OperationalError:
+            # Another dashboard request is already refreshing these records.
+            gaps = SkillGap.objects.filter(student=student, career_role=career_role) if career_role else SkillGap.objects.filter(student=student)
         serializer = SkillGapSerializer(gaps, many=True)
         return Response(serializer.data)
 
@@ -154,6 +159,9 @@ class StudentSkillGapView(APIView):
         if role_id:
             career_role = generics.get_object_or_404(CareerRole, id=role_id)
 
-        gaps = calculate_student_skill_gaps(student, career_role)
+        try:
+            gaps = calculate_student_skill_gaps(student, career_role)
+        except OperationalError:
+            gaps = SkillGap.objects.filter(student=student, career_role=career_role) if career_role else SkillGap.objects.filter(student=student)
         serializer = SkillGapSerializer(gaps, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

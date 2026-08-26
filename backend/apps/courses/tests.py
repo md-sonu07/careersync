@@ -7,7 +7,7 @@ from accounts.models import UserRole
 from students.models import StudentProfile
 from skills.models import Skill, SkillCategory, CareerRole, CareerSkillRequirement, StudentSkill
 from assessments.models import DifficultyLevel
-from courses.models import LearningResource, LearningRecommendation, ResourceType, RecommendationPriority
+from courses.models import LearningResource, LearningRecommendation, ResourceType, RecommendationPriority, CourseEnrollment, EnrollmentStatus
 
 User = get_user_model()
 
@@ -71,3 +71,24 @@ class CoursesAPITestCase(TestCase):
         })
         self.assertEqual(res_patch.status_code, status.HTTP_200_OK)
         self.assertEqual(res_patch.data['status'], 'in_progress')
+
+    def test_completed_course_adds_skill_and_resume_includes_it(self):
+        self.client.force_authenticate(user=self.student_user)
+        self.resource.curriculum = [{'title': 'Module 1', 'lessons': [{'id': 'lesson-1'}]}]
+        self.resource.save()
+        enrollment = CourseEnrollment.objects.create(student=self.student_profile, resource=self.resource)
+
+        progress_response = self.client.post(
+            f'/api/courses/enrollments/{enrollment.id}/progress/',
+            {'lesson_id': 'lesson-1', 'completed': True},
+            format='json',
+        )
+        self.assertEqual(progress_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(progress_response.data['status'], EnrollmentStatus.COMPLETED)
+        skill = StudentSkill.objects.get(student=self.student_profile, skill=self.skill_python)
+        self.assertGreaterEqual(skill.score, 70)
+
+        resume_response = self.client.get('/api/courses/resume/download/')
+        self.assertEqual(resume_response.status_code, status.HTTP_200_OK)
+        self.assertIn('attachment', resume_response['Content-Disposition'])
+        self.assertIn('Python Advanced Course', resume_response.content.decode())

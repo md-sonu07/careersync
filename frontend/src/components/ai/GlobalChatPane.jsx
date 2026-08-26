@@ -158,11 +158,7 @@ export default function GlobalChatPane() {
       const data = await aiAPI.getConversations()
       setConversations(data)
     } catch {
-      toast({
-        title: 'Failed to load conversations',
-        description: 'Could not load conversation history. Please try again.',
-        variant: 'destructive',
-      })
+      toast.error('Could not load conversation history. Please try again.')
     }
   }
 
@@ -172,11 +168,8 @@ export default function GlobalChatPane() {
       const data = await aiAPI.getConversation(conversationId)
       setMessages(data.messages || [])
     } catch {
-      toast({
-        title: 'Failed to load messages',
-        description: 'Could not load messages. Please try again.',
-        variant: 'destructive',
-      })
+      setActiveConversationId(null)
+      toast.error('Could not load messages. Starting a new chat.')
     } finally {
       setIsLoadingHistory(false)
     }
@@ -240,11 +233,7 @@ export default function GlobalChatPane() {
         fetchConversations()
       }
     } catch {
-      toast({
-        title: 'Failed to send message',
-        description: 'Failed to send message.',
-        variant: 'destructive',
-      })
+      toast.error('Failed to send message. Please try again.')
     } finally {
       setIsSending(false)
     }

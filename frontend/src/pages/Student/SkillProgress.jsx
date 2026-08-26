@@ -23,21 +23,13 @@ export default function SkillProgress() {
         const [mySkillsData, historyData] = await Promise.all([
           skillApi.getMySkills().catch(() => {
             if (isMounted) {
-              toast({
-                title: 'Failed to load skills',
-                description: 'Could not load skill data. Please try again.',
-                variant: 'destructive',
-              })
+              toast.error('Could not load skill data. Please try again.')
             }
             return null
           }),
           skillApi.getMySkillHistory().catch(() => {
             if (isMounted) {
-              toast({
-                title: 'Failed to load history',
-                description: 'Could not load skill history. Please try again.',
-                variant: 'destructive',
-              })
+              toast.error('Could not load skill history. Please try again.')
             }
             return null
           }),
@@ -67,11 +59,7 @@ export default function SkillProgress() {
         }
       } catch {
         if (isMounted) {
-          toast({
-            title: 'Error',
-            description: 'An unexpected error occurred. Please try again.',
-            variant: 'destructive',
-          })
+          toast.error('An unexpected error occurred. Please try again.')
         }
       } finally {
         if (isMounted) setLoading(false)

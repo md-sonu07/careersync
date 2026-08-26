@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.utils import OperationalError
 from students.models import StudentProfile
 from skills.models import SkillGap, SkillGapSeverity
 from skills.services.gap_engine import calculate_student_skill_gaps
@@ -18,7 +19,12 @@ def generate_learning_recommendations(student: StudentProfile):
     for matching LearningResources.
     """
     # 1. Ensure up-to-date skill gaps exist
-    gaps = calculate_student_skill_gaps(student)
+    try:
+        gaps = calculate_student_skill_gaps(student)
+    except OperationalError:
+        # A concurrent skill-gap refresh can own SQLite's write lock. The
+        # most recently committed gaps are safe to use for recommendations.
+        gaps = SkillGap.objects.filter(student=student)
     recommendations = []
 
     for gap in gaps:
@@ -49,7 +55,7 @@ def generate_learning_recommendations(student: StudentProfile):
                 defaults={
                     'skill': gap.skill,
                     'priority': priority,
-                    'recommended_reason': reason,
+                    'reason': reason,
                 }
             )
             recommendations.append(rec)
@@ -64,7 +70,7 @@ def generate_learning_recommendations(student: StudentProfile):
                 defaults={
                     'skill': res.skill,
                     'priority': RecommendationPriority.LOW,
-                    'recommended_reason': "Explore popular skill modules to expand your profile.",
+                    'reason': "Explore popular skill modules to expand your profile.",
                 }
             )
             recommendations.append(rec)

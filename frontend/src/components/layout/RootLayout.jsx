@@ -10,13 +10,6 @@ export default function RootLayout() {
   const [isResizing, setIsResizing] = useState(false);
   const containerRef = useRef(null);
 
-  // Automatically close popup chat drawer on any non-dashboard route
-  useEffect(() => {
-    const isDashboard = location.pathname.endsWith('/dashboard') || location.pathname === '/'
-    if (!isDashboard) {
-      closeChat();
-    }
-  }, [location.pathname, closeChat]);
 
   const startResizing = useCallback((e) => {
     e.preventDefault();
