@@ -120,15 +120,14 @@ export default function AdminSidebar({ onNavigate }) {
         ))}
       </div>
       <div className="border-t border-white/10 p-3 space-y-2">
-        <div className="flex items-center gap-3 rounded-2xl bg-white/10 border border-white/10 p-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500 text-white font-bold text-sm shrink-0">
-            {displayName.slice(0, 2).toUpperCase()}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-white truncate">{displayName}</p>
-            <p className="text-xs text-slate-400 truncate">{email}</p>
-          </div>
-        </div>
+        <a
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/10 py-2.5 px-3 text-xs font-semibold text-white hover:bg-white/20 transition-colors"
+        >
+          <AppIcon name="language" className="text-[16px]" /> View website
+        </a>
         <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 py-2 text-xs font-semibold text-rose-400 hover:bg-rose-500/10 transition-colors">
           <AppIcon name="logout" className="text-[16px]" /> Log out
         </button>

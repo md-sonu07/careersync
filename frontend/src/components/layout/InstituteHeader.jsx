@@ -73,11 +73,13 @@ export default function InstituteHeader({ onMenuClick }) {
         </button>
 
         <div className="flex items-center gap-1.5 sm:gap-2.5 rounded-lg border border-border bg-white p-1 sm:py-2 sm:px-2 shadow-soft shrink-0">
-          <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold shrink-0">{displayName.slice(0, 2).toUpperCase()}</div>
-          <div className="hidden text-left xl:block">
-            <p className="text-xs sm:text-sm font-semibold leading-none text-charcoal truncate max-w-[120px]">{displayName}</p>
-            <p className="text-[10px] sm:text-xs leading-none text-primary font-semibold mt-0.5 truncate max-w-[120px]">Institute</p>
-          </div>
+          <Link to="/institute/dashboard" className="flex items-center gap-1.5 sm:gap-2.5 hover:opacity-80 transition-opacity" title="Go to Dashboard">
+            <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold shrink-0">{displayName.slice(0, 2).toUpperCase()}</div>
+            <div className="hidden text-left xl:block">
+              <p className="text-xs sm:text-sm font-semibold leading-none text-charcoal truncate max-w-[120px]">{displayName}</p>
+              <p className="text-[10px] sm:text-xs leading-none text-primary font-semibold mt-0.5 truncate max-w-[120px]">Institute</p>
+            </div>
+          </Link>
           <button onClick={handleLogout} className="h-7 w-7 items-center justify-center rounded-lg text-muted hover:bg-danger/10 hover:text-danger inline-flex shrink-0" aria-label="Log out"><AppIcon name="logout" className="text-[16px] sm:text-[18px]" /></button>
         </div>
       </div>

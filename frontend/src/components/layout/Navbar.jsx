@@ -173,29 +173,29 @@ const Navbar = () => {
             <div className="hidden @2xl:flex items-center gap-3">
               {isAuthenticated ? (
                 <>
-                  <Link to={getDashboardPath(user?.role)} className="hidden @3xl:inline text-sm font-medium text-charcoal hover:text-primary px-3">
-                    Dashboard
-                  </Link>
-
-                  {/* User Profile Section */}
-                  <div className="flex items-center gap-3 pl-3 border-l border-border/80">
-                    <div className="flex items-center gap-3">
+                  {/* User Profile Section (Clicking opens Dashboard) */}
+                  <div className="flex items-center gap-3">
+                    <Link
+                      to={getDashboardPath(user?.role)}
+                      className="flex items-center gap-3 group cursor-pointer hover:opacity-85 transition-opacity"
+                      title="Go to Dashboard"
+                    >
                       {user?.profile_picture || user?.avatar_url || user?.profile_image ? (
-                        <img src={user.profile_picture || user.avatar_url || user.profile_image} alt="Profile" className="w-9 h-9 rounded-full object-cover border-2 border-primary/20 shadow-sm" />
+                        <img src={user.profile_picture || user.avatar_url || user.profile_image} alt="Profile" className="w-9 h-9 rounded-full object-cover border-2 border-primary/20 shadow-sm group-hover:border-primary transition-colors" />
                       ) : (
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/20 to-emerald-500/20 text-primary flex items-center justify-center font-bold text-sm border border-primary/30 shadow-sm">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/20 to-emerald-500/20 text-primary flex items-center justify-center font-bold text-sm border border-primary/30 shadow-sm group-hover:border-primary transition-colors">
                           {(user?.full_name || user?.name || user?.email || '?').charAt(0).toUpperCase()}
                         </div>
                       )}
                       <div className="hidden @4xl:flex flex-col text-left">
-                        <span className="text-sm font-bold text-charcoal leading-tight max-w-[120px] truncate">
+                        <span className="text-sm font-bold text-charcoal leading-tight max-w-[120px] truncate group-hover:text-primary transition-colors">
                           {user?.full_name || user?.name || 'User'}
                         </span>
                         <span className="text-[10px] uppercase font-semibold tracking-wider text-primary truncate max-w-[120px]">
                           {user?.role || 'Student'}
                         </span>
                       </div>
-                    </div>
+                    </Link>
 
                     <button
                       onClick={handleLogout}
