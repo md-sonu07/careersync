@@ -49,7 +49,7 @@ def generate_learning_recommendations(student: StudentProfile):
                 defaults={
                     'skill': gap.skill,
                     'priority': priority,
-                    'recommended_reason': reason,
+                    'reason': reason,
                 }
             )
             recommendations.append(rec)
@@ -64,7 +64,7 @@ def generate_learning_recommendations(student: StudentProfile):
                 defaults={
                     'skill': res.skill,
                     'priority': RecommendationPriority.LOW,
-                    'recommended_reason': "Explore popular skill modules to expand your profile.",
+                    'reason': "Explore popular skill modules to expand your profile.",
                 }
             )
             recommendations.append(rec)

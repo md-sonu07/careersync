@@ -24,21 +24,13 @@ export default function Internships() {
     Promise.all([
       opportunityApi.getOpportunities({ type: 'internship' }).catch(() => {
         if (isMounted) {
-          toast({
-            title: 'Failed to load internships',
-            description: 'Could not load internship opportunities. Please try again.',
-            variant: 'destructive',
-          })
+          toast.error('Could not load internship opportunities. Please try again.')
         }
         return []
       }),
       applicationApi.getMyApplications().catch(() => {
         if (isMounted) {
-          toast({
-            title: 'Failed to load applications',
-            description: 'Could not load your applications. Please try again.',
-            variant: 'destructive',
-          })
+          toast.error('Could not load your applications. Please try again.')
         }
         return []
       }),
@@ -66,17 +58,9 @@ export default function Internships() {
         cover_letter: 'I am highly interested in applying for this internship opportunity via CareerSync.',
       })
       setAppliedMap((prev) => ({ ...prev, [oppId]: true }))
-      toast({
-        title: 'Application submitted',
-        description: 'Your application has been submitted successfully.',
-        variant: 'success',
-      })
+      toast.success('Your application has been submitted successfully.')
     } catch {
-      toast({
-        title: 'Application failed',
-        description: 'Failed to submit application. Please try again.',
-        variant: 'destructive',
-      })
+      toast.error('Failed to submit application. Please try again.')
     }
   }
 

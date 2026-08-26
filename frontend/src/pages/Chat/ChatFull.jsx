@@ -224,7 +224,8 @@ export default function ChatFull({ isEmbedded = false, onOpenMobileMenu = null }
       const data = await aiAPI.getConversation(conversationId)
       setMessages(data.messages || [])
     } catch {
-      toast.error('Could not load messages. Please try again.')
+      setActiveConversationId(null)
+      toast.error('Could not load messages. Starting a new chat.')
     } finally {
       setIsLoadingMessages(false)
     }
