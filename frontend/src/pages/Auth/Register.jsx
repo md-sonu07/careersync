@@ -6,6 +6,7 @@ import { profileApi } from "../../api/profile.api";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import AppIcon from '../../components/ui/AppIcon';
+import { toast as hotToast } from "react-hot-toast";
 
 const ROLE_TABS = [
   { id: "student", label: "Student", icon: "school" },
@@ -182,8 +183,13 @@ export default function Register() {
       } else {
         const errorData = resultAction.payload;
         if (typeof errorData === "object" && errorData !== null) {
-          setErrors(errorData);
-          const firstErr = Object.values(errorData).flat()[0] || "Registration failed";
+          // Flatten array errors to strings so Inputs don't get arrays
+          const formattedErrs = {};
+          for (const [k, v] of Object.entries(errorData)) {
+            formattedErrs[k] = Array.isArray(v) ? v[0] : v;
+          }
+          setErrors(formattedErrs);
+          const firstErr = Object.values(formattedErrs)[0] || "Registration failed";
           hotToast.error(firstErr);
         } else {
           const msg = errorData || "Registration failed. Please check your info.";
@@ -469,9 +475,9 @@ export default function Register() {
                     I agree to the <a href="#" className="font-medium text-primary hover:underline">Terms</a> and <a href="#" className="font-medium text-primary hover:underline">Privacy Policy</a>
                   </span>
                 </label>
-                {errors.agreed && (
+                {/* {errors.agreed && (
                   <p role="alert" className="mt-1 text-xs font-medium text-danger">{errors.agreed}</p>
-                )}
+                )} */}
               </div>
 
               <Button type="submit" variant="primary" size="lg" className="w-full rounded-xl mt-2" disabled={loading}>

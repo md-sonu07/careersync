@@ -212,11 +212,7 @@ export default function ChatFull({ isEmbedded = false, onOpenMobileMenu = null }
         setActiveConversationId(savedId)
       }
     } catch {
-      toast({
-        title: 'Failed to load conversations',
-        description: 'Could not load conversation history. Please try again.',
-        variant: 'destructive',
-      })
+      toast.error('Could not load conversation history. Please try again.')
     } finally {
       setIsLoadingConversations(false)
     }
@@ -228,11 +224,7 @@ export default function ChatFull({ isEmbedded = false, onOpenMobileMenu = null }
       const data = await aiAPI.getConversation(conversationId)
       setMessages(data.messages || [])
     } catch {
-      toast({
-        title: 'Failed to load messages',
-        description: 'Could not load messages. Please try again.',
-        variant: 'destructive',
-      })
+      toast.error('Could not load messages. Please try again.')
     } finally {
       setIsLoadingMessages(false)
     }
@@ -296,11 +288,7 @@ export default function ChatFull({ isEmbedded = false, onOpenMobileMenu = null }
         fetchConversations()
       }
     } catch {
-      toast({
-        title: 'Failed to send message',
-        description: 'Could not send message. Please try again.',
-        variant: 'destructive',
-      })
+      toast.error('Could not send message. Please try again.')
     } finally {
       setIsSending(false)
     }

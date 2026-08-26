@@ -199,7 +199,7 @@ const Navbar = () => {
 
                     <button
                       onClick={handleLogout}
-                      className="ml-2 w-9 h-9 rounded-xl border border-border flex items-center justify-center text-charcoal/60 hover:text-danger hover:border-danger/30 hover:bg-danger/5 transition-all cursor-pointer"
+                      className="ml-2 w-9 h-9 rounded-md border border-border flex items-center justify-center text-charcoal/60 hover:text-danger hover:border-danger/30 hover:bg-danger/5 transition-all cursor-pointer"
                       title="Log out"
                     >
                       <AppIcon name="logout" className="text-[18px]" />

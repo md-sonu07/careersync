@@ -22,15 +22,6 @@ export default function InstituteHeader({ onMenuClick }) {
         <button onClick={onMenuClick} aria-label="Open navigation" className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl border border-border bg-white text-charcoal shadow-soft hover:bg-background lg:hidden shrink-0">
           <AppIcon name="menu" />
         </button>
-        <div className="hidden lg:flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white font-bold text-sm shadow-sm shrink-0">
-            <AppIcon name="apartment" className="text-[18px]" />
-          </div>
-          <div>
-            <p className="text-sm font-bold leading-none text-charcoal">{displayName}</p>
-            <p className="text-xs text-muted mt-0.5">Institutional Dashboard</p>
-          </div>
-        </div>
       </div>
 
       {/* Center section: Search */}
@@ -67,10 +58,11 @@ export default function InstituteHeader({ onMenuClick }) {
           )}
         </div>
 
-        <button onClick={toggleChat} className="inline-flex items-center gap-2 h-9 px-3 rounded-xl border border-border bg-white text-charcoal text-xs font-semibold hover:bg-background shadow-soft transition-colors shrink-0" title="Chat with AI">
-          <img src="/logo.png" alt="AI" className="w-4 h-4" />
-          <span className="hidden sm:inline">AI Assistant</span>
-        </button>
+        {isDashboard && (
+          <button onClick={toggleChat} className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg border border-border bg-white text-charcoal hover:bg-background shadow-soft shrink-0" title="Chat with AI">
+            <img src="/logo.png" alt="Career AI" className="w-5 h-5 object-contain" />
+          </button>
+        )}
 
         <div className="flex items-center gap-1.5 sm:gap-2.5 rounded-lg border border-border bg-white p-1 sm:py-2 sm:px-2 shadow-soft shrink-0">
           <Link to="/institute/dashboard" className="flex items-center gap-1.5 sm:gap-2.5 hover:opacity-80 transition-opacity" title="Go to Dashboard">
