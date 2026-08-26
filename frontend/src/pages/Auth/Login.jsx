@@ -359,7 +359,7 @@ export default function Login() {
                 <div className="h-px flex-1 bg-border" />
               </div>
 
-              <Button
+              {/* <Button
                 type="button"
                 variant="outline"
                 size="lg"
@@ -368,7 +368,7 @@ export default function Login() {
               >
                 <AppIcon name="google" className="w-[18px] h-[18px]" />
                 Continue with Google
-              </Button>
+              </Button> */}
             </form>
 
             <p className="mt-6 text-center text-sm text-charcoal/70">
