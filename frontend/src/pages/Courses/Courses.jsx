@@ -271,7 +271,7 @@ export default function Courses() {
           </div>
         ) : paginated.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 @xl:grid-cols-2 @2xl:grid-cols-3 gap-6 @3xl:gap-8 ">
               {paginated.map((c) => (
                 <ModernCourseCard key={c.id} course={c} />
               ))}
